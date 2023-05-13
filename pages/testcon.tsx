@@ -5,6 +5,9 @@ import {
   ListItemText,
   Typography,
   ListSubheader,
+  ListItemAvatar,
+  Avatar,
+  FolderIcon,
 } from "@mui/material";
 
 function ConversationPage() {
@@ -52,7 +55,6 @@ function ConversationPage() {
               message.sender === "John" ? "text-left" : "text-right"
             }`}
           />
-          <div>adsf</div>
         </ListItem>
       ))}
     </List>
