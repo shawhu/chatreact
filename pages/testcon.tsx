@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   List,
   ListItem,
@@ -11,25 +11,19 @@ import {
 import FolderIcon from "@mui/icons-material/Folder";
 
 function ConversationPage() {
-  const messages = [
-    { sender: "John", text: "Hello Mary, how are you?" },
-    { sender: "Mary", text: "Hey John, I'm doing well. How about you?" },
-    { sender: "John", text: "I'm good, <strong>thanks</strong> for asking." },
-    { sender: "Mary", text: "What have you been up to lately?" },
-    {
-      sender: "John",
-      text: "Not much, just hanging out with friends. How about you?",
-    },
-    {
-      sender: "Mary",
-      text: "I had a busy week with work, but looking forward to the weekend. I had a busy week with work, but looking forward to the weekend. I had a busy week with work, but looking forward to the weekend.",
-    },
-    {
-      sender: "Mary",
-      text: "Me too! Let's catch up then.",
-    },
-    // Add more message objects here as needed
-  ];
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    // Fetch messages from your Next.js API endpoint
+    fetch("/api/messages")
+      .then((response) => response.json())
+      .then((data) => {
+        setMessages(data); // Update state with fetched messages
+      })
+      .catch((error) => {
+        console.error("Error fetching messages:", error);
+      });
+  }, []);
 
   return (
     <List>
