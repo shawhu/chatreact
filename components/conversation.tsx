@@ -12,6 +12,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import { Configuration, OpenAIApi } from "openai";
 import { createParser } from "eventsource-parser";
 import { Session, Message, SessionManager } from "@/common/session";
+import MyMessageBlock from "@/components/mymessageblock";
 
 function Conversation({ className, prompt, config }) {
   const target_bottomRef = useRef(null);
@@ -100,17 +101,10 @@ function Conversation({ className, prompt, config }) {
       if (text !== undefined) {
         temptext += text;
         console.log(`temptext:${temptext}`);
-        //using regex to replace ```
-        var processed = temptext
-          .replace(
-            /```\s?([\s\S]*?)\s?```/g, //\s is whitespace including \n, \S is character
-            `<br><pre style="background-color: black; color: white;"><code>$1</code></pre>`
-          )
-          .replace(/\n/g, "<br>")
-          .replace(/by OpenAI/g, "by Harry Xiao [萧和]");
+
         setMessages((mmm) => {
           const newmessages = [...mmm];
-          newmessages[newmessages.length - 1].content = processed;
+          newmessages[newmessages.length - 1].content = temptext;
           SessionManager.currentSession.messages = newmessages;
           return newmessages;
         });
@@ -154,7 +148,7 @@ function Conversation({ className, prompt, config }) {
           <div className="w-3 h-3"></div>
           <ListItemText
             primary={
-              <div dangerouslySetInnerHTML={{ __html: message.content }} />
+              <MyMessageBlock rawtext={message.content}></MyMessageBlock>
             }
             secondary={message.role + " 8:13 AM"}
             className={`rounded-t-xl p-4 flex-1 ${
