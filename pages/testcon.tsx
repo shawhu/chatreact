@@ -12,7 +12,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 
 function ConversationPage() {
   const [messages, setMessages] = useState([]);
-
+  console.log("testcon start");
   useEffect(() => {
     // Fetch messages from your Next.js API endpoint
     fetch("/api/messages")

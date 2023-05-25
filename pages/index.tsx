@@ -2,10 +2,8 @@ import * as React from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MenuIcon from "@mui/icons-material/Menu";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import { Menu as MenuIcon, Mail as MailIcon } from "@mui/icons-material";
+import MuiAppBar, { AppBarProps } from "@mui/material/AppBar";
 import {
   Box,
   Drawer,
@@ -23,11 +21,15 @@ import {
   Button,
 } from "@mui/material";
 import DialogConfig from "../components/DialogConfig";
+import { GetOpenAIConfig } from "../components/DialogConfig";
+
 import TestComponent from "../components/testcomponent";
 import Conversation from "../components/conversation";
+import SessionList from "../components/sessionlist";
+import { Session, Message, SessionManager } from "@/common/session";
 
 const drawerWidth = 200;
-
+console.log("main app started");
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
@@ -47,7 +49,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   }),
 }));
 
-interface AppBarProps extends MuiAppBarProps {
+interface AppBarProps extends AppBarProps {
   open?: boolean;
 }
 
@@ -83,8 +85,19 @@ export default function PersistentDrawerLeft() {
   const [openDialogConfig, setOpenDialogConfig] = React.useState(false);
 
   //chat related
-  const [message, setMessage] = React.useState("");
-  const [prompt, setPrompt] = React.useState("");
+  const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
+  //这是用来传给conversation控件处理，发送后message会变空，prompt会变成message内容
+  const [prompt, setPrompt] = React.useState(""); //处理完成后prompt会变空
+  const [openaiconfig, setOpenaiconfig] = React.useState({});
+  React.useEffect(() => {
+    // call the GetOpenAIKey function to get the API key
+    async function fetchKeyAsync() {
+      const config1 = await GetOpenAIConfig();
+      //console.log(config1);
+      setOpenaiconfig(config1);
+    }
+    fetchKeyAsync();
+  }, []);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -136,20 +149,7 @@ export default function PersistentDrawerLeft() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List>
-          {["Session1", "Session2", "Session3", "Session4"].map(
-            (text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <InboxIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            )
-          )}
-        </List>
+        <SessionList />
         <Divider />
         <List>
           <ListItem disablePadding>
@@ -185,8 +185,12 @@ export default function PersistentDrawerLeft() {
       />
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
-        {/*this is the main chat area*/}
-        <Conversation prompt={prompt} className="flex-1 bg-yellow-50" />
+        {/*this is the main chat area                       control chat window               control chat window*/}
+        <Conversation
+          prompt={prompt}
+          config={openaiconfig}
+          className="flex-1 bg-yellow-50"
+        />
         {/*this is the input area with buttons*/}
         <Box className="w-full min-h-[130px] flex">
           <TextField
@@ -222,7 +226,20 @@ export default function PersistentDrawerLeft() {
             </Button>
             <Button variant="outlined">ReGen</Button>
             <Button variant="outlined">Rewind</Button>
-            <Button variant="outlined">Config</Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                console.log("TEST clicked");
+                console.log(
+                  `sessionmanager current sessions: ${JSON.stringify(
+                    SessionManager.currentSession
+                  )}`
+                );
+                //test to get current session info
+              }}
+            >
+              TEST
+            </Button>
           </Box>
         </Box>
       </Main>
