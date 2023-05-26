@@ -10,22 +10,26 @@ import {
   Typography,
   List,
   ListItem,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 
 let openkey = "";
-let maxtokenr = "";
-let maxtokenc = "";
+let maxtokenr = -1;
+let maxtokenc = -1;
+let usectrlenter = false;
 let myResolve;
 
-export function GetOpenAIConfig(): Promise<{
+export function GetConfig(): Promise<{
   openaikey: string;
-  maxtokenreply: string;
-  maxtokencontext: string;
+  maxtokenreply: number;
+  maxtokencontext: number;
+  ctrlenter: boolean;
 }> {
   return new Promise((resolve) => {
     // if the key is not empty, resolve immediately
-    if (openkey !== "" && maxtokenr != "" && maxtokenc != "") {
-      resolve({ openkey, maxtokenr, maxtokenc });
+    if (openkey != "" && maxtokenr != -1 && maxtokenc != -1) {
+      resolve({ openkey, maxtokenr, maxtokenc, usectrlenter });
     } else {
       // store the resolve function to call it later
       myResolve = resolve;
@@ -33,10 +37,11 @@ export function GetOpenAIConfig(): Promise<{
   });
 }
 
-function DialogConfig({ open, handleClose }) {
-  const [openaiKey, setOpenaiKey] = React.useState("");
-  const [maxtokencontext, setMaxtokencontext] = React.useState("");
-  const [maxtokenreply, setMaxtokenreply] = React.useState("");
+function DialogConfig({ open, handleClose, indexpageconfig }) {
+  const [openaikey, setOpenaikey] = React.useState("");
+  const [maxtokencontext, setMaxtokencontext] = React.useState(-1);
+  const [maxtokenreply, setMaxtokenreply] = React.useState(-1);
+  const [ctrlenter, setCtrlenter] = React.useState(false);
   const [version, setVersion] = React.useState("");
 
   React.useEffect(() => {
@@ -44,18 +49,25 @@ function DialogConfig({ open, handleClose }) {
       try {
         const response = await fetch("/api/getconfig");
         const configData = await response.json();
-        const { openaikey, version, maxtokencontext, maxtokenreply } =
-          JSON.parse(configData);
-        setOpenaiKey(openaikey);
+        const {
+          openaikey,
+          version,
+          maxtokencontext,
+          maxtokenreply,
+          ctrlenter,
+        } = JSON.parse(configData);
+        setOpenaikey(openaikey);
         setVersion(version);
         setMaxtokencontext(maxtokencontext);
         setMaxtokenreply(maxtokenreply);
+        setCtrlenter(ctrlenter);
         openkey = openaikey;
         maxtokenr = maxtokenreply;
         maxtokenc = maxtokencontext;
+        usectrlenter = ctrlenter;
         // if the resolve function is defined, call it with the new value
         if (myResolve) {
-          myResolve({ openkey, maxtokenr, maxtokenc });
+          myResolve({ openkey, maxtokenr, maxtokenc, usectrlenter });
         }
         // console.log(
         //   `openaikey read from json: ${openaikey} version:${version}`
@@ -66,9 +78,6 @@ function DialogConfig({ open, handleClose }) {
     };
     fetchConfigData();
   }, []);
-  const handleChange = (event) => {
-    setOpenaiKey(event.target.value);
-  };
   const handleSave = async () => {
     try {
       const response = await fetch("/api/saveconfig", {
@@ -76,8 +85,14 @@ function DialogConfig({ open, handleClose }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ openaikey: openaiKey, version: version }),
+        body: JSON.stringify({
+          openaikey,
+          ctrlenter,
+          maxtokencontext,
+          maxtokenreply,
+        }),
       });
+      indexpageconfig({ openkey, maxtokenr, maxtokenc, usectrlenter });
       handleClose();
     } catch (error) {
       console.log("server error");
@@ -99,18 +114,63 @@ function DialogConfig({ open, handleClose }) {
             type="text"
             fullWidth
             variant="standard"
-            value={openaiKey}
-            onChange={handleChange}
+            value={openaikey}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setOpenaikey(event.target.value);
+              openkey = event.target.value;
+            }}
+          />
+        </ListItem>
+        <ListItem>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={ctrlenter}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setCtrlenter(event.target.checked);
+                  usectrlenter = event.target.checked;
+                }}
+              />
+            }
+            label="Use Ctrl + Enter to submit"
           />
         </ListItem>
         <ListItem>
           <Typography variant="caption">
-            MaxTokenContext: {maxtokencontext}
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="MaxTokenContext"
+              label="MaxTokenContext"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={maxtokencontext}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setMaxtokencontext(event.target.value);
+                maxtokenc = event.target.value;
+              }}
+            />
           </Typography>
         </ListItem>
         <ListItem>
           <Typography variant="caption">
-            MaxTokenReply: {maxtokenreply}
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="MaxTokenReply"
+              label="MaxTokenReply"
+              type="number"
+              fullWidth
+              variant="standard"
+              value={maxtokenreply}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setMaxtokenreply(event.target.value);
+                maxtokenr = event.target.value;
+              }}
+            />
           </Typography>
         </ListItem>
         <ListItem>

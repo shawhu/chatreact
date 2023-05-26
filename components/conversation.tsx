@@ -12,11 +12,14 @@ import FolderIcon from "@mui/icons-material/Folder";
 import { Configuration, OpenAIApi } from "openai";
 import { createParser } from "eventsource-parser";
 import { Session, Message, SessionManager } from "@/common/session";
+import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
 
 function Conversation({ className, prompt, config }) {
   const target_bottomRef = useRef(null);
   const [messages, setMessages] = useState([]);
+  const [toastopen, setToastopen] = React.useState(false);
+  const [toastmessage, setToastmessage] = React.useState("");
   //this loads session history
   useEffect(() => {
     const trigger = () => {
@@ -54,9 +57,8 @@ function Conversation({ className, prompt, config }) {
       { role: "user", content: prompt },
       { role: "assistant", content: "Thinking..." },
     ];
-    SessionManager.currentSession.messages = newmessages;
     setMessages(newmessages);
-
+    SessionManager.currentSession.messages = newmessages;
     // abort signal for fetch
     const controller = new AbortController();
     const cancel = () => {
@@ -67,6 +69,20 @@ function Conversation({ className, prompt, config }) {
     //actual calling api to get a response stream
     const host = "https://api.openai.com";
     console.log(`${config.openkey} ${config.maxtokenr}`);
+    //before calling api, do a sanity check
+    //last one is assistant placeholder message
+    //this will check the 2nd to last message to see if it's from the user
+    if (SessionManager.currentSession.messages.slice(-2)[0].role != "user") {
+      //this is an error, the last message should the one sent from the user
+      console.log(
+        "error, the role of the last message is assistant. stop the processing"
+      );
+      setToastmessage(
+        "error, the role of the last message is assistant. stop the processing"
+      );
+      setToastopen(true);
+      return;
+    }
     const response = await fetch(`${host}/v1/chat/completions`, {
       method: "POST",
       headers: {
@@ -74,13 +90,14 @@ function Conversation({ className, prompt, config }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        messages: SessionManager.currentSession.messages,
+        messages: SessionManager.currentSession.messages.slice(0, -1),
         model: "gpt-3.5-turbo",
         max_tokens: config.maxtokenr,
         stream: true,
       }),
       signal: controller.signal,
     });
+
     let temptext = "";
 
     await handleSSE(response, (message) => {
@@ -114,68 +131,79 @@ function Conversation({ className, prompt, config }) {
   };
 
   return (
-    <List className={`${className} w-full overflow-auto min-h-[40vh] pb-10`}>
-      <ListSubheader
-        className="font-bold text-2xl "
-        onClick={() => {
-          console.log(`conversatoin header clicked`);
-          console.log(`${JSON.stringify(messages)}`);
-        }}
-      >
-        这里是conversaion
-      </ListSubheader>
-      {messages.map((message, index) => (
-        <ListItem
-          key={index}
-          alignItems="flex-start"
-          className={`flex justify-start ${
-            (message.role === "assistant") | (message.role === "system")
-              ? "flex-row "
-              : "flex-row-reverse"
-          }`}
+    <>
+      <List className={`${className} w-full overflow-auto min-h-[40vh] pb-10`}>
+        <ListSubheader
+          className="font-bold text-2xl "
+          onClick={() => {
+            console.log(`conversatoin header clicked`);
+            console.log(`${JSON.stringify(messages)}`);
+          }}
         >
-          <ListItemAvatar className="flex justify-center">
-            <Avatar
-              className="w-20 h-20"
-              alt="Remy Sharp"
-              src={`${
+          这里是conversaion
+        </ListSubheader>
+        {messages.map((message, index) => (
+          <ListItem
+            key={index}
+            alignItems="flex-start"
+            className={`flex justify-start ${
+              (message.role === "assistant") | (message.role === "system")
+                ? "flex-row "
+                : "flex-row-reverse"
+            }`}
+          >
+            <ListItemAvatar className="flex justify-center">
+              <Avatar
+                className="w-20 h-20"
+                alt="Remy Sharp"
+                src={`${
+                  (message.role === "assistant") | (message.role === "system")
+                    ? "/headshots/pure/00033-3165699849.jpg"
+                    : ""
+                }`}
+              />
+            </ListItemAvatar>
+            <div className="w-3 h-3"></div>
+            <ListItemText
+              primary={
+                <MyMessageBlock rawtext={message.content}></MyMessageBlock>
+              }
+              secondary={message.role + " 8:13 AM"}
+              className={`rounded-t-xl p-4 flex-1 ${
                 (message.role === "assistant") | (message.role === "system")
-                  ? "/headshots/pure/00033-3165699849.jpg"
-                  : ""
-              }`}
-            />
-          </ListItemAvatar>
-          <div className="w-3 h-3"></div>
-          <ListItemText
-            primary={
-              <MyMessageBlock rawtext={message.content}></MyMessageBlock>
-            }
-            secondary={message.role + " 8:13 AM"}
-            className={`rounded-t-xl p-4 flex-1 ${
-              (message.role === "assistant") | (message.role === "system")
-                ? "rounded-br-xl"
-                : "rounded-bl-xl"
-            } ${
-              (message.role === "assistant") | (message.role === "system")
-                ? "bg-blue-100"
-                : "bg-green-50"
-            }
+                  ? "rounded-br-xl"
+                  : "rounded-bl-xl"
+              } ${
+                (message.role === "assistant") | (message.role === "system")
+                  ? "bg-blue-100"
+                  : "bg-green-50"
+              }
             ${
               (message.role === "assistant") | (message.role === "system")
                 ? "text-black"
                 : "text-black"
             } ${
-              (message.role === "assistant") | (message.role === "system")
-                ? "text-left"
-                : "text-right"
-            }`}
-          />
+                (message.role === "assistant") | (message.role === "system")
+                  ? "text-left"
+                  : "text-right"
+              }`}
+            />
+          </ListItem>
+        ))}
+        <ListItem ref={target_bottomRef} className="text-yellow-50">
+          thebottom
         </ListItem>
-      ))}
-      <ListItem ref={target_bottomRef} className="text-yellow-50">
-        thebottom
-      </ListItem>
-    </List>
+      </List>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={toastopen}
+        autoHideDuration={1000}
+        message={toastmessage}
+        onClose={() => {
+          setToastopen(false);
+        }}
+      />
+    </>
   );
 }
 
@@ -186,19 +214,20 @@ export async function handleSSE(
 ) {
   if (!response.ok) {
     const error = await response.json().catch(() => null);
-    throw new Error(
+    console.log(
       error
         ? JSON.stringify(error)
         : `${response.status} ${response.statusText}`
     );
+    return;
   }
   if (response.status !== 200) {
-    throw new Error(
-      `Error from OpenAI: ${response.status} ${response.statusText}`
-    );
+    console.log(`Error from OpenAI: ${response.status} ${response.statusText}`);
+    return;
   }
   if (!response.body) {
-    throw new Error("No response body");
+    console.log("No response body");
+    return;
   }
   const parser = createParser((event) => {
     if (event.type === "event") {

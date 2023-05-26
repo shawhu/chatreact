@@ -21,7 +21,7 @@ import {
   Button,
 } from "@mui/material";
 import DialogConfig from "../components/DialogConfig";
-import { GetOpenAIConfig } from "../components/DialogConfig";
+import { GetConfig } from "../components/DialogConfig";
 
 import TestComponent from "../components/testcomponent";
 import Conversation from "../components/conversation";
@@ -82,19 +82,19 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false); //this is to control sidebar open by default
-  const [openDialogConfig, setOpenDialogConfig] = React.useState(false);
+  const [openDialogConfig, setOpenDialogConfig] = React.useState(false); //control config dialog to show
 
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
   //这是用来传给conversation控件处理，发送后message会变空，prompt会变成message内容
   const [prompt, setPrompt] = React.useState(""); //处理完成后prompt会变空
-  const [openaiconfig, setOpenaiconfig] = React.useState({});
+  const [myconfig, setMyconfig] = React.useState({});
   React.useEffect(() => {
-    // call the GetOpenAIKey function to get the API key
+    // call the GetConfig function to get the API key and other configs
     async function fetchKeyAsync() {
-      const config1 = await GetOpenAIConfig();
+      const config1 = await GetConfig();
       //console.log(config1);
-      setOpenaiconfig(config1);
+      setMyconfig(config1);
     }
     fetchKeyAsync();
   }, []);
@@ -107,6 +107,11 @@ export default function PersistentDrawerLeft() {
     setOpen(false);
   };
 
+  const ChangeIndexPageConfig = (config) => {
+    console.log("got config callback from dialogconfig");
+    console.log(config);
+    setMyconfig(config);
+  };
   return (
     <Box className="flex">
       <CssBaseline />
@@ -182,13 +187,14 @@ export default function PersistentDrawerLeft() {
       <DialogConfig
         open={openDialogConfig}
         handleClose={() => setOpenDialogConfig(false)}
+        indexpageconfig={ChangeIndexPageConfig}
       />
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}
         <Conversation
           prompt={prompt}
-          config={openaiconfig}
+          config={myconfig}
           className="flex-1 bg-yellow-50"
         />
         {/*this is the input area with buttons*/}
@@ -198,14 +204,18 @@ export default function PersistentDrawerLeft() {
             multiline
             minRows="4"
             id="outlined-basic"
-            label="Your Prompt here"
+            label={`Your prompt goes here. Press [${
+              myconfig.usectrlenter ? "Ctrl+Enter" : "Enter"
+            }] to submit`}
             variant="outlined"
             value={message}
             onChange={(e) => {
               setMessage(e.target.value);
             }}
             onKeyDown={(e) => {
-              if (e.keyCode == 13 && e.ctrlKey) {
+              if (e.keyCode == 13 && (e.ctrlKey || !myconfig.usectrlenter)) {
+                console.log(`usectrlenter: ${myconfig.usectrlenter}`);
+                e.preventDefault();
                 setPrompt(message);
                 setMessage("");
               }
