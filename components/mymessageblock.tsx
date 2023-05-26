@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import IconButton from "@mui/material/IconButton";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import Snackbar from "@mui/material/Snackbar";
+
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {
   docco,
@@ -12,6 +16,7 @@ import {
 //this is the actual block that display the content returned by AI LLM
 export default function MyMessageBlock({ rawtext }) {
   const [displaytexts, setDisplaytexts] = useState([]);
+  const [toastopen, setToastopen] = React.useState(false);
   useEffect(() => {
     //using regex to replace ```
     const regex = /```([^`]+?)```|```([^`]+?)$/g;
@@ -37,8 +42,8 @@ export default function MyMessageBlock({ rawtext }) {
         //processing codeblock to get first line and the rest
         const codelines = codeblocks[i - 1].split("\n");
         const language = codelines[0];
-        //const actualcode = codelines.slice(1).join("\n"); //this removes the 1st line
-        const actualcode = codelines.join("\n"); //this wont
+        const actualcode = codelines.slice(1).join("\n"); //this removes the 1st line
+        //const actualcode = codelines.join("\n"); //this wont
         tempdisplaytexts.push({
           type: "code",
           content: actualcode,
@@ -58,12 +63,41 @@ export default function MyMessageBlock({ rawtext }) {
     <div>
       {displaytexts.map((displaytext, index) =>
         displaytext.type == "code" ? (
-          <SyntaxHighlighter
-            language={displaytext.language}
-            style={atomOneDarkReasonable}
-          >
-            {displaytext.content}
-          </SyntaxHighlighter>
+          <div className="flex flex-col ">
+            {/*this's code block toolbar*/}
+            <div className="flex flex-row justify-between bg-black text-white">
+              <div>{`${displaytext.language.toUpperCase()}`}</div>
+              <IconButton
+                id="copytoclipboard"
+                color="primary"
+                aria-label="copy to clipboard"
+                onClick={() => {
+                  console.log(`copytoclipboard triggered`);
+                  navigator.clipboard.writeText(displaytext.content);
+                  setToastopen(true);
+                }}
+              >
+                <ContentCopyIcon color="primary" fontSize="small" />
+              </IconButton>
+              <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                open={toastopen}
+                autoHideDuration={1000}
+                message="Copied to the clipboard"
+                onClose={() => {
+                  setToastopen(false);
+                }}
+              />
+            </div>
+            {/*end of code block toolbar*/}
+            <SyntaxHighlighter
+              language={displaytext.language}
+              style={atomOneDarkReasonable}
+              customStyle={{ margin: 0 }}
+            >
+              {displaytext.content}
+            </SyntaxHighlighter>
+          </div>
         ) : (
           <div
             key={index}
