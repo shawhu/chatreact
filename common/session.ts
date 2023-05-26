@@ -1,6 +1,7 @@
 export class Message {
   role: "user" | "assistant" | "system";
-  content: string;
+  content: string = "";
+  timestamp: number = "";
 }
 export class Session {
   sessionId: string = "";
@@ -8,6 +9,8 @@ export class Session {
   messages: Message[] = [];
   model: string = "";
   maxToken: number = 0;
+  aiheadshotimg: string = "";
+  username: string = "";
 }
 export class SessionManager {
   public static sessions: Session[] = [
@@ -24,7 +27,7 @@ export class SessionManager {
         },
         {
           role: "assistant",
-          content: "Hello, I'm an AI, nice to meet you. How may I help you?",
+          content: "Hello, I'm an AI, nice to meet you. How can I help you?",
         },
       ],
     },
@@ -87,4 +90,5 @@ export class SessionManager {
       );
     }
   }
+  public static SaveSessionToJson(session: Session) {}
 }
