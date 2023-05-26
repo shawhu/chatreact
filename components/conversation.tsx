@@ -172,7 +172,9 @@ function Conversation({ className, prompt, config }) {
           />
         </ListItem>
       ))}
-      <ListItem ref={target_bottomRef}>thebottom</ListItem>
+      <ListItem ref={target_bottomRef} className="text-yellow-50">
+        thebottom
+      </ListItem>
     </List>
   );
 }
