@@ -65,8 +65,8 @@ export default function MyMessageBlock({ rawtext }) {
         displaytext.type == "code" ? (
           <div className="flex flex-col ">
             {/*this's code block toolbar*/}
-            <div className="flex flex-row justify-between bg-black text-white">
-              <div>{`${displaytext.language.toUpperCase()}`}</div>
+            <div className="flex flex-row justify-between bg-black text-white rounded-tl-lg rounded-tr-lg pl-2">
+              <span className="pt-1">{`${displaytext.language.toUpperCase()}`}</span>
               <IconButton
                 id="copytoclipboard"
                 color="primary"

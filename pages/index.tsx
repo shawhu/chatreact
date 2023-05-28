@@ -2,6 +2,7 @@ import * as React from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CloseIcon from "@mui/icons-material/Close";
 import { Menu as MenuIcon, Mail as MailIcon } from "@mui/icons-material";
 import MuiAppBar, { AppBarProps } from "@mui/material/AppBar";
 import {
@@ -19,6 +20,10 @@ import {
   CssBaseline,
   TextField,
   Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
 } from "@mui/material";
 import DialogConfig from "../components/DialogConfig";
 import { GetConfig } from "../components/DialogConfig";
@@ -81,8 +86,10 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false); //this is to control sidebar open by default
+  const [open, setOpen] = React.useState(true); //this is to control sidebar open by default
   const [openDialogConfig, setOpenDialogConfig] = React.useState(false); //control config dialog to show
+  const [opendialog, setOpendialog] = React.useState(false);
+  const [dialogMessage, setDialogMessage] = React.useState("");
 
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
@@ -105,6 +112,9 @@ export default function PersistentDrawerLeft() {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+  const handleClose = () => {
+    setOpendialog(false);
   };
 
   const ChangeIndexPageConfig = (config) => {
@@ -160,26 +170,26 @@ export default function PersistentDrawerLeft() {
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                console.log("登录 clicked");
+                console.log("Login clicked");
               }}
             >
               <ListItemIcon>
                 <MailIcon />
               </ListItemIcon>
-              <ListItemText primary={"登录"} />
+              <ListItemText primary={"Login"} />
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
-                console.log("设置 clicked");
+                console.log("Config clicked");
                 setOpenDialogConfig(true);
               }}
             >
               <ListItemIcon>
                 <MailIcon />
               </ListItemIcon>
-              <ListItemText primary={"设置"} />
+              <ListItemText primary={"Config"} />
             </ListItemButton>
           </ListItem>
         </List>
@@ -206,7 +216,7 @@ export default function PersistentDrawerLeft() {
             id="outlined-basic"
             label={`Your prompt goes here. Press [${
               myconfig.usectrlenter ? "Ctrl+Enter" : "Enter"
-            }] to submit`}
+            }] to submit. Set in config`}
             variant="outlined"
             value={message}
             onChange={(e) => {
@@ -235,28 +245,61 @@ export default function PersistentDrawerLeft() {
               Gen
             </Button>
             <Button variant="outlined">ReGen</Button>
-            <Button variant="outlined">Rewind</Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setDialogMessage(
+                  "Do you want to delete all messages from this session?"
+                );
+                setOpendialog(true);
+              }}
+            >
+              Delete All
+            </Button>
             <Button
               variant="outlined"
               onClick={async () => {
                 console.log("TEST clicked");
-                console.log(
-                  `sessionmanager current sessions: ${JSON.stringify(
-                    SessionManager.currentSession
-                  )}`
-                );
-                const ss = await SessionManager.LoadSessionFromJson(
-                  "e7b2120a-663b-4024-9504-2397c99736fa"
-                );
-                console.log(ss);
-                const sessions = await SessionManager.ReloadAndGetAllSessions();
-                console.log(sessions);
+                // console.log(
+                //   `sessionmanager current sessions: ${JSON.stringify(
+                //     SessionManager.currentSession
+                //   )}`
+                // );
+                // const ss = await SessionManager.LoadSessionFromJson(
+                //   "e7b2120a-663b-4024-9504-2397c99736fa"
+                // );
+                // console.log(ss);
+                // const sessions = await SessionManager.ReloadAndGetAllSessions();
+                // console.log(sessions);
+
+                const aaa = [1, 2, 3, 4, 5, 6, 7];
+                let fable = aaa.splice(2);
+                console.log(fable);
               }}
             >
               TEST
             </Button>
           </Box>
         </Box>
+        <Dialog open={opendialog} onClose={handleClose}>
+          <DialogTitle>Clean up</DialogTitle>
+          <DialogContent>{dialogMessage}</DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button
+              onClick={async () => {
+                SessionManager.ResetSessionToOriginal(
+                  SessionManager.currentSession
+                );
+                console.log("delete all executed.");
+                setOpendialog(false);
+              }}
+              autoFocus
+            >
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Main>
     </Box>
   );

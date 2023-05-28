@@ -142,9 +142,7 @@ function Conversation({ className, prompt, config }) {
             console.log(`conversatoin header clicked`);
             console.log(`${JSON.stringify(messages)}`);
           }}
-        >
-          这里是conversaion
-        </ListSubheader>
+        ></ListSubheader>
         {messages.map((message, index) => (
           <ListItem
             key={index}

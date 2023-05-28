@@ -92,4 +92,17 @@ export class SessionManager {
       console.error(error);
     }
   }
+  public static async ResetSessionToOriginal(session: Session) {
+    if (session) {
+      //clean up
+      session.messages = session.messages.slice(0, 2);
+      //save to json
+      await SessionManager.SaveSessionToJson(session);
+      if (SessionManager.listnercallback) {
+        SessionManager.listnercallback(); //trigger any component using session manager to re-render
+      } else {
+        console.error("listnercallback is undefined, can't call");
+      }
+    }
+  }
 }
