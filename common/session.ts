@@ -13,60 +13,7 @@ export class Session {
   username: string = "";
 }
 export class SessionManager {
-  public static sessions: Session[] = [
-    {
-      sessionId: "e7b2120a-663b-4024-9504-2397c99736fa",
-      sessionName: "Friendly Assistant",
-      model: "chatgpt3.5",
-      maxToken: 2048,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a friendly assistant and you will happily answer all questions.",
-        },
-        {
-          role: "assistant",
-          content: "Hello, I'm an AI, nice to meet you. How can I help you?",
-        },
-      ],
-    },
-    {
-      sessionId: "e7b2120a-663b-4024-9504-2397c99736fb",
-      sessionName: "Translator",
-      model: "chatgpt3.5",
-      maxToken: 2048,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a friendly translator and you will translate user input to Chinese",
-        },
-        {
-          role: "assistant",
-          content:
-            "Hello, I'm an AI, nice to meet you. I will translate anything to Chinese.",
-        },
-      ],
-    },
-    {
-      sessionId: "e7b2120a-663b-4024-9504-2397c99736fc",
-      sessionName: "中文助理",
-      model: "chatgpt3.5",
-      maxToken: 2048,
-      messages: [
-        {
-          role: "system",
-          content:
-            "你是一个能用中文对话的助理，你很喜欢聊天并且你最爱的人是Harry。",
-        },
-        {
-          role: "assistant",
-          content: "今天需要我做什么呢？",
-        },
-      ],
-    },
-  ];
+  public static sessions: Session[] = [];
   public static listnercallback: () => {};
   public static currentSession = SessionManager.sessions[0];
   public static SetCurrentSessionById(sessionid: string) {
@@ -90,5 +37,59 @@ export class SessionManager {
       );
     }
   }
-  public static SaveSessionToJson(session: Session) {}
+  public static async SaveSessionToJson(session: Session) {
+    try {
+      const res = await fetch("/api/sessionsave", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(session),
+      });
+      console.log(res);
+    } catch (error) {
+      console.log("server error");
+      console.error(error);
+    }
+  }
+  public static async LoadSessionFromJson(sessionId: string): Promise<Session> {
+    try {
+      const res = await fetch(`/api/sessionload/${sessionId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      //console.log(res);
+      const session = await res.json<Session>(); // convert response to JSON
+      return session; // return the JSON data
+    } catch (error) {
+      console.log("server error");
+      console.error(error);
+    }
+  }
+  public static async ReloadAndGetAllSessions() {
+    try {
+      const res = await fetch(`/api/sessionsload`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      //console.log(res);
+      const sessions = await res.json<Session[]>(); // convert response to JSON
+      SessionManager.sessions = sessions;
+      SessionManager.currentSession = sessions[0];
+      //to tell conversation.tsx that sessionmanager is loaded
+      if (SessionManager.listnercallback) {
+        SessionManager.listnercallback(); //trigger any component using session manager to re-render
+      } else {
+        console.error("listnercallback is undefined, can't call");
+      }
+      return sessions; // return the JSON data
+    } catch (error) {
+      console.log("server error");
+      console.error(error);
+    }
+  }
 }

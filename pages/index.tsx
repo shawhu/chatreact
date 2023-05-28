@@ -238,14 +238,19 @@ export default function PersistentDrawerLeft() {
             <Button variant="outlined">Rewind</Button>
             <Button
               variant="outlined"
-              onClick={() => {
+              onClick={async () => {
                 console.log("TEST clicked");
                 console.log(
                   `sessionmanager current sessions: ${JSON.stringify(
                     SessionManager.currentSession
                   )}`
                 );
-                //test to get current session info
+                const ss = await SessionManager.LoadSessionFromJson(
+                  "e7b2120a-663b-4024-9504-2397c99736fa"
+                );
+                console.log(ss);
+                const sessions = await SessionManager.ReloadAndGetAllSessions();
+                console.log(sessions);
               }}
             >
               TEST

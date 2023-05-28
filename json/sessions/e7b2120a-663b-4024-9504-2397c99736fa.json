@@ -1,0 +1,40 @@
+{
+  "sessionId": "e7b2120a-663b-4024-9504-2397c99736fa",
+  "sessionName": "Friendly Assistant",
+  "model": "chatgpt3.5",
+  "maxToken": 2048,
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a friendly assistant and you will happily answer all questions."
+    },
+    {
+      "role": "assistant",
+      "content": "Hello, I'm an AI, nice to meet you. How can I help you?"
+    },
+    {
+      "role": "user",
+      "content": "hello"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! How can I help you today?"
+    },
+    {
+      "role": "user",
+      "content": "who are you?"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm an AI language model designed to help assist with tasks and answer questions. You can ask me anything you want and I'll do my best to provide a helpful response."
+    },
+    {
+      "role": "user",
+      "content": "what can you do?"
+    },
+    {
+      "role": "assistant",
+      "content": "I can do a wide range of things! Some of the things I can do include:\n\n- Answering questions\n- Providing information on a wide variety of topics\n- Offering technical support\n- Providing language translations\n- Conducting internet searches\n- Setting alarms and reminders\n- Generating text content\n- And much more!\n\nLet me know if there's anything specific you'd like help with and I'll do my best to assist you!"
+    }
+  ]
+}

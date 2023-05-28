@@ -27,7 +27,7 @@ function Conversation({ className, prompt, config }) {
       setMessages(SessionManager.currentSession.messages);
     };
     SessionManager.listnercallback = trigger;
-    trigger();
+    //trigger();
   });
   //this handle prompt change, prompt is a prop
   useEffect(() => {
@@ -59,6 +59,7 @@ function Conversation({ className, prompt, config }) {
     ];
     setMessages(newmessages);
     SessionManager.currentSession.messages = newmessages;
+    SessionManager.SaveSessionToJson(SessionManager.currentSession);
     // abort signal for fetch
     const controller = new AbortController();
     const cancel = () => {
@@ -102,6 +103,8 @@ function Conversation({ className, prompt, config }) {
 
     await handleSSE(response, (message) => {
       if (message === "[DONE]") {
+        console.log("try to save session");
+        SessionManager.SaveSessionToJson(SessionManager.currentSession);
         return;
       }
       const data = JSON.parse(message);
@@ -223,6 +226,8 @@ export async function handleSSE(
   }
   if (response.status !== 200) {
     console.log(`Error from OpenAI: ${response.status} ${response.statusText}`);
+    onMessage("Error from OpenAI, please retry.");
+    onMessage("[DONE]");
     return;
   }
   if (!response.body) {

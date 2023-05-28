@@ -12,7 +12,10 @@ import { Session, Message, SessionManager } from "@/common/session";
 export default function SessionList() {
   const [mySessions, setMySessions] = React.useState<[Session]>([]);
   React.useEffect(() => {
-    setMySessions(SessionManager.sessions);
+    const ggg = async () => {
+      setMySessions(await SessionManager.ReloadAndGetAllSessions());
+    };
+    ggg();
   }, []);
   return (
     <List>
