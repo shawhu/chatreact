@@ -46,7 +46,7 @@ export class SessionManager {
         },
         body: JSON.stringify(session),
       });
-      console.log(res);
+      //console.log(res);
     } catch (error) {
       console.log("server error");
       console.error(error);

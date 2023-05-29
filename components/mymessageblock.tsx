@@ -63,7 +63,7 @@ export default function MyMessageBlock({ rawtext }) {
     <div>
       {displaytexts.map((displaytext, index) =>
         displaytext.type == "code" ? (
-          <div className="flex flex-col ">
+          <div key={index} className="flex flex-col ">
             {/*this's code block toolbar*/}
             <div className="flex flex-row justify-between bg-black text-white rounded-tl-lg rounded-tr-lg pl-2">
               <span className="pt-1">{`${displaytext.language.toUpperCase()}`}</span>
@@ -79,21 +79,15 @@ export default function MyMessageBlock({ rawtext }) {
               >
                 <ContentCopyIcon color="primary" fontSize="small" />
               </IconButton>
-              <Snackbar
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                open={toastopen}
-                autoHideDuration={1000}
-                message="Copied to the clipboard"
-                onClose={() => {
-                  setToastopen(false);
-                }}
-              />
             </div>
             {/*end of code block toolbar*/}
             <SyntaxHighlighter
               language={displaytext.language}
               style={atomOneDarkReasonable}
-              customStyle={{ margin: 0 }}
+              wrapLongLines={true}
+              customStyle={{
+                margin: 0,
+              }}
             >
               {displaytext.content}
             </SyntaxHighlighter>
@@ -105,6 +99,15 @@ export default function MyMessageBlock({ rawtext }) {
           ></div>
         )
       )}
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={toastopen}
+        autoHideDuration={1000}
+        message="Copied to the clipboard"
+        onClose={() => {
+          setToastopen(false);
+        }}
+      />
     </div>
   );
 }

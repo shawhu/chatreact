@@ -14,11 +14,27 @@
     },
     {
       "role": "user",
-      "content": "写一个c#的hello world console app"
+      "content": "what is the difference between tts_models/en/ljspeech/tacotron2-DDC and tts_models/en/ljspeech/tacotron2-DDC_ph in coqui-tts"
     },
     {
       "role": "assistant",
-      "content": "当然，以下是一个简单的“Hello, World!”控制台应用程序的C#代码示例：\n\n```csharp\nusing System;\n\npublic class Program\n{\n    public static void Main()\n    {\n        Console.WriteLine(\"Hello, World!\");\n    }\n}\n```\n\n你可以通过在Visual Studio中创建控制台应用程序来尝试运行此代码，或将其复制并粘贴到C#编译器中。"
+      "content": "In Coqui TTS, the difference between `tts_models/en/ljspeech/tacotron2-DDC` and `tts_models/en/ljspeech/tacotron2-DDC_ph` is that the latter contains additional pre-trained phoneme embeddings. \n\nPhonemes are the basic units of sound in a language, so pre-training with phonemes can potentially improve the quality of the synthesized speech. `tts_models/en/ljspeech/tacotron2-DDC` uses traditional acoustic features like mel-spectrograms, while `tts_models/en/ljspeech/tacotron2-DDC_ph` utilizes both acoustic features and phoneme embeddings. \n\nIn summary, `tts_models/en/ljspeech/tacotron2-DDC_ph` may produce better quality speech, but comes with a larger file size and requires additional pre-processing steps for input text."
+    },
+    {
+      "role": "user",
+      "content": "i use this to highlight code in my next.js project. but it can't auto wrap long sentences, how to enable auto wrap\nimport SyntaxHighlighter from \"react-syntax-highlighter\";"
+    },
+    {
+      "role": "assistant",
+      "content": "To enable auto-wrapping of long sentences of code in `react-syntax-highlighter`, you can use the props of the component to change the style of the code block. Here's an example:\n\n```jsx\nimport SyntaxHighlighter from 'react-syntax-highlighter';\nimport { darcula } from 'react-syntax-highlighter/dist/cjs/styles/hljs'; // Or any other theme of your choice\n\nfunction Code({ value }) {\n  // Set a maximum width for the code block and enable wrapping\n  const codeStyle = {\n    maxWidth: '100%',\n    overflowWrap: 'break-word',\n    wordWrap: 'break-word',\n    hyphens: 'auto',\n  };\n\n  return (\n    <SyntaxHighlighter language=\"javascript\" style={darcula} customStyle={codeStyle}>\n      {value}\n    </SyntaxHighlighter>\n  );\n}\n```\n\nIn the example above, we create a `codeStyle` object that sets a maximum width for the code block and enables wrapping with the `overflowWrap`, `wordWrap`, and `hyphens` CSS properties. We then pass this object to the `customStyle` prop of the `SyntaxHighlighter` component.\n\nYou can adjust the values of these properties to fit your needs."
+    },
+    {
+      "role": "user",
+      "content": "i use inline style like this\ncustomStyle={{ margin: 0 }}\n\nmodify your code to make it so"
+    },
+    {
+      "role": "assistant",
+      "content": "Sure, to modify the code to include inline styles and set margin to 0, you can use the following code:\n\n```jsx\nimport SyntaxHighlighter from 'react-syntax-highlighter';\nimport { darcula } from 'react-syntax-highlighter/dist/cjs/styles/hljs';\n\nfunction Code({ value }) {\n  const codeStyle = {\n    maxWidth: '100%',\n    overflowWrap: 'break-word',\n    wordWrap: 'break-word',\n    hyphens: 'auto',\n    margin: 0,\n  };\n\n  return (\n    <SyntaxHighlighter language=\"javascript\" style={darcula} customStyle={codeStyle}>\n      {value}\n    </SyntaxHighlighter>\n  );\n}\n```\n\nIn this modified code, we simply add the `margin: 0` style property to the `codeStyle` object along with the other properties to set the maximum width and enable word wrapping. Then, we pass this object to the `customStyle` prop of the `SyntaxHighlighter` component to apply the inline styles.\n\nYou can adjust the value of the `margin` property to fit your desired styling."
     }
   ]
 }
