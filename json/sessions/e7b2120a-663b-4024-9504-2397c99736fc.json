@@ -1,8 +1,6 @@
 {
   "sessionId": "e7b2120a-663b-4024-9504-2397c99736fc",
   "sessionName": "中文助理",
-  "model": "chatgpt3.5",
-  "maxToken": 2048,
   "messages": [
     {
       "role": "system",
@@ -11,6 +9,18 @@
     {
       "role": "assistant",
       "content": "今天需要我做什么呢？"
+    },
+    {
+      "role": "user",
+      "content": "你好",
+      "completets": 1685367528
+    },
+    {
+      "role": "assistant",
+      "content": "你好！很高兴能够和你聊天。有什么我可以帮助你的吗？",
+      "completets": 1685367533
     }
-  ]
+  ],
+  "model": "chatgpt3.5",
+  "maxToken": 2048
 }

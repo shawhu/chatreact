@@ -2,7 +2,7 @@ import { estimateTokens } from "@/common/helper";
 export class Message {
   role: "user" | "assistant" | "system";
   content: string = "";
-  timestamp: number = "";
+  completets: number = -1;
 }
 export class Session {
   sessionId: string = "";

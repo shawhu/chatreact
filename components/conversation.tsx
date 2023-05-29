@@ -14,12 +14,16 @@ import { createParser } from "eventsource-parser";
 import { Session, Message, SessionManager } from "@/common/session";
 import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
+import { getFormattedDateTime } from "@/common/helper";
 
 function Conversation({ className, prompt, config }) {
   const target_bottomRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [toastopen, setToastopen] = React.useState(false);
   const [toastmessage, setToastmessage] = React.useState("");
+  //Hello, I'm your friendly AI assistant. What can I do for you today?
+  const [audioText, setAudioText] = React.useState("");
+  const audioRef = useRef(null);
   //this loads session history
   useEffect(() => {
     const trigger = () => {
@@ -54,7 +58,11 @@ function Conversation({ className, prompt, config }) {
     );
     const newmessages = [
       ...messages,
-      { role: "user", content: prompt },
+      {
+        role: "user",
+        content: prompt,
+        completets: Math.floor(Date.now() / 1000),
+      },
       { role: "assistant", content: "Thinking..." },
     ];
     setMessages(newmessages);
@@ -91,7 +99,9 @@ function Conversation({ className, prompt, config }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        messages: SessionManager.currentSession.GetMessagesWithTokenLimit(2000),
+        messages: SessionManager.currentSession
+          .GetMessagesWithTokenLimit(2000)
+          .map(({ role, content }) => ({ role, content })),
         model: "gpt-3.5-turbo",
         max_tokens: config.maxtokenr,
         stream: true,
@@ -104,6 +114,11 @@ function Conversation({ className, prompt, config }) {
     await handleSSE(response, (message) => {
       if (message === "[DONE]") {
         console.log("try to save session");
+        const messages = SessionManager.currentSession.messages;
+        messages[messages.length - 1].completets = Math.floor(
+          Date.now() / 1000
+        );
+        setAudioText(messages[messages.length - 1].content);
         SessionManager.SaveSessionToJson(SessionManager.currentSession);
         return;
       }
@@ -145,7 +160,18 @@ function Conversation({ className, prompt, config }) {
             console.log(`conversatoin header clicked`);
             console.log(`${JSON.stringify(messages)}`);
           }}
-        ></ListSubheader>
+        >
+          {audioText != "" ? (
+            <audio
+              ref={audioRef}
+              src={`http://localhost:5002/api/tts?text=${audioText}&speaker_id=&style_wav=&language_id=`}
+              controls
+              autoPlay
+            />
+          ) : (
+            <></>
+          )}
+        </ListSubheader>
         {messages.map((message, index) => (
           <ListItem
             key={`message_${index}`}
@@ -156,23 +182,25 @@ function Conversation({ className, prompt, config }) {
                 : "flex-row-reverse"
             }`}
           >
-            <ListItemAvatar className="flex justify-center">
-              <Avatar
-                className="w-20 h-20"
-                alt="Remy Sharp"
-                src={`${
-                  (message.role === "assistant") | (message.role === "system")
-                    ? "/headshots/pure/00033-3165699849.jpg"
-                    : ""
-                }`}
-              />
-            </ListItemAvatar>
+            <div>
+              <ListItemAvatar className="flex justify-center">
+                <Avatar
+                  className="w-20 h-20"
+                  alt="Remy Sharp"
+                  src={`${
+                    (message.role === "assistant") | (message.role === "system")
+                      ? "/headshots/pure/00033-3165699849.jpg"
+                      : ""
+                  }`}
+                />
+              </ListItemAvatar>
+            </div>
             <div className="w-3 h-3"></div>
             <ListItemText
               primary={
                 <MyMessageBlock rawtext={message.content}></MyMessageBlock>
               }
-              secondary={message.role + " 8:13 AM"}
+              secondary={`${getFormattedDateTime(message.completets)}`}
               className={`rounded-t-xl p-4 ${
                 (message.role === "assistant") | (message.role === "system")
                   ? "rounded-br-xl bg-blue-100 text-black text-left flex-1"
