@@ -14,30 +14,6 @@
     },
     {
       "role": "user",
-      "content": "who are you?"
-    },
-    {
-      "role": "assistant",
-      "content": "I am an AI language model designed to assist and communicate with users like you. My purpose is to answer your questions and provide helpful information in a friendly and efficient manner."
-    },
-    {
-      "role": "user",
-      "content": "what can you do?"
-    },
-    {
-      "role": "assistant",
-      "content": "As an AI language model, I can answer questions, provide information on various topics, offer suggestions, and assist with tasks such as scheduling appointments or setting reminders. I can also have conversations and engage in small talk to help make your day more enjoyable. Additionally, I'm always learning and improving, so I can continue to better assist you over time."
-    },
-    {
-      "role": "user",
-      "content": "give me 3 day trip to new york"
-    },
-    {
-      "role": "assistant",
-      "content": "Sure, I can give you a sample 3-day trip itinerary to New York. Here it is:\n\nDay 1:\n- Start the day with a visit to the iconic Statue of Liberty and Ellis Island.\n- Take a walk through the historic streets of the Financial District and see the New York Stock Exchange and Wall Street.\n- Head to One World Trade Center and soak in the panoramic views of the city from the observation deck.\n- End the day with dinner at a nearby restaurant or explore the nightlife in the area.\n\nDay 2:\n- Tour the famous landmarks in Midtown Manhattan, such as the Empire State Building, Rockefeller Center, and Times Square.\n- Go on a shopping spree at Fifth Avenue's luxury shops and department stores.\n- Catch a Broadway show at one of the many theaters in the area.\n- Dine at one of the city's top-rated restaurants or enjoy some street food from a food truck.\n\nDay 3:\n- Visit the world-renowned museums in Manhattan, such as the Metropolitan Museum of Art, the Museum of Modern Art, or the American Museum of Natural History.\n- Explore the colorful neighborhoods of Greenwich Village and SoHo, and take a stroll through Central Park.\n- Experience New York's ethnic diversity by choosing from a variety of food options for lunch.\n- End your trip with a spectacular view of the city at the Top of the Rock observation deck.\n\nI hope you find this 3-day trip itinerary helpful in planning a fun and memorable trip to New York!"
-    },
-    {
-      "role": "user",
       "content": "hello"
     },
     {
@@ -46,19 +22,11 @@
     },
     {
       "role": "user",
-      "content": "const response = await fetch(`${host}/v1/chat/completions`, {\n      method: \"POST\",\n      headers: {\n        Authorization: `Bearer ${config.openkey}`,\n        \"Content-Type\": \"application/json\",\n      },\n      body: JSON.stringify({\n        messages: SessionManager.currentSession.messages.slice(0, -1),\n        model: \"gpt-3.5-turbo\",\n        max_tokens: config.maxtokenr,\n        stream: true,\n      }),\n      signal: controller.signal,\n    });\n\n\nhow to define its wait  duration? for example i want to set 5 seconds, after that it should return error"
+      "content": "who are you?\nwhat can you do?"
     },
     {
       "role": "assistant",
-      "content": "One way to define a wait duration is by using a Promise with a timeout. Here's an example of how you can modify the code you provided to wait for 5 seconds before returning an error:\n\n```\nconst timeoutPromise = (duration) =>\n  new Promise((resolve, reject) => {\n    setTimeout(() => {\n      reject(new Error(\"Request timeout\"));\n    }, duration);\n  });\n\nconst completionPromise = fetch(`${host}/v1/chat/completions`, {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${config.openkey}`,\n    \"Content-Type\": \"application/json\",\n  },\n  body: JSON.stringify({\n    messages: SessionManager.currentSession.messages.slice(0, -1),\n    model: \"gpt-3.5-turbo\",\n    max_tokens: config.maxtokenr,\n    stream: true,\n  }),\n  signal: controller.signal,\n});\n\nPromise.race([completionPromise, timeoutPromise(5000)]).then((response) => {\n  // handle response\n}).catch((error) => {\n  // handle error\n});\n```\n\nIn the example above, the `Promise.race` method is used to wait for either the `completionPromise` or `timeoutPromise` to resolve. If the `completionPromise` resolves before the timeout duration of 5 seconds, then the `then` block will handle the response. If the `timeoutPromise` resolves first, then it will return an error with the message \"Request timeout\". You can change the duration by adjusting the argument passed to `timeoutPromise` method."
-    },
-    {
-      "role": "user",
-      "content": "does fetch has a timeout prop?"
-    },
-    {
-      "role": "assistant",
-      "content": "The `fetch` API does not have a built-in `timeout` property. However, you can use the `AbortController` and `setTimeout` APIs to implement a timeout feature and cancel the `fetch` request if it takes longer than expected.\n\nHere's an example of how you can add a timeout to a `fetch` request:\n\n```\nconst controller = new AbortController();\nconst timeout = setTimeout(() => controller.abort(), 5000); // 5 second timeout\n\nconst response = await fetch(url, {\n  signal: controller.signal,\n});\n\nif (!response.ok) {\n  throw new Error(`HTTP error! status: ${response.status}`);\n}\n\nconst data = await response.json();\n\nclearTimeout(timeout); // clear the timeout if the request is successful\n```\n\nIn the example above, an `AbortController` is created and used to signal a `fetch` request to abort if necessary. A `setTimeout` function is also used to specify a timeout duration of 5 seconds, after which the `controller.abort()` method is called to cancel the request.\n\nIf the request is successful and returns a response with a status of `ok`, then the response data is stored in the `data` variable. The `clearTimeout` function is also called to clear the timeout if the request is successful.\n\nIf the request is not successful or takes longer than the defined timeout duration, then an error is thrown with the appropriate message."
+      "content": "I am an AI language model designed to assist and communicate with users like you. I have been programmed to respond to various types of questions and tasks and can perform a range of functions such as answering questions, providing information, reminding you of important events, giving suggestions, among other things. Please let me know how I can help you."
     }
   ]
 }

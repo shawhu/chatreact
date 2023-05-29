@@ -186,7 +186,7 @@ function Conversation({ className, prompt, config }) {
             } ${
                 (message.role === "assistant") | (message.role === "system")
                   ? "text-left"
-                  : "text-right"
+                  : "text-left"
               }`}
             />
           </ListItem>
