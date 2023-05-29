@@ -1,3 +1,4 @@
+import { estimateTokens } from "@/common/helper";
 export class Message {
   role: "user" | "assistant" | "system";
   content: string = "";
@@ -11,11 +12,24 @@ export class Session {
   maxToken: number = 0;
   aiheadshotimg: string = "";
   username: string = "";
+  public GetMessagesWithTokenLimit(tokenLimit: number) {
+    var newmessages: Message[] = [];
+    for (let index = this.messages.length - 2; index >= 0; index--) {
+      const msg = this.messages[index];
+      newmessages.unshift(msg);
+      const value = estimateTokens(JSON.stringify(newmessages));
+      if (value > tokenLimit) {
+        newmessages.shift(msg);
+        break;
+      }
+    }
+    return newmessages;
+  }
 }
 export class SessionManager {
   public static sessions: Session[] = [];
   public static listnercallback: () => {};
-  public static currentSession = SessionManager.sessions[0];
+  public static currentSession: Session = SessionManager.sessions[0];
   public static SetCurrentSessionById(sessionid: string) {
     // Find the session object in the array with the matching session ID
     const session = SessionManager.sessions.find(
@@ -61,8 +75,16 @@ export class SessionManager {
         },
       });
       //console.log(res);
-      const session = await res.json<Session>(); // convert response to JSON
-      return session; // return the JSON data
+      const sessionData = await res.json();
+      const session = new Session();
+      session.sessionId = sessionData.sessionId;
+      session.sessionName = sessionData.sessionName;
+      session.messages = sessionData.messages;
+      session.model = sessionData.model;
+      session.maxToken = sessionData.maxToken;
+      session.aiheadshotimg = sessionData.aiheadshotimg;
+      session.username = sessionData.username;
+      return session;
     } catch (error) {
       console.log("server error");
       console.error(error);
@@ -77,7 +99,19 @@ export class SessionManager {
         },
       });
       //console.log(res);
-      const sessions = await res.json<Session[]>(); // convert response to JSON
+      //the res.json<Session>() can't acutally return Session object it doesn't have methods
+      const sessionsData = await res.json<Session[]>();
+      const sessions = sessionsData.map((sessionData) => {
+        const session = new Session();
+        session.sessionId = sessionData.sessionId;
+        session.sessionName = sessionData.sessionName;
+        session.messages = sessionData.messages;
+        session.model = sessionData.model;
+        session.maxToken = sessionData.maxToken;
+        session.aiheadshotimg = sessionData.aiheadshotimg;
+        session.username = sessionData.username;
+        return session;
+      });
       SessionManager.sessions = sessions;
       SessionManager.currentSession = sessions[0];
       //to tell conversation.tsx that sessionmanager is loaded

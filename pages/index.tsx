@@ -202,11 +202,7 @@ export default function PersistentDrawerLeft() {
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}
-        <Conversation
-          prompt={prompt}
-          config={myconfig}
-          className="flex-1 bg-yellow-50"
-        />
+        <Conversation prompt={prompt} config={myconfig} />
         {/*this is the input area with buttons*/}
         <Box className="w-full min-h-[130px] flex">
           <TextField
@@ -231,6 +227,7 @@ export default function PersistentDrawerLeft() {
               }
             }}
           />
+          {/*this is prompt buttons*/}
           <Box className="w-[150px] gap-1 p-1 grid grid-cols-2 bg-blue">
             <Button
               id="generate"
@@ -283,10 +280,9 @@ export default function PersistentDrawerLeft() {
                 // console.log(ss);
                 // const sessions = await SessionManager.ReloadAndGetAllSessions();
                 // console.log(sessions);
-
-                const aaa = [1, 2, 3, 4, 5, 6, 7];
-                let fable = aaa.splice(2);
-                console.log(fable);
+                const tokenused =
+                  SessionManager.currentSession.GetMessagesWithTokenLimit(2000);
+                console.log(tokenused);
               }}
             >
               TEST

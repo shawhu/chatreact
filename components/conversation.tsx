@@ -91,7 +91,7 @@ function Conversation({ className, prompt, config }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        messages: SessionManager.currentSession.messages.slice(0, -1),
+        messages: SessionManager.currentSession.GetMessagesWithTokenLimit(2000),
         model: "gpt-3.5-turbo",
         max_tokens: config.maxtokenr,
         stream: true,
@@ -116,6 +116,7 @@ function Conversation({ className, prompt, config }) {
           SessionManager.currentSession.messages = newmessages;
           return newmessages;
         });
+        return;
       }
       const text = data.choices[0]?.delta?.content;
       if (text !== undefined) {
@@ -135,7 +136,9 @@ function Conversation({ className, prompt, config }) {
 
   return (
     <>
-      <List className={`${className} w-full overflow-auto min-h-[40vh] pb-10`}>
+      <List
+        className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}
+      >
         <ListSubheader
           className="font-bold text-2xl "
           onClick={() => {
@@ -145,7 +148,7 @@ function Conversation({ className, prompt, config }) {
         ></ListSubheader>
         {messages.map((message, index) => (
           <ListItem
-            key={index}
+            key={`message_${index}`}
             alignItems="flex-start"
             className={`flex justify-start ${
               (message.role === "assistant") | (message.role === "system")
@@ -170,24 +173,11 @@ function Conversation({ className, prompt, config }) {
                 <MyMessageBlock rawtext={message.content}></MyMessageBlock>
               }
               secondary={message.role + " 8:13 AM"}
-              className={`rounded-t-xl p-4 flex-1 ${
+              className={`rounded-t-xl p-4 ${
                 (message.role === "assistant") | (message.role === "system")
-                  ? "rounded-br-xl"
-                  : "rounded-bl-xl"
-              } ${
-                (message.role === "assistant") | (message.role === "system")
-                  ? "bg-blue-100"
-                  : "bg-green-50"
-              }
-            ${
-              (message.role === "assistant") | (message.role === "system")
-                ? "text-black"
-                : "text-black"
-            } ${
-                (message.role === "assistant") | (message.role === "system")
-                  ? "text-left"
-                  : "text-left"
-              }`}
+                  ? "rounded-br-xl bg-blue-100 text-black text-left flex-1"
+                  : "rounded-bl-xl bg-green-100 text-black text-left flex-1 max-w-full min-w-0"
+              } `}
             />
           </ListItem>
         ))}
