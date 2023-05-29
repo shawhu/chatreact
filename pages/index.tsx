@@ -244,7 +244,19 @@ export default function PersistentDrawerLeft() {
             >
               Gen
             </Button>
-            <Button variant="outlined">ReGen</Button>
+            <Button
+              variant="outlined"
+              onClick={async () => {
+                //remove the last message
+                const previousPrompt = await SessionManager.RegenLastMessage(
+                  SessionManager.currentSession
+                );
+                setMessage(`${previousPrompt}`);
+                console.log("regen clicked");
+              }}
+            >
+              R.Back
+            </Button>
             <Button
               variant="outlined"
               onClick={() => {

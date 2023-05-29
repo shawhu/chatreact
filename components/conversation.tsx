@@ -220,11 +220,17 @@ export async function handleSSE(
         ? JSON.stringify(error)
         : `${response.status} ${response.statusText}`
     );
+    onMessage(
+      error
+        ? JSON.stringify(error)
+        : `${response.status} ${response.statusText}`
+    );
+    onMessage("[DONE]");
     return;
   }
   if (response.status !== 200) {
     console.log(`Error from OpenAI: ${response.status} ${response.statusText}`);
-    onMessage("Error from OpenAI, please retry.");
+    onMessage(`Error from OpenAI: ${response.status} ${response.statusText}`);
     onMessage("[DONE]");
     return;
   }

@@ -19,7 +19,7 @@ export default function MyMessageBlock({ rawtext }) {
   const [toastopen, setToastopen] = React.useState(false);
   useEffect(() => {
     //using regex to replace ```
-    const regex = /```([^`]+?)```|```([^`]+?)$/g;
+    const regex = /```([\s\S]+?)```|```([\s\S]+?)$/g;
     //             ^match[1]       ^match[2]
     const matchesArray = Array.from(rawtext.matchAll(regex));
     const codeblocks = matchesArray.map((match) =>
@@ -39,6 +39,7 @@ export default function MyMessageBlock({ rawtext }) {
         if (!codeblocks[i - 1]) {
           break;
         }
+        //processing codeblock
         //processing codeblock to get first line and the rest
         const codelines = codeblocks[i - 1].split("\n");
         const language = codelines[0];
@@ -49,8 +50,9 @@ export default function MyMessageBlock({ rawtext }) {
           content: actualcode,
           language: language,
         });
+        //processing textblock after this codeblock
         const textlines = textblocks[i].split("\n");
-        const actualtext = textlines.join("");
+        const actualtext = textlines.join("<br>");
         tempdisplaytexts.push({ type: "text", content: actualtext });
       }
     }

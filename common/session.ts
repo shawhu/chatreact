@@ -105,4 +105,15 @@ export class SessionManager {
       }
     }
   }
+  public static async RegenLastMessage(session: Session): string {
+    const lastusermessage =
+      session.messages[session.messages.length - 2].content;
+    session.messages = session.messages.slice(0, -2); //delete both the user and ai response, last 2 messages
+    if (SessionManager.listnercallback) {
+      SessionManager.listnercallback(); //trigger any component using session manager to re-render
+    } else {
+      console.error("listnercallback is undefined, can't call");
+    }
+    return lastusermessage;
+  }
 }
