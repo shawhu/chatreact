@@ -15,8 +15,9 @@ import { Session, Message, SessionManager } from "@/common/session";
 import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
 import { getFormattedDateTime } from "@/common/helper";
+import { Config } from "@/common/config";
 
-function Conversation({ className, prompt, config }) {
+function Conversation({ className, prompt }) {
   const target_bottomRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [toastopen, setToastopen] = React.useState(false);
@@ -51,6 +52,7 @@ function Conversation({ className, prompt, config }) {
     if (!prompt) {
       return;
     }
+    const config = await Config.GetConfigInstanceAsync();
     console.log(config);
     console.log("processing prompt:" + prompt);
     console.log(
@@ -77,7 +79,7 @@ function Conversation({ className, prompt, config }) {
 
     //actual calling api to get a response stream
     const host = "https://api.openai.com";
-    console.log(`${config.openkey} ${config.maxtokenr}`);
+    console.log(`${config.openaikey} ${config.maxtokenreply}`);
     //before calling api, do a sanity check
     //last one is assistant placeholder message
     //this will check the 2nd to last message to see if it's from the user
@@ -95,7 +97,7 @@ function Conversation({ className, prompt, config }) {
     const response = await fetch(`${host}/v1/chat/completions`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${config.openkey}`,
+        Authorization: `Bearer ${config.openaikey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -103,7 +105,7 @@ function Conversation({ className, prompt, config }) {
           .GetMessagesWithTokenLimit(2000)
           .map(({ role, content }) => ({ role, content })),
         model: "gpt-3.5-turbo",
-        max_tokens: config.maxtokenr,
+        max_tokens: config.maxtokenreply,
         stream: true,
       }),
       signal: controller.signal,
@@ -161,7 +163,7 @@ function Conversation({ className, prompt, config }) {
             console.log(`${JSON.stringify(messages)}`);
           }}
         >
-          {audioText != "" ? (
+          {audioText != "" && Config.GetConfig().voiceover ? (
             <audio
               ref={audioRef}
               src={`http://localhost:5002/api/tts?text=${audioText}&speaker_id=&style_wav=&language_id=`}

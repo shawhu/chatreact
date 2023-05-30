@@ -19,11 +19,15 @@ export default function MyMessageBlock({ rawtext }) {
   const [toastopen, setToastopen] = React.useState(false);
   useEffect(() => {
     //using regex to replace ```
-    const regex = /```([\s\S]+?)```|```([\s\S]+?)$/g;
+    //const regex = /```([\s\S]+?)```|```([\s\S]+?)$/g;
     //             ^match[1]       ^match[2]
+    const regex = /```([^`]+)(?:```)?/g;
+
     const matchesArray = Array.from(rawtext.matchAll(regex));
-    const codeblocks = matchesArray.map((match) =>
-      match[1] ? match[1] : match[2]
+    const codeblocks = matchesArray.map(
+      (match) =>
+        //match[1] ? match[1] : match[2]
+        match[1]
     );
     const processed = rawtext.replace(regex, `codeblock`);
     //here we add first block of text. if no code found, first block

@@ -6,7 +6,7 @@ export default async function saveconfig(req, res) {
     const jsonDirectory = path.join(process.cwd(), "json");
     const configData = JSON.stringify(req.body, null, 2); //filter nothing, and indent 2 chars
 
-    await fs.writeFile(`${jsonDirectory}/config.json`, configData, "utf8");
+    await fs.writeFile(`${jsonDirectory}/confignew.json`, configData, "utf8");
     //Return the content of the data file in json format
     res.status(200).json({ success: true });
   } catch (error) {

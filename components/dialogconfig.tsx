@@ -13,65 +13,24 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
+import { Config } from "@/common/config";
 
-let openkey = "";
-let maxtokenr = -1;
-let maxtokenc = -1;
-let usectrlenter = false;
-let myResolve;
-
-export function GetConfig(): Promise<{
-  openaikey: string;
-  maxtokenreply: number;
-  maxtokencontext: number;
-  ctrlenter: boolean;
-}> {
-  return new Promise((resolve) => {
-    // if the key is not empty, resolve immediately
-    if (openkey != "" && maxtokenr != -1 && maxtokenc != -1) {
-      resolve({ openkey, maxtokenr, maxtokenc, usectrlenter });
-    } else {
-      // store the resolve function to call it later
-      myResolve = resolve;
-    }
-  });
-}
-
-function DialogConfig({ open, handleClose, indexpageconfig }) {
+function DialogConfig({ open, handleClose, refreshindexpageconfig }) {
   const [openaikey, setOpenaikey] = React.useState("");
   const [maxtokencontext, setMaxtokencontext] = React.useState(-1);
   const [maxtokenreply, setMaxtokenreply] = React.useState(-1);
   const [ctrlenter, setCtrlenter] = React.useState(false);
-  const [version, setVersion] = React.useState("");
+  const [voiceover, setVoiceover] = React.useState(false);
 
   React.useEffect(() => {
     const fetchConfigData = async () => {
       try {
-        const response = await fetch("/api/getconfig");
-        const configData = await response.json();
-        const {
-          openaikey,
-          version,
-          maxtokencontext,
-          maxtokenreply,
-          ctrlenter,
-        } = JSON.parse(configData);
-        setOpenaikey(openaikey);
-        setVersion(version);
-        setMaxtokencontext(maxtokencontext);
-        setMaxtokenreply(maxtokenreply);
-        setCtrlenter(ctrlenter);
-        openkey = openaikey;
-        maxtokenr = maxtokenreply;
-        maxtokenc = maxtokencontext;
-        usectrlenter = ctrlenter;
-        // if the resolve function is defined, call it with the new value
-        if (myResolve) {
-          myResolve({ openkey, maxtokenr, maxtokenc, usectrlenter });
-        }
-        // console.log(
-        //   `openaikey read from json: ${openaikey} version:${version}`
-        // );
+        const myconfig = await Config.GetConfigInstanceAsync();
+        setOpenaikey(myconfig.openaikey);
+        setMaxtokencontext(myconfig.maxtokencontext);
+        setMaxtokenreply(myconfig.maxtokenreply);
+        setCtrlenter(myconfig.ctrlenter);
+        setVoiceover(myconfig.voiceover);
       } catch (error) {
         console.error(error);
       }
@@ -79,25 +38,16 @@ function DialogConfig({ open, handleClose, indexpageconfig }) {
     fetchConfigData();
   }, []);
   const handleSave = async () => {
-    try {
-      const response = await fetch("/api/saveconfig", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          openaikey,
-          ctrlenter,
-          maxtokencontext,
-          maxtokenreply,
-        }),
-      });
-      indexpageconfig({ openkey, maxtokenr, maxtokenc, usectrlenter });
-      handleClose();
-    } catch (error) {
-      console.log("server error");
-      console.error(error);
-    }
+    const myconfig = await Config.GetConfigInstanceAsync();
+    myconfig.openaikey = openaikey;
+    myconfig.maxtokencontext = maxtokencontext;
+    myconfig.maxtokenreply = maxtokenreply;
+    myconfig.ctrlenter = ctrlenter;
+    myconfig.voiceover = voiceover;
+
+    await myconfig.SaveAsync();
+    refreshindexpageconfig(myconfig);
+    handleClose();
   };
 
   return (
@@ -117,7 +67,6 @@ function DialogConfig({ open, handleClose, indexpageconfig }) {
             value={openaikey}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setOpenaikey(event.target.value);
-              openkey = event.target.value;
             }}
           />
         </ListItem>
@@ -128,7 +77,6 @@ function DialogConfig({ open, handleClose, indexpageconfig }) {
                 checked={ctrlenter}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setCtrlenter(event.target.checked);
-                  usectrlenter = event.target.checked;
                 }}
               />
             }
@@ -149,7 +97,6 @@ function DialogConfig({ open, handleClose, indexpageconfig }) {
               value={maxtokencontext}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setMaxtokencontext(event.target.value);
-                maxtokenc = event.target.value;
               }}
             />
           </Typography>
@@ -168,13 +115,9 @@ function DialogConfig({ open, handleClose, indexpageconfig }) {
               value={maxtokenreply}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setMaxtokenreply(event.target.value);
-                maxtokenr = event.target.value;
               }}
             />
           </Typography>
-        </ListItem>
-        <ListItem>
-          <Typography variant="caption">Version: {version}</Typography>
         </ListItem>
       </List>
       <DialogActions>

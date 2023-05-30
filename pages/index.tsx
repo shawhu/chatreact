@@ -1,5 +1,4 @@
 import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,14 +23,40 @@ import {
   DialogActions,
   DialogTitle,
   DialogContent,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
+import { alpha, styled, useTheme } from "@mui/material/styles";
+import { pink } from "@mui/material/colors";
 import DialogConfig from "../components/DialogConfig";
-import { GetConfig } from "../components/DialogConfig";
 
 import TestComponent from "../components/testcomponent";
 import Conversation from "../components/conversation";
 import SessionList from "../components/sessionlist";
 import { Session, Message, SessionManager } from "@/common/session";
+import { Config } from "@/common/config";
+const PinkSwitch = styled(Switch)(({ theme }) => ({
+  "& .MuiSwitch-switchBase.Mui-checked": {
+    color: pink[600],
+    "&:hover": {
+      backgroundColor: alpha(pink[600], theme.palette.action.hoverOpacity),
+    },
+  },
+  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+    backgroundColor: pink[600],
+  },
+}));
+const GreenSwitch = styled(Switch)(({ theme }) => ({
+  "& .MuiSwitch-switchBase.Mui-checked": {
+    color: "#33cf4d",
+    "&:hover": {
+      backgroundColor: alpha("#33cf4d", theme.palette.action.hoverOpacity),
+    },
+  },
+  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+    backgroundColor: "#33cf4d",
+  },
+}));
 
 const drawerWidth = 200;
 console.log("main app started");
@@ -90,6 +115,7 @@ export default function PersistentDrawerLeft() {
   const [openDialogConfig, setOpenDialogConfig] = React.useState(false); //control config dialog to show
   const [opendialog, setOpendialog] = React.useState(false);
   const [dialogMessage, setDialogMessage] = React.useState("");
+  const [voiceoverChecked, setvoiceoverChecked] = React.useState(false);
 
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
@@ -99,12 +125,13 @@ export default function PersistentDrawerLeft() {
   React.useEffect(() => {
     // call the GetConfig function to get the API key and other configs
     async function fetchKeyAsync() {
-      const config1 = await GetConfig();
+      const config1 = await Config.GetConfigInstanceAsync();
       //console.log(config1);
       setMyconfig(config1);
+      setvoiceoverChecked(config1.voiceover);
     }
     fetchKeyAsync();
-  }, []);
+  });
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -117,7 +144,7 @@ export default function PersistentDrawerLeft() {
     setOpendialog(false);
   };
 
-  const ChangeIndexPageConfig = (config) => {
+  const RefreshIndexPageConfig = (config) => {
     console.log("got config callback from dialogconfig");
     console.log(config);
     setMyconfig(config);
@@ -139,6 +166,24 @@ export default function PersistentDrawerLeft() {
           <Typography variant="h6" noWrap component="div">
             这是一个很欢乐的聊天
           </Typography>
+          <div className="flex-1 flex justify-end">
+            <FormControlLabel
+              control={
+                <GreenSwitch
+                  color="default"
+                  checked={voiceoverChecked}
+                  onChange={async () => {
+                    setvoiceoverChecked(!voiceoverChecked);
+                    //save this to config
+                    let config = await Config.GetConfigInstanceAsync();
+                    config.voiceover = !voiceoverChecked;
+                    await config.SaveAsync();
+                  }}
+                />
+              }
+              label="Turn on voice-over"
+            />
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -197,12 +242,12 @@ export default function PersistentDrawerLeft() {
       <DialogConfig
         open={openDialogConfig}
         handleClose={() => setOpenDialogConfig(false)}
-        indexpageconfig={ChangeIndexPageConfig}
+        refreshindexpageconfig={RefreshIndexPageConfig}
       />
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}
-        <Conversation prompt={prompt} config={myconfig} />
+        <Conversation prompt={prompt} />
         {/*this is the input area with buttons*/}
         <Box className="w-full min-h-[130px] flex">
           <TextField
@@ -280,9 +325,11 @@ export default function PersistentDrawerLeft() {
                 // console.log(ss);
                 // const sessions = await SessionManager.ReloadAndGetAllSessions();
                 // console.log(sessions);
-                const tokenused =
-                  SessionManager.currentSession.GetMessagesWithTokenLimit(2000);
-                console.log(tokenused);
+                // const tokenused =
+                //   SessionManager.currentSession.GetMessagesWithTokenLimit(2000);
+                // console.log(tokenused);
+                const ccc = await Config.GetConfigInstanceAsync();
+                console.log(ccc);
               }}
             >
               TEST
