@@ -6,7 +6,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Session, Message, SessionManager } from "@/common/session";
 
 export default function SessionList() {
@@ -27,10 +27,19 @@ export default function SessionList() {
               SessionManager.SetCurrentSessionById(session.sessionId);
             }}
           >
+            <ListItemText className="flex-1" primary={session.sessionName} />
             <ListItemIcon>
-              <InboxIcon />
+              <DeleteIcon
+                onClick={async (event) => {
+                  console.log("session delete clicked");
+                  event.stopPropagation();
+                  const newsessions = await SessionManager.DeleteSessionAsync(
+                    session.sessionId
+                  );
+                  setMySessions(newsessions);
+                }}
+              />
             </ListItemIcon>
-            <ListItemText primary={session.sessionName} />
           </ListItemButton>
         </ListItem>
       ))}

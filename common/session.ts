@@ -151,4 +151,36 @@ export class SessionManager {
     }
     return lastusermessage;
   }
+  public static async DeleteSessionAsync(sessionid: string): Session[] {
+    const newSessions = SessionManager.sessions.filter(
+      (session) => session.sessionId !== sessionid
+    );
+    SessionManager.sessions = newSessions;
+    //call api to actually delete the file
+    try {
+      const res = await fetch(`/api/sessionload/${sessionid}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const responseText = await res.text(); // read the response body as text
+
+      if (res.ok) {
+        console.log(responseText); // "ok"
+      } else {
+        console.error(`HTTP error ${res.status}: ${responseText}`);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+    }
+    //callback
+    if (SessionManager.listnercallback) {
+      SessionManager.listnercallback(); //trigger any component using session manager to re-render
+    } else {
+      console.error("listnercallback is undefined, can't call");
+    }
+    return newSessions;
+  }
 }

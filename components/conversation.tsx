@@ -168,7 +168,9 @@ function Conversation({ className, prompt }) {
           {audioText != "" && Config.GetConfig().voiceover ? (
             <audio
               ref={audioRef}
-              src={`http://localhost:5002/api/tts?text=${audioText}&speaker_id=p248&style_wav=&language_id=`}
+              src={`http://localhost:5002/api/tts?text=${encodeURIComponent(
+                audioText
+              )}&speaker_id=p248&style_wav=&language_id=`}
               controls
               autoPlay
             />
