@@ -15,9 +15,15 @@ You will have to get a apikey from platform.openai.com first. https://platform.o
 To apply your openai key, click the config in the UI and apply it.
 
 Updates:
-The voice over is nearly done, here's an example video
-
+The voice over is nearly done, here's some examples
+In order to use this voice over, you will have to run a local tts server.
 
 https://github.com/shawhu/chatreact/assets/1240808/3af1f04f-539e-496a-a146-feb059e11d18
 
+the demo uses a tts server like this. 
 
+    tts-server --use_cuda true --model_name tts_models/en/jenny/jenny
+    
+if you don't have a powerful gpu, you can use the cpu version
+
+    tts-server --model_name tts_models/en/jenny/jenny
