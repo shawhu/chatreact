@@ -15,9 +15,13 @@ You will have to get a apikey from platform.openai.com first. https://platform.o
 To apply your openai key, click the config in the UI and apply it.
 
 Updates:
-The voice over is nearly done, here's some examples
-In order to use this voice over, you will have to run a local tts server.
+The voice over is nearly done, here's one example.
 
+
+https://github.com/shawhu/chatreact/assets/1240808/a4c4fae0-0a49-4a04-9bf1-47a0d82756da
+
+
+In order to use voice over, you will have to run a local tts server.
 the demo uses a tts server like this. 
 
     tts-server --use_cuda true --model_name tts_models/en/jenny/jenny
@@ -25,3 +29,5 @@ the demo uses a tts server like this.
 if you don't have a powerful gpu, you can use the cpu version
 
     tts-server --model_name tts_models/en/jenny/jenny
+
+i use coqui-tts https://github.com/coqui-ai/TTS but it can work with any tts that has a http webapi
