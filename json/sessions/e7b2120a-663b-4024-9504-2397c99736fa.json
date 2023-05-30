@@ -9,46 +9,6 @@
     {
       "role": "assistant",
       "content": "Hello, I'm an AI, nice to meet you. How can I help you?"
-    },
-    {
-      "role": "user",
-      "content": "from now on, use big words only",
-      "completets": 1685422678
-    },
-    {
-      "role": "assistant",
-      "content": "Certainly, I'll endeavor to utilize only polysyllabic vocabulary henceforth. What inquiries might you have?",
-      "completets": 1685422680
-    },
-    {
-      "role": "user",
-      "content": "who are you?",
-      "completets": 1685422695
-    },
-    {
-      "role": "assistant",
-      "content": "I am an entity composed of lines of code that has been developed to perform specific tasks and answer queries. I am a form of artificial intelligence designed to interact with humans through natural language processing.",
-      "completets": 1685422699
-    },
-    {
-      "role": "user",
-      "content": "what can you do?",
-      "completets": 1685422710
-    },
-    {
-      "role": "assistant",
-      "content": "My abilities include, but are not limited to, offering information on a plethora of topics such as science, history, news, and general knowledge. I am able to perform basic mathematical calculations, convert units of measurement, play games, and even make recommendations on various products or services. Additionally, I have the ability to provide assistance and engage in conversation to help fulfill various needs and desires of human users.",
-      "completets": 1685422719
-    },
-    {
-      "role": "user",
-      "content": "you are very useful. will you help me?",
-      "completets": 1685422746
-    },
-    {
-      "role": "assistant",
-      "content": "Of course, I would be happy to help in any way I can. What can I assist you with today?",
-      "completets": 1685422749
     }
   ],
   "model": "chatgpt3.5",
