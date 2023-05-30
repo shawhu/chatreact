@@ -47,13 +47,15 @@ function Conversation({ className, prompt }) {
     // scrollIntoView function will be called when messages are updated
     target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
+  const ClearAudioText = () => {
+    setAudioText("");
+  };
   const handlePrompt = async (prompt: string) => {
     if (!prompt) {
       return;
     }
     const config = await Config.GetConfigInstanceAsync();
-    console.log(config);
+    //console.log(config);
     console.log("processing prompt:" + prompt);
     console.log(
       "add user prompt question message AND assistant placeholder response first"
@@ -79,7 +81,7 @@ function Conversation({ className, prompt }) {
 
     //actual calling api to get a response stream
     const host = "https://api.openai.com";
-    console.log(`${config.openaikey} ${config.maxtokenreply}`);
+    //console.log(`${config.openaikey} ${config.maxtokenreply}`);
     //before calling api, do a sanity check
     //last one is assistant placeholder message
     //this will check the 2nd to last message to see if it's from the user
@@ -166,7 +168,7 @@ function Conversation({ className, prompt }) {
           {audioText != "" && Config.GetConfig().voiceover ? (
             <audio
               ref={audioRef}
-              src={`http://localhost:5002/api/tts?text=${audioText}&speaker_id=&style_wav=&language_id=`}
+              src={`http://localhost:5002/api/tts?text=${audioText}&speaker_id=p248&style_wav=&language_id=`}
               controls
               autoPlay
             />

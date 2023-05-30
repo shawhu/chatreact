@@ -92,6 +92,7 @@ export class SessionManager {
   }
   public static async ReloadAndGetAllSessions() {
     try {
+      //this is going to add 3 session json files to the sessions folder if the folder is empty
       const res = await fetch(`/api/sessionsload`, {
         method: "GET",
         headers: {

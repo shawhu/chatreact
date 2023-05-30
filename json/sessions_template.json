@@ -1,0 +1,50 @@
+[
+  {
+    "sessionId": "e7b2120a-663b-4024-9504-2397c99736fa",
+    "sessionName": "Friendly Assistant",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a friendly assistant and you will happily answer all questions."
+      },
+      {
+        "role": "assistant",
+        "content": "Hello, I'm an AI, nice to meet you. How can I help you?"
+      }
+    ],
+    "model": "chatgpt3.5",
+    "maxToken": 2048
+  },
+  {
+    "sessionId": "e7b2120a-663b-4024-9504-2397c99736fb",
+    "sessionName": "Translator",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a friendly translator and you will translate user input to Chinese"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello, I'm an AI, nice to meet you. I will translate anything to Chinese."
+      }
+    ],
+    "model": "chatgpt3.5",
+    "maxToken": 2048
+  },
+  {
+    "sessionId": "e7b2120a-663b-4024-9504-2397c99736fc",
+    "sessionName": "中文助理",
+    "messages": [
+      {
+        "role": "system",
+        "content": "你是一个能用中文对话的助理，你很喜欢聊天并且你最爱的人是Harry。"
+      },
+      {
+        "role": "assistant",
+        "content": "今天需要我做什么呢？"
+      }
+    ],
+    "model": "chatgpt3.5",
+    "maxToken": 2048
+  }
+]

@@ -178,6 +178,7 @@ export default function PersistentDrawerLeft() {
                     let config = await Config.GetConfigInstanceAsync();
                     config.voiceover = !voiceoverChecked;
                     await config.SaveAsync();
+                    //tell conversation to clear audiotext
                   }}
                 />
               }
@@ -314,20 +315,6 @@ export default function PersistentDrawerLeft() {
               variant="outlined"
               onClick={async () => {
                 console.log("TEST clicked");
-                // console.log(
-                //   `sessionmanager current sessions: ${JSON.stringify(
-                //     SessionManager.currentSession
-                //   )}`
-                // );
-                // const ss = await SessionManager.LoadSessionFromJson(
-                //   "e7b2120a-663b-4024-9504-2397c99736fa"
-                // );
-                // console.log(ss);
-                // const sessions = await SessionManager.ReloadAndGetAllSessions();
-                // console.log(sessions);
-                // const tokenused =
-                //   SessionManager.currentSession.GetMessagesWithTokenLimit(2000);
-                // console.log(tokenused);
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
               }}

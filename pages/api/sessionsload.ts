@@ -19,6 +19,27 @@ async function LoadAllSessions() {
   try {
     const jsonDirectory = path.join(process.cwd(), "json/sessions");
     const files = await fs.readdir(jsonDirectory);
+    if (files.length == 0) {
+      //sessions folder is empty, we should create them from sessions_template.json
+      const template_file = path.join(
+        process.cwd(),
+        "json/sessions_template.json"
+      );
+      const template = await fs.readFile(template_file, "utf-8");
+      const template_sessions = JSON.parse(template);
+      template_sessions.forEach(async (session) => {
+        const sessionfile = path.join(
+          process.cwd(),
+          `json/sessions/${session.sessionId}.json`
+        );
+        const outcome = await fs.writeFile(
+          sessionfile,
+          JSON.stringify(session),
+          "utf-8"
+        );
+      });
+      return template_sessions;
+    }
     const jsonfiles = files.filter((f) => f.endsWith(".json"));
     var sessions = [];
 
