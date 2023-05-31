@@ -271,7 +271,7 @@ export default function PersistentDrawerLeft() {
               if (e.keyCode == 13 && (e.ctrlKey || !myconfig.ctrlenter)) {
                 console.log(`send by enter or ctrlenter`);
                 e.preventDefault();
-                setPrompt(`${message}`);
+                setPrompt({ value: message });
                 setMessage("");
               }
             }}
@@ -283,7 +283,7 @@ export default function PersistentDrawerLeft() {
               variant="contained"
               onClick={() => {
                 console.log("gen clicked: message is: " + message);
-                setPrompt(`${message}`);
+                setPrompt({ value: message });
                 setMessage("");
                 console.log("prompt is: " + prompt);
               }}

@@ -37,8 +37,8 @@ function Conversation({ className, prompt }) {
   //this handle prompt change, prompt is a prop
   useEffect(() => {
     //only when base change the prompt, will it trigger this handle function
-    if (prompt && prompt != "") {
-      handlePrompt(prompt);
+    if (prompt && prompt.value != "") {
+      handlePrompt(prompt.value);
       console.log(`conversation got the prompt prop changes: ${prompt}`);
     }
   }, [prompt]);
