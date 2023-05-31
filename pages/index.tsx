@@ -257,16 +257,18 @@ export default function PersistentDrawerLeft() {
             minRows="4"
             id="outlined-basic"
             label={`Your prompt goes here. Press [${
-              myconfig.usectrlenter ? "Ctrl+Enter" : "Enter"
+              myconfig.ctrlenter ? "Ctrl+Enter" : "Enter"
             }] to submit. Set in config`}
             variant="outlined"
             value={message}
             onChange={(e) => {
               setMessage(e.target.value);
             }}
-            onKeyDown={(e) => {
-              if (e.keyCode == 13 && (e.ctrlKey || !myconfig.usectrlenter)) {
-                console.log(`usectrlenter: ${myconfig.usectrlenter}`);
+            onKeyDown={async (e) => {
+              console.log(
+                `onKeyDown checking ctrlenter: ${myconfig.ctrlenter}`
+              );
+              if (e.keyCode == 13 && (e.ctrlKey || !myconfig.ctrlenter)) {
                 e.preventDefault();
                 setPrompt(message);
                 setMessage("");

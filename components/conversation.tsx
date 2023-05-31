@@ -31,7 +31,7 @@ function Conversation({ className, prompt }) {
       //console.log("conversation useEffect triggered, loading a new session");
       setMessages(SessionManager.currentSession.messages);
     };
-    SessionManager.listnercallback = trigger;
+    SessionManager.listenercallback = trigger;
     //trigger();
   });
   //this handle prompt change, prompt is a prop

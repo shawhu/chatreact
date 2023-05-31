@@ -28,7 +28,7 @@ export class Session {
 }
 export class SessionManager {
   public static sessions: Session[] = [];
-  public static listnercallback: () => {};
+  public static listenercallback: () => {};
   public static currentSession: Session = SessionManager.sessions[0];
   public static SetCurrentSessionById(sessionid: string) {
     // Find the session object in the array with the matching session ID
@@ -39,10 +39,10 @@ export class SessionManager {
       // If a matching session was found, set it as the current session
       SessionManager.currentSession = session;
       //try to callback
-      if (SessionManager.listnercallback) {
-        SessionManager.listnercallback(); //trigger any component using session manager to re-render
+      if (SessionManager.listenercallback) {
+        SessionManager.listenercallback(); //trigger any component using session manager to re-render
       } else {
-        console.error("listnercallback is undefined, can't call");
+        console.error("listenercallback is undefined, can't call");
       }
     } else {
       // If no matching session was found, throw an error
@@ -116,10 +116,10 @@ export class SessionManager {
       SessionManager.sessions = sessions;
       SessionManager.currentSession = sessions[0];
       //to tell conversation.tsx that sessionmanager is loaded
-      if (SessionManager.listnercallback) {
-        SessionManager.listnercallback(); //trigger any component using session manager to re-render
+      if (SessionManager.listenercallback) {
+        SessionManager.listenercallback(); //trigger any component using session manager to re-render
       } else {
-        console.error("listnercallback is undefined, can't call");
+        console.error("listenercallback is undefined, can't call");
       }
       return sessions; // return the JSON data
     } catch (error) {
@@ -133,10 +133,10 @@ export class SessionManager {
       session.messages = session.messages.slice(0, 2);
       //save to json
       await SessionManager.SaveSessionToJson(session);
-      if (SessionManager.listnercallback) {
-        SessionManager.listnercallback(); //trigger any component using session manager to re-render
+      if (SessionManager.listenercallback) {
+        SessionManager.listenercallback(); //trigger any component using session manager to re-render
       } else {
-        console.error("listnercallback is undefined, can't call");
+        console.error("listenercallback is undefined, can't call");
       }
     }
   }
@@ -144,10 +144,10 @@ export class SessionManager {
     const lastusermessage =
       session.messages[session.messages.length - 2].content;
     session.messages = session.messages.slice(0, -2); //delete both the user and ai response, last 2 messages
-    if (SessionManager.listnercallback) {
-      SessionManager.listnercallback(); //trigger any component using session manager to re-render
+    if (SessionManager.listenercallback) {
+      SessionManager.listenercallback(); //trigger any component using session manager to re-render
     } else {
-      console.error("listnercallback is undefined, can't call");
+      console.error("listenercallback is undefined, can't call");
     }
     return lastusermessage;
   }
@@ -176,10 +176,10 @@ export class SessionManager {
       console.error("Network error:", error);
     }
     //callback
-    if (SessionManager.listnercallback) {
-      SessionManager.listnercallback(); //trigger any component using session manager to re-render
+    if (SessionManager.listenercallback) {
+      SessionManager.listenercallback(); //trigger any component using session manager to re-render
     } else {
-      console.error("listnercallback is undefined, can't call");
+      console.error("listenercallback is undefined, can't call");
     }
     return newSessions;
   }
