@@ -20,7 +20,14 @@ import CharacterPicker from "@/components/characterpicker";
 
 function Conversation({ className, prompt }) {
   const target_bottomRef = useRef(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    { role: "system", content: "loading" },
+  ]);
+  const [changemessagerequest, setChangemessagerequest] = React.useState({
+    index: 0,
+    content: "",
+  });
+
   const [toastopen, setToastopen] = React.useState(false);
   const [toastmessage, setToastmessage] = React.useState("");
   const [showcharactorpicker, setShowcharactorpicker] = React.useState(true);
@@ -214,11 +221,15 @@ function Conversation({ className, prompt }) {
                 <MyMessageBlock rawtext={message.content}></MyMessageBlock>
               }
               secondary={`${getFormattedDateTime(message.completets)}`}
-              className={`rounded-t-xl p-4 ${
+              className={`rounded-t-xl p-4 cursor-pointer ${
                 (message.role === "assistant") | (message.role === "system")
                   ? "rounded-br-xl bg-blue-100 text-black text-left flex-1"
                   : "rounded-bl-xl bg-green-100 text-black text-left flex-1 max-w-full min-w-0"
               } `}
+              onClick={() => {
+                setChangemessagerequest({ index, content: message.content });
+                setShowcharactorpicker(true);
+              }}
             />
           </ListItem>
         ))}
@@ -237,6 +248,8 @@ function Conversation({ className, prompt }) {
       />
       <CharacterPicker
         show={showcharactorpicker}
+        contexttext={messages[0].content}
+        changemessagerequest={changemessagerequest}
         handleClose={() => {
           setShowcharactorpicker(!showcharactorpicker);
         }}

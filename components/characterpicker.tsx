@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   TextField,
@@ -13,19 +13,25 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import { Config } from "@/common/config";
 
-export default function CharacterPicker({ show, handleClose }) {
+import { Session, Message, SessionManager } from "@/common/session";
+
+export default function CharacterPicker({
+  show,
+  contexttext,
+  changemessagerequest,
+  handleClose,
+}) {
+  const [context, setContext] = React.useState(changemessagerequest.content);
+  useEffect(() => {
+    //console.log(changemessagerequest);
+    setContext(changemessagerequest.content);
+  }, [changemessagerequest]);
   const handleSave = async () => {
-    const myconfig = await Config.GetConfigInstanceAsync();
-    myconfig.openaikey = openaikey;
-    myconfig.maxtokencontext = maxtokencontext;
-    myconfig.maxtokenreply = maxtokenreply;
-    myconfig.ctrlenter = ctrlenter;
-    myconfig.voiceover = voiceover;
-
-    await myconfig.SaveAsync();
-    refreshindexpageconfig(myconfig);
+    SessionManager.currentSession.messages[changemessagerequest.index].content =
+      context;
+    await SessionManager.SaveSessionToJson(SessionManager.currentSession);
+    //handleClose will update conversation.tsx
     handleClose();
   };
   return (
@@ -37,11 +43,16 @@ export default function CharacterPicker({ show, handleClose }) {
             autoFocus
             required
             margin="dense"
-            id="openaikey"
-            label="Context"
+            id="contexttext"
+            label="Change history"
             type="text"
+            value={context}
             fullWidth
+            multiline
             variant="standard"
+            onChange={(e) => {
+              setContext(e.target.value);
+            }}
           />
         </ListItem>
       </List>

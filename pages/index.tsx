@@ -327,7 +327,11 @@ export default function PersistentDrawerLeft() {
                 console.log("TEST clicked");
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
-                console.log(`sessions: ${SessionManager.sessions}`);
+                console.log(
+                  `sessions: ${JSON.stringify(
+                    SessionManager.currentSession.messages[0]
+                  )}`
+                );
               }}
             >
               TEST
