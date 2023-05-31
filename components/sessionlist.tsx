@@ -12,9 +12,16 @@ import { Session, Message, SessionManager } from "@/common/session";
 
 export default function SessionList() {
   const [mySessions, setMySessions] = React.useState<[Session]>([]);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
   React.useEffect(() => {
     const ggg = async () => {
-      setMySessions(await SessionManager.ReloadAndGetAllSessions());
+      const sessions = await SessionManager.ReloadAndGetAllSessions();
+      const sessionIndex = sessions.findIndex(
+        (session) =>
+          session.sessionId === SessionManager.currentSession.sessionId
+      );
+      setSelectedIndex(sessionIndex);
+      setMySessions(sessions);
     };
     ggg();
   }, []);
@@ -35,9 +42,11 @@ export default function SessionList() {
       {mySessions.map((session, index) => (
         <ListItem key={session.sessionId} disablePadding>
           <ListItemButton
+            selected={selectedIndex === index}
             onClick={() => {
               //console.log("Clicked, session id:" + session.sessionId);
               SessionManager.SetCurrentSessionById(session.sessionId);
+              setSelectedIndex(index);
             }}
           >
             <ListItemText className="flex-1" primary={session.sessionName} />
