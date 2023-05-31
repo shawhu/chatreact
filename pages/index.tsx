@@ -269,8 +269,9 @@ export default function PersistentDrawerLeft() {
                 `onKeyDown checking ctrlenter: ${myconfig.ctrlenter}`
               );
               if (e.keyCode == 13 && (e.ctrlKey || !myconfig.ctrlenter)) {
+                console.log(`send by enter or ctrlenter`);
                 e.preventDefault();
-                setPrompt(message);
+                setPrompt(`${message}`);
                 setMessage("");
               }
             }}
@@ -281,10 +282,10 @@ export default function PersistentDrawerLeft() {
               id="generate"
               variant="contained"
               onClick={() => {
-                //console.log("gen clicked: message is :" + message);
-                setPrompt(message);
+                console.log("gen clicked: message is: " + message);
+                setPrompt(`${message}`);
                 setMessage("");
-                //console.log("prompt is :" + prompt);
+                console.log("prompt is: " + prompt);
               }}
             >
               Gen
@@ -319,6 +320,8 @@ export default function PersistentDrawerLeft() {
                 console.log("TEST clicked");
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
+                console.log(`prompt: ${prompt}`);
+                console.log(`message: ${message}`);
               }}
             >
               TEST
