@@ -15,6 +15,7 @@ export class Session {
   maxToken: number = 0;
   aiheadshotimg: string = "";
   username: string = "";
+  create_ts: number = 0;
   public GetMessagesWithTokenLimit(tokenLimit: number) {
     var newmessages: Message[] = [];
     for (let index = this.messages.length - 2; index >= 0; index--) {
@@ -82,6 +83,7 @@ export class SessionManager {
     const newsession = new Session();
     newsession.sessionId = uuidv4();
     newsession.sessionName = "new session";
+    newsession.create_ts = Math.floor(Date.now() / 1000);
     const msg = new Message();
     msg.role = "system";
     msg.content =

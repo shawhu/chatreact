@@ -12,8 +12,8 @@
         "content": "Hello, I'm an AI, nice to meet you. How can I help you?"
       }
     ],
-    "model": "chatgpt3.5",
-    "maxToken": 2048
+    "model": "gpt-3.5-turbo",
+    "maxToken": 2000
   },
   {
     "sessionId": "e7b2120a-663b-4024-9504-2397c99736fb",
@@ -48,8 +48,8 @@
         "completets": 1685502360
       }
     ],
-    "model": "chatgpt3.5",
-    "maxToken": 2048
+    "model": "gpt-3.5-turbo",
+    "maxToken": 2000
   },
   {
     "sessionId": "e7b2120a-663b-4024-9504-2397c99736fc",
@@ -64,7 +64,7 @@
         "content": "今天需要我做什么呢？"
       }
     ],
-    "model": "chatgpt3.5",
-    "maxToken": 2048
+    "model": "gpt-3.5-turbo",
+    "maxToken": 2000
   }
 ]

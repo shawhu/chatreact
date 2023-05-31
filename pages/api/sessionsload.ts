@@ -34,7 +34,7 @@ async function LoadAllSessions() {
         );
         const outcome = await fs.writeFile(
           sessionfile,
-          JSON.stringify(session),
+          JSON.stringify(session, null, 2),
           "utf-8"
         );
       });
