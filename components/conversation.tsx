@@ -16,12 +16,14 @@ import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
 import { getFormattedDateTime } from "@/common/helper";
 import { Config } from "@/common/config";
+import CharacterPicker from "@/components/characterpicker";
 
 function Conversation({ className, prompt }) {
   const target_bottomRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [toastopen, setToastopen] = React.useState(false);
   const [toastmessage, setToastmessage] = React.useState("");
+  const [showcharactorpicker, setShowcharactorpicker] = React.useState(true);
   //Hello, I'm your friendly AI assistant. What can I do for you today?
   const [audioText, setAudioText] = React.useState("");
   const audioRef = useRef(null);
@@ -189,7 +191,12 @@ function Conversation({ className, prompt }) {
             }`}
           >
             <div>
-              <ListItemAvatar className="flex justify-center">
+              <ListItemAvatar
+                className="flex justify-center cursor-pointer"
+                onClick={() => {
+                  setShowcharactorpicker(true);
+                }}
+              >
                 <Avatar
                   className="w-20 h-20"
                   alt="Remy Sharp"
@@ -226,6 +233,12 @@ function Conversation({ className, prompt }) {
         message={toastmessage}
         onClose={() => {
           setToastopen(false);
+        }}
+      />
+      <CharacterPicker
+        show={showcharactorpicker}
+        handleClose={() => {
+          setShowcharactorpicker(!showcharactorpicker);
         }}
       />
     </>
