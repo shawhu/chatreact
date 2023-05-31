@@ -1,4 +1,5 @@
 import { estimateTokens } from "@/common/helper";
+import { Config } from "@/common/config";
 export class Message {
   role: "user" | "assistant" | "system";
   content: string = "";
@@ -37,7 +38,7 @@ export class SessionManager {
       console.error("listenercallback is undefined, can't call");
     }
   }
-  public static SetCurrentSessionById(sessionid: string) {
+  public static async SetCurrentSessionById(sessionid: string) {
     // Find the session object in the array with the matching session ID
     const session = SessionManager.sessions.find(
       (s) => s.sessionId === sessionid
@@ -45,6 +46,10 @@ export class SessionManager {
     if (session) {
       // If a matching session was found, set it as the current session
       SessionManager.currentSession = session;
+      //save to config
+      const config = await Config.GetConfigInstanceAsync();
+      config.currentsessionid = session.sessionId;
+      await config.SaveAsync();
       //try to callback
       SessionManager.dolistenercallback();
     } else {
@@ -117,7 +122,28 @@ export class SessionManager {
         return session;
       });
       SessionManager.sessions = sessions;
-      SessionManager.currentSession = sessions[0];
+
+      const config = await Config.GetConfigInstanceAsync();
+      console.log(config);
+      if (config.currentsessionid && config.currentsessionid != "") {
+        console.log("found history sessionid");
+        const current_session = SessionManager.sessions.find(
+          (session) => session.sessionId == config.currentsessionid
+        );
+        if (current_session) {
+          SessionManager.currentSession = current_session;
+        } else {
+          SessionManager.currentSession = sessions[0];
+          config.currentsessionid = SessionManager.currentSession.sessionId;
+          await config.SaveAsync();
+        }
+      } else {
+        console.log("no history sessionid has been found");
+        SessionManager.currentSession = sessions[0];
+        config.currentsessionid = SessionManager.currentSession.sessionId;
+        await config.SaveAsync();
+      }
+
       //to tell conversation.tsx that sessionmanager is loaded
       SessionManager.dolistenercallback();
       return sessions; // return the JSON data

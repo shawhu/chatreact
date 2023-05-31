@@ -5,6 +5,7 @@ export class Config {
   maxtokencontext: number = 0;
   maxtokenreply: number = 0;
   voiceover: boolean = false;
+  currentsessionid: string = "";
 
   public static async GetConfigInstanceAsync() {
     //load config from json and return it
@@ -41,6 +42,7 @@ export class Config {
     myconfig.maxtokencontext = jobj.maxtokencontext;
     myconfig.maxtokenreply = jobj.maxtokenreply;
     myconfig.voiceover = jobj.voiceover;
+    myconfig.currentsessionid = jobj.currentsessionid;
     return myconfig;
   }
 }

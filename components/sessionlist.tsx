@@ -23,7 +23,7 @@ export default function SessionList() {
       <ListItem>
         <ListItemButton
           onClick={() => {
-            console.log("New");
+            console.log("New session clicked");
           }}
         >
           <ListItemIcon>

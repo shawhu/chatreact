@@ -267,9 +267,9 @@ export default function PersistentDrawerLeft() {
               setMessage(e.target.value);
             }}
             onKeyDown={async (e) => {
-              console.log(
-                `onKeyDown checking ctrlenter: ${myconfig.ctrlenter}`
-              );
+              // console.log(
+              //   `onKeyDown checking ctrlenter: ${myconfig.ctrlenter}`
+              // );
               if (e.keyCode == 13 && (e.ctrlKey || !myconfig.ctrlenter)) {
                 console.log(`send by enter or ctrlenter`);
                 e.preventDefault();
