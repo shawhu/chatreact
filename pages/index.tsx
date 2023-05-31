@@ -119,6 +119,9 @@ export default function PersistentDrawerLeft() {
   const [dialogMessage, setDialogMessage] = React.useState("");
   const [voiceoverChecked, setvoiceoverChecked] = React.useState(false);
 
+  //this is to show current session name on the top
+  const [sessionname, setSessionname] = React.useState("");
+
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
   //这是用来传给conversation控件处理，发送后message会变空，prompt会变成message内容
@@ -126,13 +129,17 @@ export default function PersistentDrawerLeft() {
   const [myconfig, setMyconfig] = React.useState({});
   React.useEffect(() => {
     // call the GetConfig function to get the API key and other configs
-    async function fetchKeyAsync() {
+    async function getvoiceoverAsync() {
       const config1 = await Config.GetConfigInstanceAsync();
       //console.log(config1);
       setMyconfig(config1);
       setvoiceoverChecked(config1.voiceover);
     }
-    fetchKeyAsync();
+    getvoiceoverAsync();
+    SessionManager.indexpagecallback = () => {
+      console.log("Index page indexpagecallback triggered");
+      setSessionname(SessionManager.currentSession.sessionName);
+    };
   });
 
   const handleDrawerOpen = () => {
@@ -166,7 +173,7 @@ export default function PersistentDrawerLeft() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            这是一个很欢乐的聊天
+            {sessionname}
           </Typography>
           <div className="flex-1 flex justify-end">
             <FormControlLabel

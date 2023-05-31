@@ -30,6 +30,7 @@ export class Session {
 export class SessionManager {
   public static sessions: Session[] = [];
   public static listenercallback: () => {};
+  public static indexpagecallback: () => {};
   public static currentSession: Session = SessionManager.sessions[0];
   private static dolistenercallback() {
     if (SessionManager.listenercallback) {
@@ -52,6 +53,7 @@ export class SessionManager {
       await config.SaveAsync();
       //try to callback
       SessionManager.dolistenercallback();
+      SessionManager.indexpagecallback();
     } else {
       // If no matching session was found, throw an error
       throw new Error(
@@ -146,6 +148,7 @@ export class SessionManager {
 
       //to tell conversation.tsx that sessionmanager is loaded
       SessionManager.dolistenercallback();
+      SessionManager.indexpagecallback();
       return sessions; // return the JSON data
     } catch (error) {
       console.log("server error");
