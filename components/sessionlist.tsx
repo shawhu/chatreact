@@ -7,6 +7,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Session, Message, SessionManager } from "@/common/session";
 
 export default function SessionList() {
@@ -19,6 +20,18 @@ export default function SessionList() {
   }, []);
   return (
     <List>
+      <ListItem>
+        <ListItemButton
+          onClick={() => {
+            console.log("New");
+          }}
+        >
+          <ListItemIcon>
+            <AddCircleOutlineIcon />
+          </ListItemIcon>
+          <ListItemText primary={"New"} />
+        </ListItemButton>
+      </ListItem>
       {mySessions.map((session, index) => (
         <ListItem key={session.sessionId} disablePadding>
           <ListItemButton

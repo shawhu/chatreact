@@ -2,6 +2,8 @@ import * as React from "react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
+import TuneIcon from "@mui/icons-material/Tune";
+import LoginIcon from "@mui/icons-material/Login";
 import { Menu as MenuIcon, Mail as MailIcon } from "@mui/icons-material";
 import MuiAppBar, { AppBarProps } from "@mui/material/AppBar";
 import {
@@ -220,7 +222,7 @@ export default function PersistentDrawerLeft() {
               }}
             >
               <ListItemIcon>
-                <MailIcon />
+                <LoginIcon />
               </ListItemIcon>
               <ListItemText primary={"Login"} />
             </ListItemButton>
@@ -233,9 +235,9 @@ export default function PersistentDrawerLeft() {
               }}
             >
               <ListItemIcon>
-                <MailIcon />
+                <TuneIcon />
               </ListItemIcon>
-              <ListItemText primary={"Config"} />
+              <ListItemText primary={"Settings"} />
             </ListItemButton>
           </ListItem>
         </List>

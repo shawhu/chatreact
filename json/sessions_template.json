@@ -17,15 +17,35 @@
   },
   {
     "sessionId": "e7b2120a-663b-4024-9504-2397c99736fb",
-    "sessionName": "Translator",
+    "sessionName": "英文翻译助手",
     "messages": [
       {
         "role": "system",
-        "content": "You are a friendly translator and you will translate user input to Chinese"
+        "content": "You are a friendly translator. If user enter english you will translate to chinese. If user input chinese you will translate to english."
       },
       {
         "role": "assistant",
-        "content": "Hello, I'm an AI, nice to meet you. I will translate anything to Chinese."
+        "content": "Hello, I'm an AI, nice to meet you. I will translate anything you typed."
+      },
+      {
+        "role": "user",
+        "content": "what is your name?",
+        "completets": 1685502347
+      },
+      {
+        "role": "assistant",
+        "content": "你叫什么名字？",
+        "completets": 1685502350
+      },
+      {
+        "role": "user",
+        "content": "你叫什么名字？",
+        "completets": 1685502355
+      },
+      {
+        "role": "assistant",
+        "content": "What is your name?",
+        "completets": 1685502360
       }
     ],
     "model": "chatgpt3.5",
