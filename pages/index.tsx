@@ -31,12 +31,12 @@ import {
 import { alpha, styled, useTheme } from "@mui/material/styles";
 import { pink } from "@mui/material/colors";
 import DialogConfig from "../components/DialogConfig";
-
-import TestComponent from "../components/testcomponent";
+import EditableLabel from "../components/editablelabel";
 import Conversation from "../components/conversation";
 import SessionList from "../components/sessionlist";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
+
 const PinkSwitch = styled(Switch)(({ theme }) => ({
   "& .MuiSwitch-switchBase.Mui-checked": {
     color: pink[600],
@@ -172,9 +172,7 @@ export default function PersistentDrawerLeft() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            {sessionname}
-          </Typography>
+          <EditableLabel text={sessionname} />
           <div className="flex-1 flex justify-end">
             <FormControlLabel
               control={
@@ -329,8 +327,7 @@ export default function PersistentDrawerLeft() {
                 console.log("TEST clicked");
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
-                console.log(`prompt: ${prompt}`);
-                console.log(`message: ${message}`);
+                console.log(`sessions: ${SessionManager.sessions}`);
               }}
             >
               TEST

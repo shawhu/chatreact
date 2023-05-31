@@ -29,8 +29,10 @@ export default function SessionList() {
     <List>
       <ListItem>
         <ListItemButton
-          onClick={() => {
+          onClick={async () => {
             console.log("New session clicked");
+            const newsession = await SessionManager.CreateSessionAsync();
+            setMySessions(SessionManager.sessions);
           }}
         >
           <ListItemIcon>

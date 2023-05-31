@@ -1,5 +1,7 @@
 import { estimateTokens } from "@/common/helper";
 import { Config } from "@/common/config";
+import { v4 as uuidv4 } from "uuid";
+
 export class Message {
   role: "user" | "assistant" | "system";
   content: string = "";
@@ -75,6 +77,30 @@ export class SessionManager {
       console.log("server error");
       console.error(error);
     }
+  }
+  public static async CreateSessionAsync() {
+    const newsession = new Session();
+    newsession.sessionId = uuidv4();
+    newsession.sessionName = "new session";
+    const msg = new Message();
+    msg.role = "system";
+    msg.content =
+      "You are a friendly assistant and you will happily answer all questions.";
+    newsession.messages = [msg];
+    try {
+      const res = await fetch("/api/sessionsave", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newsession),
+      });
+      //console.log(res);
+    } catch (error) {
+      console.log("server error");
+      console.error(error);
+    }
+    SessionManager.sessions = [...SessionManager.sessions, newsession];
   }
   public static async LoadSessionFromJson(sessionId: string): Promise<Session> {
     try {
