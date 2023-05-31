@@ -342,7 +342,7 @@ export default function PersistentDrawerLeft() {
             <Button
               onClick={async () => {
                 SessionManager.ResetSessionToOriginal(
-                  SessionManager.currentSession
+                  SessionManager.currentSession.sessionId
                 );
                 console.log("delete all executed.");
                 setOpendialog(false);

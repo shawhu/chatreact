@@ -183,12 +183,37 @@ export class SessionManager {
       console.error(error);
     }
   }
-  public static async ResetSessionToOriginal(session: Session) {
-    if (session) {
-      //clean up
-      session.messages = session.messages.slice(0, 2);
+  public static async ResetSessionToOriginal(sessionid: string) {
+    //clean up
+    try {
+      const res = await fetch(`/api/sessionloadtemplate/${sessionid}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      //console.log(res);
+      const sessionData = await res.json();
+      const session = new Session();
+      session.sessionId = sessionData.sessionId;
+      session.sessionName = sessionData.sessionName;
+      session.messages = sessionData.messages;
+      session.model = sessionData.model;
+      session.maxToken = sessionData.maxToken;
+      session.aiheadshotimg = sessionData.aiheadshotimg;
+      session.username = sessionData.username;
       //save to json
       await SessionManager.SaveSessionToJson(session);
+      SessionManager.currentSession = session;
+      SessionManager.dolistenercallback();
+    } catch (error) {
+      console.log("server error, can't find session in template");
+      console.log("will delete all messages until 2 left");
+
+      SessionManager.currentSession.messages =
+        SessionManager.currentSession.messages.slice(0, 2);
+      //save to json
+      await SessionManager.SaveSessionToJson(SessionManager.currentSession);
       SessionManager.dolistenercallback();
     }
   }
