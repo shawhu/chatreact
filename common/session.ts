@@ -82,7 +82,7 @@ export class SessionManager {
   public static async CreateSessionAsync() {
     const newsession = new Session();
     newsession.sessionId = uuidv4();
-    newsession.sessionName = "new session";
+    newsession.sessionName = "Click me to change";
     newsession.create_ts = Math.floor(Date.now() / 1000);
     newsession.messages = [
       {

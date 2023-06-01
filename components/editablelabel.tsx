@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { TextField, Typography, Box } from "@mui/material";
 import { Session, Message, SessionManager } from "@/common/session";
 
-export default function EditableLabel({ text }) {
+export default function EditableLabel({ text, onModified }) {
   const [isEditing, setIsEditing] = useState(false);
   const [currentText, setCurrentText] = useState(text);
 
@@ -17,7 +17,8 @@ export default function EditableLabel({ text }) {
     await SessionManager.SaveSessionToJson(SessionManager.currentSession);
   };
 
-  const handleTextFieldBlur = () => {
+  const handleSave = () => {
+    onModified();
     setIsEditing(false);
   };
 
@@ -36,7 +37,13 @@ export default function EditableLabel({ text }) {
           variant="outlined"
           value={currentText}
           onChange={handleTextFieldChange}
-          onBlur={handleTextFieldBlur}
+          onBlur={handleSave}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault(); // prevent default form submission
+              handleSave(); // call the blur handler function
+            }
+          }}
           InputProps={{ sx: { fontSize: "1.5rem", color: "white" } }} // set font size of text field
         />
       ) : (

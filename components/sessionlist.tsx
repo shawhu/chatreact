@@ -10,7 +10,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Session, Message, SessionManager } from "@/common/session";
 
-export default function SessionList() {
+export default function SessionList(refreshtimestamp) {
   const [mySessions, setMySessions] = React.useState<[Session]>([]);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   React.useEffect(() => {
@@ -25,6 +25,14 @@ export default function SessionList() {
     };
     ggg();
   }, []);
+  React.useEffect(() => {
+    const sessions = SessionManager.sessions;
+    const sessionIndex = sessions.findIndex(
+      (session) => session.sessionId === SessionManager.currentSession.sessionId
+    );
+    setSelectedIndex(sessionIndex);
+    setMySessions(sessions);
+  });
   return (
     <List>
       <ListItem>

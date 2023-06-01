@@ -118,6 +118,8 @@ export default function PersistentDrawerLeft() {
   const [opendialog, setOpendialog] = React.useState(false);
   const [dialogMessage, setDialogMessage] = React.useState("");
   const [voiceoverChecked, setvoiceoverChecked] = React.useState(false);
+  const [sessionlistrefreshtimestamp, setSessionlistrefreshtimestamp] =
+    React.useState(0);
 
   //this is to show current session name on the top
   const [sessionname, setSessionname] = React.useState("");
@@ -172,7 +174,13 @@ export default function PersistentDrawerLeft() {
           >
             <MenuIcon />
           </IconButton>
-          <EditableLabel text={sessionname} />
+          <EditableLabel
+            text={sessionname}
+            onModified={() => {
+              console.log("setSessionlistrefreshtimestamp triggered");
+              setSessionlistrefreshtimestamp(sessionlistrefreshtimestamp + 1);
+            }}
+          />
           <div className="flex-1 flex justify-end">
             <FormControlLabel
               control={
@@ -217,7 +225,7 @@ export default function PersistentDrawerLeft() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <SessionList />
+        <SessionList refreshtimestamp={sessionlistrefreshtimestamp} />
         <Divider />
         <List>
           <ListItem disablePadding>

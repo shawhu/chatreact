@@ -49,6 +49,8 @@ function Conversation({ className, prompt }) {
     if (prompt && prompt.value != "") {
       handlePrompt(prompt.value);
       console.log(`conversation got the prompt prop changes: ${prompt}`);
+    } else {
+      ClearAudioText();
     }
   }, [prompt]);
   //this helps to scroll to the bottom when messages changes.
