@@ -16,7 +16,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
 import { getFormattedDateTime } from "@/common/helper";
 import { Config } from "@/common/config";
-import CharacterPicker from "@/components/characterpicker";
+import HistoryEditor from "@/components/HistoryEditor";
 
 function Conversation({ className, prompt }) {
   const target_bottomRef = useRef(null);
@@ -30,7 +30,7 @@ function Conversation({ className, prompt }) {
 
   const [toastopen, setToastopen] = React.useState(false);
   const [toastmessage, setToastmessage] = React.useState("");
-  const [showcharactorpicker, setShowcharactorpicker] = React.useState(true);
+  const [showhistoryeditor, setShowhistoryeditor] = React.useState(false);
   //Hello, I'm your friendly AI assistant. What can I do for you today?
   const [audioText, setAudioText] = React.useState("");
   const audioRef = useRef(null);
@@ -228,7 +228,7 @@ function Conversation({ className, prompt }) {
               } `}
               onClick={() => {
                 setChangemessagerequest({ index, content: message.content });
-                setShowcharactorpicker(true);
+                setShowhistoryeditor(true);
               }}
             />
           </ListItem>
@@ -246,12 +246,12 @@ function Conversation({ className, prompt }) {
           setToastopen(false);
         }}
       />
-      <CharacterPicker
-        show={showcharactorpicker}
+      <HistoryEditor
+        show={showhistoryeditor}
         contexttext={messages[0].content}
         changemessagerequest={changemessagerequest}
         handleClose={() => {
-          setShowcharactorpicker(!showcharactorpicker);
+          setShowhistoryeditor(!showhistoryeditor);
         }}
       />
     </>

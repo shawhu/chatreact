@@ -16,7 +16,7 @@ import {
 
 import { Session, Message, SessionManager } from "@/common/session";
 
-export default function CharacterPicker({
+export default function HistoryEditor({
   show,
   contexttext,
   changemessagerequest,
@@ -36,7 +36,7 @@ export default function CharacterPicker({
   };
   return (
     <Dialog open={show} onClose={handleClose} maxWidth="lg" fullWidth={true}>
-      <DialogTitle>Customize your character</DialogTitle>
+      <DialogTitle>Change history</DialogTitle>
       <List className="m-12">
         <ListItem>
           <TextField
@@ -44,7 +44,7 @@ export default function CharacterPicker({
             required
             margin="dense"
             id="contexttext"
-            label="Change history"
+            label="History text"
             type="text"
             value={context}
             fullWidth
