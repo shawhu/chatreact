@@ -27,7 +27,7 @@ async function LoadAllSessions() {
       );
       const template = await fs.readFile(template_file, "utf-8");
       const template_sessions = JSON.parse(template);
-      template_sessions.forEach(async (session) => {
+      template_sessions.forEach(async (session: any) => {
         const sessionfile = path.join(
           process.cwd(),
           `json/sessions/${session.sessionId}.json`

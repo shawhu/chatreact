@@ -24,7 +24,7 @@ export function estimateTokens(str: string): number {
   return encoded.bpe.length;
 }
 
-export function getFormattedDateTime(unixTime: number) {
+export function getFormattedDateTime(unixTime?: number) {
   if (!unixTime) {
     return "";
   }

@@ -30,10 +30,10 @@ import {
 } from "@mui/material";
 import { alpha, styled, useTheme } from "@mui/material/styles";
 import { pink } from "@mui/material/colors";
-import DialogConfig from "../components/DialogConfig";
-import EditableLabel from "../components/editablelabel";
-import Conversation from "../components/conversation";
-import SessionList from "../components/sessionlist";
+import DialogConfig from "@/components/dialogconfig";
+import EditableLabel from "@/components/editablelabel";
+import Conversation from "@/components/conversation";
+import SessionList from "@/components/sessionlist";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
 
@@ -81,13 +81,13 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   }),
 }));
 
-interface AppBarProps extends AppBarProps {
+interface MyAppBarProps extends AppBarProps {
   open?: boolean;
 }
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
+})<MyAppBarProps>(({ theme, open }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -127,8 +127,8 @@ export default function PersistentDrawerLeft() {
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
   //这是用来传给conversation控件处理，发送后message会变空，prompt会变成message内容
-  const [prompt, setPrompt] = React.useState(""); //处理完成后prompt会变空
-  const [myconfig, setMyconfig] = React.useState({});
+  const [prompt, setPrompt] = React.useState({ value: "" }); //处理完成后prompt会变空
+  const [myconfig, setMyconfig] = React.useState(new Config());
   React.useEffect(() => {
     // call the GetConfig function to get the API key and other configs
     async function getvoiceoverAsync() {
@@ -155,7 +155,7 @@ export default function PersistentDrawerLeft() {
     setOpendialog(false);
   };
 
-  const RefreshIndexPageConfig = (config) => {
+  const RefreshIndexPageConfig = (config: any) => {
     console.log("got config callback from dialogconfig");
     console.log(config);
     setMyconfig(config);
@@ -263,7 +263,7 @@ export default function PersistentDrawerLeft() {
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}
-        <Conversation prompt={prompt} />
+        <Conversation prompt={prompt} voiceover={voiceoverChecked} />
         {/*this is the input area with buttons*/}
         <Box className="w-full min-h-[130px] flex">
           <TextField

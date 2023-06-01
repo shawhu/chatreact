@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { Config } from "@/common/config";
 
-function DialogConfig({ open, handleClose, refreshindexpageconfig }) {
+function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
   const [openaikey, setOpenaikey] = React.useState("");
   const [maxtokencontext, setMaxtokencontext] = React.useState(-1);
   const [maxtokenreply, setMaxtokenreply] = React.useState(-1);
@@ -96,7 +96,8 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }) {
               variant="standard"
               value={maxtokencontext}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setMaxtokencontext(event.target.value);
+                const newValue = parseInt(event.target.value); // convert to number
+                setMaxtokencontext(newValue);
               }}
             />
           </Typography>
@@ -114,7 +115,8 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }) {
               variant="standard"
               value={maxtokenreply}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setMaxtokenreply(event.target.value);
+                const newValue = parseInt(event.target.value); // convert to number
+                setMaxtokenreply(newValue);
               }}
             />
           </Typography>

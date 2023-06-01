@@ -14,28 +14,43 @@ import {
 //docs reference
 //https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/AVAILABLE_STYLES_HLJS.MD
 //this is the actual block that display the content returned by AI LLM
-export default function MyMessageBlock({ rawtext }) {
-  const [displaytexts, setDisplaytexts] = useState([]);
+export default function MyMessageBlock({ rawtext }: any) {
+  const [displaytexts, setDisplaytexts] = useState<
+    {
+      type: string;
+      content: any;
+      language: string;
+    }[]
+  >([]);
   const [toastopen, setToastopen] = React.useState(false);
   useEffect(() => {
     //using regex to replace ```
-    //const regex = /```([\s\S]+?)```|```([\s\S]+?)$/g;
-    //             ^match[1]       ^match[2]
-    const regex = /```([^`]+)(?:```)?/g;
 
+    // const regex = /```([^`]+)(?:```)?/g;
+    // const matchesArray = Array.from(rawtext.matchAll(regex));
+    // const codeblocks = matchesArray.map(
+    //   (match) =>
+    //     //match[1] ? match[1] : match[2]
+    //     match[1]
+    // );
+
+    const regex = /```([^`]+)(?:```)?/g;
     const matchesArray = Array.from(rawtext.matchAll(regex));
-    const codeblocks = matchesArray.map(
-      (match) =>
+    const codeblocks: string[] = matchesArray.map(
+      (match: any) =>
         //match[1] ? match[1] : match[2]
         match[1]
     );
+
     const processed = rawtext.replace(regex, `codeblock`);
     //here we add first block of text. if no code found, first block
     // is the one and only block.
     const textblocks = processed.split("codeblock");
     const textlines = textblocks[0].split("\n");
     const actualtext = textlines.join("<br>");
-    var tempdisplaytexts = [{ type: "text", content: actualtext }];
+    var tempdisplaytexts = [
+      { type: "text", content: actualtext, language: "" },
+    ];
     //if there's code block, we then add <code><text>,<code><text>, until the end
     if (textblocks.length > 1) {
       for (let i = 1; i < textblocks.length; i++) {
@@ -57,7 +72,11 @@ export default function MyMessageBlock({ rawtext }) {
         //processing textblock after this codeblock
         const textlines = textblocks[i].split("\n");
         const actualtext = textlines.join("<br>");
-        tempdisplaytexts.push({ type: "text", content: actualtext });
+        tempdisplaytexts.push({
+          type: "text",
+          content: actualtext,
+          language: "",
+        });
       }
     }
     //finally we pass tempdisplaytexts to state variable and to re-render

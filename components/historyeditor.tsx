@@ -21,7 +21,7 @@ export default function HistoryEditor({
   contexttext,
   changemessagerequest,
   handleClose,
-}) {
+}: any) {
   const [context, setContext] = React.useState(changemessagerequest.content);
   useEffect(() => {
     //console.log(changemessagerequest);

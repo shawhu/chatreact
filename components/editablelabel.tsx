@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { TextField, Typography, Box } from "@mui/material";
 import { Session, Message, SessionManager } from "@/common/session";
 
-export default function EditableLabel({ text, onModified }) {
+export default function EditableLabel({ text, onModified }: any) {
   const [isEditing, setIsEditing] = useState(false);
   const [currentText, setCurrentText] = useState(text);
 
@@ -11,7 +11,7 @@ export default function EditableLabel({ text, onModified }) {
     setCurrentText(text);
   }, [text]);
 
-  const handleTextFieldChange = async (event) => {
+  const handleTextFieldChange = async (event: any) => {
     setCurrentText(event.target.value);
     SessionManager.currentSession.sessionName = event.target.value;
     await SessionManager.SaveSessionToJson(SessionManager.currentSession);

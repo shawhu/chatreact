@@ -13,7 +13,7 @@ export default async function handler(
   const { sessionid } = req.query;
   if (req.method === "GET") {
     try {
-      const session = await LoadSessionById(sessionid);
+      const session = await LoadSessionById(sessionid as string);
       //Return the content of the data file in json format
       res.status(200).json(session);
     } catch (error) {
@@ -22,7 +22,7 @@ export default async function handler(
     }
   } else if (req.method === "DELETE") {
     try {
-      const session = await DeleteSessionById(sessionid);
+      const session = await DeleteSessionById(sessionid as string);
       //Return the content of the data file in json format
       res.status(200).json(`ok`);
     } catch (error) {

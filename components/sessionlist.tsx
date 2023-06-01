@@ -10,14 +10,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Session, Message, SessionManager } from "@/common/session";
 
-export default function SessionList(refreshtimestamp) {
-  const [mySessions, setMySessions] = React.useState<[Session]>([]);
+export default function SessionList({ refreshtimestamp }: any) {
+  const [mySessions, setMySessions] = React.useState<Session[]>([]);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   React.useEffect(() => {
     const ggg = async () => {
       const sessions = await SessionManager.ReloadAndGetAllSessions();
       const sessionIndex = sessions.findIndex(
-        (session) =>
+        (session: Session) =>
           session.sessionId === SessionManager.currentSession.sessionId
       );
       setSelectedIndex(sessionIndex);

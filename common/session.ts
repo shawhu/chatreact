@@ -3,9 +3,23 @@ import { Config } from "@/common/config";
 import { v4 as uuidv4 } from "uuid";
 
 export class Message {
-  role: "user" | "assistant" | "system";
+  role: string = "";
   content: string = "";
-  completets: number = -1;
+  completets?: number = -1;
+
+  constructor({
+    role,
+    content,
+    completets,
+  }: {
+    role: string;
+    content: string;
+    completets?: number;
+  }) {
+    this.role = role as "user" | "assistant" | "system";
+    this.content = content;
+    this.completets = completets ?? -1;
+  }
 }
 export class Session {
   sessionId: string = "";
@@ -23,7 +37,7 @@ export class Session {
       newmessages.unshift(msg);
       const value = estimateTokens(JSON.stringify(newmessages));
       if (value > tokenLimit) {
-        newmessages.shift(msg);
+        newmessages.shift();
         break;
       }
     }
@@ -32,8 +46,8 @@ export class Session {
 }
 export class SessionManager {
   public static sessions: Session[] = [];
-  public static listenercallback: () => {};
-  public static indexpagecallback: () => {};
+  public static listenercallback: () => void;
+  public static indexpagecallback: () => void;
   public static currentSession: Session = SessionManager.sessions[0];
   private static dolistenercallback() {
     if (SessionManager.listenercallback) {
@@ -111,7 +125,9 @@ export class SessionManager {
     }
     SessionManager.sessions = [...SessionManager.sessions, newsession];
   }
+  //doesn't have any usage
   public static async LoadSessionFromJson(sessionId: string): Promise<Session> {
+    const session = new Session();
     try {
       const res = await fetch(`/api/sessionload/${sessionId}`, {
         method: "GET",
@@ -121,7 +137,7 @@ export class SessionManager {
       });
       //console.log(res);
       const sessionData = await res.json();
-      const session = new Session();
+
       session.sessionId = sessionData.sessionId;
       session.sessionName = sessionData.sessionName;
       session.messages = sessionData.messages;
@@ -129,11 +145,11 @@ export class SessionManager {
       session.maxToken = sessionData.maxToken;
       session.aiheadshotimg = sessionData.aiheadshotimg;
       session.username = sessionData.username;
-      return session;
     } catch (error) {
       console.log("server error");
       console.error(error);
     }
+    return session;
   }
   public static async ReloadAndGetAllSessions() {
     try {
@@ -146,8 +162,8 @@ export class SessionManager {
       });
       //console.log(res);
       //the res.json<Session>() can't acutally return Session object it doesn't have methods
-      const sessionsData = await res.json<Session[]>();
-      const sessions = sessionsData.map((sessionData) => {
+      const sessionsData = await res.json();
+      const sessions = sessionsData.map((sessionData: any) => {
         const session = new Session();
         session.sessionId = sessionData.sessionId;
         session.sessionName = sessionData.sessionName;
@@ -224,14 +240,16 @@ export class SessionManager {
       SessionManager.dolistenercallback();
     }
   }
-  public static async RegenLastMessage(session: Session): string {
+  public static async RegenLastMessage(session: Session): Promise<string> {
     const lastusermessage =
       session.messages[session.messages.length - 2].content;
     session.messages = session.messages.slice(0, -2); //delete both the user and ai response, last 2 messages
     SessionManager.dolistenercallback();
     return lastusermessage;
   }
-  public static async DeleteSessionAsync(sessionid: string): Session[] {
+  public static async DeleteSessionAsync(
+    sessionid: string
+  ): Promise<Session[]> {
     const newSessions = SessionManager.sessions.filter(
       (session) => session.sessionId !== sessionid
     );

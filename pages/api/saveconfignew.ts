@@ -1,7 +1,7 @@
 import path from "path";
 import { promises as fs } from "fs";
 
-export default async function saveconfig(req, res) {
+export default async function saveconfig(req: any, res: any) {
   try {
     const jsonDirectory = path.join(process.cwd(), "json");
     const configData = JSON.stringify(req.body, null, 2); //filter nothing, and indent 2 chars

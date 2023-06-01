@@ -1,7 +1,7 @@
 export class Config {
-  private static _myconfig: Config = null;
+  private static _myconfig: Config | null = null;
   openaikey: string = "";
-  ctrlenter: string = "";
+  ctrlenter: boolean = false;
   maxtokencontext: number = 0;
   maxtokenreply: number = 0;
   voiceover: boolean = false;

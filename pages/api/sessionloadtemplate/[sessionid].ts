@@ -13,7 +13,7 @@ export default async function handler(
   const { sessionid } = req.query;
   if (req.method === "GET") {
     try {
-      const session = await LoadSessionFromTemplateById(sessionid);
+      const session = await LoadSessionFromTemplateById(sessionid as string);
       //Return the content of the data file in json format
       res.status(200).json(session);
     } catch (error) {
@@ -34,7 +34,7 @@ async function LoadSessionFromTemplateById(sessionid: string) {
     const filePath = jsonDirectory;
     const fileContent = await fs.readFile(filePath, "utf-8");
     const sessions = JSON.parse(fileContent);
-    const session = sessions.find((s) => s.sessionId == sessionid);
+    const session = sessions.find((s: any) => s.sessionId == sessionid);
     return session;
   } catch (error) {
     console.error(error);

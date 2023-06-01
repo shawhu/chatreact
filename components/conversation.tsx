@@ -16,12 +16,20 @@ import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
 import { getFormattedDateTime } from "@/common/helper";
 import { Config } from "@/common/config";
-import HistoryEditor from "@/components/HistoryEditor";
+import HistoryEditor from "@/components/historyeditor";
 
-function Conversation({ className, prompt }) {
-  const target_bottomRef = useRef(null);
+function Conversation({
+  prompt,
+  voiceover,
+}: {
+  prompt: {
+    value: string;
+  };
+  voiceover: boolean;
+}) {
+  const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState([
-    { role: "system", content: "loading" },
+    new Message({ role: "system", content: "loading", completets: 1 }),
   ]);
   const [changemessagerequest, setChangemessagerequest] = React.useState({
     index: 0,
@@ -49,14 +57,14 @@ function Conversation({ className, prompt }) {
     if (prompt && prompt.value != "") {
       handlePrompt(prompt.value);
       console.log(`conversation got the prompt prop changes: ${prompt}`);
-    } else {
-      ClearAudioText();
     }
   }, [prompt]);
   //this helps to scroll to the bottom when messages changes.
   useEffect(() => {
     // scrollIntoView function will be called when messages are updated
-    target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    if (target_bottomRef.current) {
+      target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
   const ClearAudioText = () => {
     setAudioText("");
@@ -73,22 +81,22 @@ function Conversation({ className, prompt }) {
     );
     const newmessages = [
       ...messages,
-      {
+      new Message({
         role: "user",
         content: prompt,
         completets: Math.floor(Date.now() / 1000),
-      },
-      { role: "assistant", content: "Thinking..." },
+      }),
+      new Message({
+        role: "assistant",
+        content: "Thinking...",
+        completets: Math.floor(Date.now() / 1000),
+      }),
     ];
     setMessages(newmessages);
     SessionManager.currentSession.messages = newmessages;
     SessionManager.SaveSessionToJson(SessionManager.currentSession);
     // abort signal for fetch
     const controller = new AbortController();
-    const cancel = () => {
-      hasCancel = true;
-      controller.abort();
-    };
 
     //actual calling api to get a response stream
     const host = "https://api.openai.com";
@@ -176,7 +184,7 @@ function Conversation({ className, prompt }) {
             console.log(`${JSON.stringify(messages)}`);
           }}
         >
-          {audioText != "" && Config.GetConfig().voiceover ? (
+          {audioText != "" && voiceover ? (
             <audio
               ref={audioRef}
               src={`http://localhost:5002/api/tts?text=${encodeURIComponent(
@@ -194,23 +202,18 @@ function Conversation({ className, prompt }) {
             key={`message_${index}`}
             alignItems="flex-start"
             className={`flex justify-start ${
-              (message.role === "assistant") | (message.role === "system")
+              message.role === "assistant" || message.role === "system"
                 ? "flex-row "
                 : "flex-row-reverse"
             }`}
           >
             <div>
-              <ListItemAvatar
-                className="flex justify-center cursor-pointer"
-                onClick={() => {
-                  setShowcharactorpicker(true);
-                }}
-              >
+              <ListItemAvatar className="flex justify-center cursor-pointer">
                 <Avatar
                   className="w-20 h-20"
                   alt="Remy Sharp"
                   src={`${
-                    (message.role === "assistant") | (message.role === "system")
+                    message.role === "assistant" || message.role === "system"
                       ? "/headshots/pure/00033-3165699849.jpg"
                       : ""
                   }`}
@@ -224,7 +227,7 @@ function Conversation({ className, prompt }) {
               }
               secondary={`${getFormattedDateTime(message.completets)}`}
               className={`rounded-t-xl p-4 cursor-pointer ${
-                (message.role === "assistant") | (message.role === "system")
+                message.role === "assistant" || message.role === "system"
                   ? "rounded-br-xl bg-blue-100 text-black text-left flex-1"
                   : "rounded-bl-xl bg-green-100 text-black text-left flex-1 max-w-full min-w-0"
               } `}
@@ -235,9 +238,9 @@ function Conversation({ className, prompt }) {
             />
           </ListItem>
         ))}
-        <ListItem ref={target_bottomRef} className="text-yellow-50">
+        <div ref={target_bottomRef} className="text-yellow-50">
           thebottom
-        </ListItem>
+        </div>
       </List>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
