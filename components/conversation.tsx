@@ -17,6 +17,7 @@ import MyMessageBlock from "@/components/mymessageblock";
 import { getFormattedDateTime } from "@/common/helper";
 import { Config } from "@/common/config";
 import HistoryEditor from "@/components/historyeditor";
+import HeadshotPicker from "@/components/headshotpicker";
 
 function Conversation({
   prompt,
@@ -41,6 +42,8 @@ function Conversation({
   const [showhistoryeditor, setShowhistoryeditor] = React.useState(false);
   //Hello, I'm your friendly AI assistant. What can I do for you today?
   const [audioText, setAudioText] = React.useState("");
+  const [headshotopen, setHeadshotopen] = React.useState(false);
+
   const audioRef = useRef(null);
   //this loads session history
   useEffect(() => {
@@ -208,7 +211,12 @@ function Conversation({
             }`}
           >
             <div>
-              <ListItemAvatar className="flex justify-center cursor-pointer">
+              <ListItemAvatar
+                className="flex justify-center cursor-pointer"
+                onClick={() => {
+                  setHeadshotopen(true);
+                }}
+              >
                 <Avatar
                   className="w-20 h-20"
                   alt="Remy Sharp"
@@ -257,6 +265,12 @@ function Conversation({
         changemessagerequest={changemessagerequest}
         handleClose={() => {
           setShowhistoryeditor(!showhistoryeditor);
+        }}
+      />
+      <HeadshotPicker
+        show={headshotopen}
+        handleClose={() => {
+          setHeadshotopen(false);
         }}
       />
     </>
