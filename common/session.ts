@@ -84,11 +84,18 @@ export class SessionManager {
     newsession.sessionId = uuidv4();
     newsession.sessionName = "new session";
     newsession.create_ts = Math.floor(Date.now() / 1000);
-    const msg = new Message();
-    msg.role = "system";
-    msg.content =
-      "You are a friendly assistant and you will happily answer all questions.";
-    newsession.messages = [msg];
+    newsession.messages = [
+      {
+        role: "system",
+        content:
+          "You are a friendly assistant and you will happily answer all questions.",
+      },
+      {
+        role: "assistant",
+        content: "Hi dear, What can I help you today?",
+      },
+    ];
+
     try {
       const res = await fetch("/api/sessionsave", {
         method: "POST",
