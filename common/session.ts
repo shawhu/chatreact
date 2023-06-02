@@ -177,7 +177,7 @@ export class SessionManager {
       SessionManager.sessions = sessions;
 
       const config = await Config.GetConfigInstanceAsync();
-      console.log(config);
+      //console.log(config);
       if (config.currentsessionid && config.currentsessionid != "") {
         console.log("found history sessionid");
         const current_session = SessionManager.sessions.find(

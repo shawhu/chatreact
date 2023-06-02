@@ -13,7 +13,8 @@
       }
     ],
     "model": "gpt-3.5-turbo",
-    "maxToken": 2000
+    "maxToken": 2000,
+    "aiheadshotimg": "/headshots/fairy/00019-3329581369.jpg"
   },
   {
     "sessionId": "e7b2120a-663b-4024-9504-2397c99736fb",
@@ -49,7 +50,8 @@
       }
     ],
     "model": "gpt-3.5-turbo",
-    "maxToken": 2000
+    "maxToken": 2000,
+    "aiheadshotimg": "/headshots/ai/00017-3896379606.jpg"
   },
   {
     "sessionId": "e7b2120a-663b-4024-9504-2397c99736fc",
@@ -65,6 +67,7 @@
       }
     ],
     "model": "gpt-3.5-turbo",
-    "maxToken": 2000
+    "maxToken": 2000,
+    "aiheadshotimg": "/headshots/pure/00032-1439467013.jpg"
   }
 ]

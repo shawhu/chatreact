@@ -4,13 +4,7 @@ import {
   Box,
   Dialog,
   DialogActions,
-  DialogContent,
-  DialogContentText,
   DialogTitle,
-  Typography,
-  List,
-  ListItem,
-  FormControlLabel,
   Tabs,
   Tab,
   Grid,
@@ -50,9 +44,29 @@ function TabPanel(props: TabPanelProps) {
             columns={{ xs: 2, sm: 3, md: 4, lg: 6, xl: 8 }}
           >
             {data.map((headshot, index) => (
-              <Grid item xs={1} sm={1} md={1} key={index}>
+              <Grid
+                item
+                xs={1}
+                sm={1}
+                md={1}
+                key={index}
+                sx={{ cursor: "pointer" }}
+                onClick={async () => {
+                  console.log("image clicked " + headshot.url);
+                  console.log("try to modify and change session headshot url");
+                  SessionManager.currentSession.aiheadshotimg = headshot.url;
+                  await SessionManager.SaveSessionToJson(
+                    SessionManager.currentSession
+                  );
+                }}
+              >
                 <div>
-                  <Image width={200} height={200} src={headshot.url} />
+                  <Image
+                    width={200}
+                    height={200}
+                    src={headshot.url}
+                    alt="Headshot of a Chatbot"
+                  />
                 </div>
               </Grid>
             ))}
@@ -107,6 +121,7 @@ export default function HeadshotPicker({ show, handleClose }: any) {
       </Box>
       {headshots.genres.map((genre, index) => (
         <TabPanel
+          key={index}
           value={value}
           index={index}
           data={headshots.data.filter((d) => d.genre == genre)}

@@ -29,9 +29,7 @@ function Conversation({
   voiceover: boolean;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState([
-    new Message({ role: "system", content: "loading", completets: 1 }),
-  ]);
+  const [messages, setMessages] = useState([]);
   const [changemessagerequest, setChangemessagerequest] = React.useState({
     index: 0,
     content: "",
@@ -214,7 +212,12 @@ function Conversation({
               <ListItemAvatar
                 className="flex justify-center cursor-pointer"
                 onClick={() => {
-                  setHeadshotopen(true);
+                  if (
+                    message.role === "assistant" ||
+                    message.role === "system"
+                  ) {
+                    setHeadshotopen(true);
+                  }
                 }}
               >
                 <Avatar
@@ -222,7 +225,7 @@ function Conversation({
                   alt="Remy Sharp"
                   src={`${
                     message.role === "assistant" || message.role === "system"
-                      ? "/headshots/pure/00033-3165699849.jpg"
+                      ? SessionManager.currentSession.aiheadshotimg
                       : ""
                   }`}
                 />
@@ -261,7 +264,7 @@ function Conversation({
       />
       <HistoryEditor
         show={showhistoryeditor}
-        contexttext={messages[0].content}
+        contexttext={messages.length > 0 ? messages[0].content : ""}
         changemessagerequest={changemessagerequest}
         handleClose={() => {
           setShowhistoryeditor(!showhistoryeditor);
