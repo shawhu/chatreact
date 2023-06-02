@@ -292,7 +292,7 @@ export default function PersistentDrawerLeft() {
             }}
           />
           {/*this is prompt buttons*/}
-          <Box className="w-[150px] gap-1 p-1 grid grid-cols-2 bg-blue">
+          <Box className="w-[220px] gap-1 p-1 grid grid-cols-3 bg-blue">
             <Button
               id="generate"
               variant="contained"
@@ -327,7 +327,7 @@ export default function PersistentDrawerLeft() {
                 setOpendialog(true);
               }}
             >
-              Delete All
+              Reset
             </Button>
             <Button
               variant="outlined"
@@ -342,7 +342,23 @@ export default function PersistentDrawerLeft() {
                 );
               }}
             >
-              TEST
+              TEST1
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={async () => {
+                console.log("Record button clicked");
+              }}
+            >
+              RECORD
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={async () => {
+                console.log("test3 clicked");
+              }}
+            >
+              TEST3
             </Button>
           </Box>
         </Box>
