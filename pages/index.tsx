@@ -34,6 +34,7 @@ import DialogConfig from "@/components/dialogconfig";
 import EditableLabel from "@/components/editablelabel";
 import Conversation from "@/components/conversation";
 import SessionList from "@/components/sessionlist";
+import VoiceInput from "@/components/voiceinput";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
 
@@ -266,31 +267,38 @@ export default function PersistentDrawerLeft() {
         <Conversation prompt={prompt} voiceover={voiceoverChecked} />
         {/*this is the input area with buttons*/}
         <Box className="w-full min-h-[130px] flex">
-          <TextField
-            className="flex-1 ml-1 bg-white"
-            multiline
-            minRows="4"
-            id="outlined-basic"
-            label={`Your prompt goes here. Press [${
-              myconfig.ctrlenter ? "Ctrl+Enter" : "Enter"
-            }] to submit. Set in config`}
-            variant="outlined"
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value);
-            }}
-            onKeyDown={async (e) => {
-              // console.log(
-              //   `onKeyDown checking ctrlenter: ${myconfig.ctrlenter}`
-              // );
-              if (e.keyCode == 13 && (e.ctrlKey || !myconfig.ctrlenter)) {
-                console.log(`send by enter or ctrlenter`);
-                e.preventDefault();
-                setPrompt({ value: message });
-                setMessage("");
-              }
-            }}
-          />
+          <div className="flex-1 ml-1">
+            <VoiceInput
+              sendbacktext={(text) => {
+                setMessage(text);
+              }}
+            />
+            <TextField
+              fullWidth
+              multiline
+              minRows="4"
+              id="outlined-basic"
+              label={`Your prompt goes here. Press [${
+                myconfig.ctrlenter ? "Ctrl+Enter" : "Enter"
+              }] to submit. Set in config`}
+              variant="outlined"
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
+              onKeyDown={async (e) => {
+                // console.log(
+                //   `onKeyDown checking ctrlenter: ${myconfig.ctrlenter}`
+                // );
+                if (e.keyCode == 13 && (e.ctrlKey || !myconfig.ctrlenter)) {
+                  console.log(`send by enter or ctrlenter`);
+                  e.preventDefault();
+                  setPrompt({ value: message });
+                  setMessage("");
+                }
+              }}
+            />
+          </div>
           {/*this is prompt buttons*/}
           <Box className="w-[220px] gap-1 p-1 grid grid-cols-3 bg-blue">
             <Button
