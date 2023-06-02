@@ -29,7 +29,7 @@ function Conversation({
   voiceover: boolean;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [changemessagerequest, setChangemessagerequest] = React.useState({
     index: 0,
     content: "",

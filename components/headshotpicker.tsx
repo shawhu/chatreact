@@ -8,7 +8,6 @@ import {
   Tabs,
   Tab,
   Grid,
-  Item,
 } from "@mui/material";
 import { Session, Message, SessionManager } from "@/common/session";
 import Image from "next/image";
@@ -17,7 +16,8 @@ interface TabPanelProps {
   index: number;
   value: number;
   genre: string;
-  data: [];
+  handleClose: () => void;
+  data: any[];
 }
 function a11yProps(index: number) {
   return {
@@ -26,7 +26,7 @@ function a11yProps(index: number) {
   };
 }
 function TabPanel(props: TabPanelProps) {
-  const { value, index, genre, data, ...other } = props;
+  const { value, index, genre, data, handleClose, ...other } = props;
 
   return (
     <div
@@ -41,7 +41,7 @@ function TabPanel(props: TabPanelProps) {
           <Grid
             container
             spacing={2}
-            columns={{ xs: 2, sm: 3, md: 4, lg: 6, xl: 8 }}
+            columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 8 }}
           >
             {data.map((headshot, index) => (
               <Grid
@@ -58,6 +58,7 @@ function TabPanel(props: TabPanelProps) {
                   await SessionManager.SaveSessionToJson(
                     SessionManager.currentSession
                   );
+                  handleClose();
                 }}
               >
                 <div>
@@ -76,7 +77,14 @@ function TabPanel(props: TabPanelProps) {
     </div>
   );
 }
-export default function HeadshotPicker({ show, handleClose }: any) {
+
+export default function HeadshotPicker({
+  show,
+  handleClose,
+}: {
+  show: boolean;
+  handleClose: () => void;
+}) {
   //code to run tabs and UI
   const [value, setValue] = React.useState(0);
   useEffect(() => {}, []);
@@ -106,7 +114,7 @@ export default function HeadshotPicker({ show, handleClose }: any) {
   }, []);
 
   return (
-    <Dialog open={show} onClose={handleClose} maxWidth="xxl" fullWidth={true}>
+    <Dialog open={show} onClose={handleClose} maxWidth="xl" fullWidth={true}>
       <DialogTitle>Choose</DialogTitle>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
@@ -124,16 +132,15 @@ export default function HeadshotPicker({ show, handleClose }: any) {
           key={index}
           value={value}
           index={index}
+          genre={genre}
+          handleClose={handleClose}
           data={headshots.data.filter((d) => d.genre == genre)}
         />
       ))}
 
       <DialogActions>
         <Button onClick={handleClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleSave} color="primary">
-          Ok
+          Close
         </Button>
       </DialogActions>
     </Dialog>

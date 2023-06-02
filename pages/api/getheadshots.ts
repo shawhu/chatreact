@@ -5,8 +5,8 @@ import { promises as fs } from "fs";
 const headshotsdir = "public/headshots";
 const urlprefix = "headshots";
 class HeadShot {
-  url: string;
-  genre: string;
+  url: string = "";
+  genre: string = "";
 }
 async function LoadAllHeadshots() {
   const subDirs = await ListSubDirsAsync(headshotsdir);
