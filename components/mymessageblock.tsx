@@ -113,6 +113,9 @@ export default function MyMessageBlock({ rawtext }: any) {
               customStyle={{
                 margin: 0,
               }}
+              onClick={(e: any) => {
+                e.stopPropagation();
+              }}
             >
               {displaytext.content}
             </SyntaxHighlighter>
