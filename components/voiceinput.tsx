@@ -7,17 +7,16 @@ import SendIcon from "@mui/icons-material/Send";
 import MicIcon from "@mui/icons-material/Mic";
 import StopIcon from "@mui/icons-material/Stop";
 import GlobalValues from "@/common/globalvalues";
-const ReactMediaRecorder = dynamic(
-  () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder),
-  {
-    ssr: false,
-  }
-);
+import { ReactMediaRecorder } from "react-media-recorder";
+// const ReactMediaRecorder = dynamic(
+//   () => import("react-media-recorder").then((mod) => mod.ReactMediaRecorder),
+//   {
+//     ssr: false,
+//   }
+// );
 
-export default function VoiceInput({ sendbacktext }: any) {
+const VoiceInput = ({ sendbacktext }: any) => {
   const [isRecording, setIsRecording] = React.useState(false);
-
-  //return <div>{displaytext}</div>;
   return (
     <Box className="absolute z-10 right-56 m-1">
       <ReactMediaRecorder
@@ -107,4 +106,6 @@ export default function VoiceInput({ sendbacktext }: any) {
       />
     </Box>
   );
-}
+};
+
+export default VoiceInput;

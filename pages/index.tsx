@@ -34,9 +34,13 @@ import DialogConfig from "@/components/dialogconfig";
 import EditableLabel from "@/components/editablelabel";
 import Conversation from "@/components/conversation";
 import SessionList from "@/components/sessionlist";
-import VoiceInput from "@/components/voiceinput";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
+//import VoiceInput from "@/components/voiceinput";
+import dynamic from "next/dynamic";
+const VoiceInput = dynamic(() => import("@/components/voiceinput"), {
+  ssr: false,
+});
 
 const PinkSwitch = styled(Switch)(({ theme }) => ({
   "& .MuiSwitch-switchBase.Mui-checked": {
@@ -269,7 +273,7 @@ export default function PersistentDrawerLeft() {
         <Box className="w-full min-h-[130px] flex">
           <div className="flex-1 ml-1">
             <VoiceInput
-              sendbacktext={(text) => {
+              sendbacktext={(text: string) => {
                 setMessage(text);
               }}
             />

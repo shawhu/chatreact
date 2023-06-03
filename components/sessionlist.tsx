@@ -26,12 +26,20 @@ export default function SessionList({ refreshtimestamp }: any) {
     ggg();
   }, []);
   React.useEffect(() => {
-    const sessions = SessionManager.sessions;
-    const sessionIndex = sessions.findIndex(
-      (session) => session.sessionId === SessionManager.currentSession.sessionId
-    );
-    setSelectedIndex(sessionIndex);
-    setMySessions(sessions);
+    if (
+      SessionManager.sessions &&
+      SessionManager.sessions.length > 0 &&
+      SessionManager.currentSession &&
+      SessionManager.currentSession.sessionId
+    ) {
+      const sessions = SessionManager.sessions;
+      const sessionIndex = sessions.findIndex(
+        (session) =>
+          session.sessionId === SessionManager.currentSession.sessionId
+      );
+      setSelectedIndex(sessionIndex);
+      setMySessions(sessions);
+    }
   });
   return (
     <List>
