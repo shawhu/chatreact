@@ -30,4 +30,11 @@ if you don't have a powerful gpu, you can use the cpu version
 
     tts-server --model_name tts_models/en/jenny/jenny
 
-i use coqui-tts https://github.com/coqui-ai/TTS but it can work with any tts that has a http webapi
+I use coqui-tts https://github.com/coqui-ai/TTS but it can work with any tts that has a http webapi
+
+Another demo shows stt, using openai whisper running at local computer. sorry for the loud noises, I was using a webcam.
+
+
+https://github.com/shawhu/chatreact/assets/1240808/2b7baeb1-1a7a-4052-af53-66ab01d6cce5
+
+
