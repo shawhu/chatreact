@@ -18,6 +18,19 @@ export default async function handler(
 async function LoadAllSessions() {
   try {
     const jsonDirectory = path.join(process.cwd(), "json/sessions");
+    try {
+      await fs.access(jsonDirectory);
+    } catch (error) {
+      console.log(`Directory ${jsonDirectory} doesn't exist, create a new one`);
+      fs.mkdir(jsonDirectory, (error) => {
+        if (error) {
+          res
+            .status(500)
+            .json({ message: `Failed to create directory: ${error}` });
+        }
+      });
+    }
+
     const files = await fs.readdir(jsonDirectory);
     if (files.length == 0) {
       //sessions folder is empty, we should create them from sessions_template.json
