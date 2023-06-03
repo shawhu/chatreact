@@ -228,6 +228,13 @@ export class SessionManager {
       //save to json
       await SessionManager.SaveSessionToJson(session);
       SessionManager.currentSession = session;
+      //replace session in sessions
+      const index = SessionManager.sessions.findIndex(
+        (s) => s.sessionId == sessionid
+      );
+      if (index >= 0) {
+        SessionManager.sessions[index] = session;
+      }
       SessionManager.dolistenercallback();
     } catch (error) {
       console.log("server error, can't find session in template");

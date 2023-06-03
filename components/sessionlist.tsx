@@ -40,7 +40,7 @@ export default function SessionList({ refreshtimestamp }: any) {
       setSelectedIndex(sessionIndex);
       setMySessions(sessions);
     }
-  });
+  }, [refreshtimestamp]);
   return (
     <List>
       <ListItem>

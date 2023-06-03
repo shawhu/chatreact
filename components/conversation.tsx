@@ -43,6 +43,122 @@ function Conversation({
   const [headshotopen, setHeadshotopen] = React.useState(false);
 
   const audioRef = useRef(null);
+  const ClearAudioText = () => {
+    setAudioText("");
+  };
+
+  //this handle prompt change, prompt is a prop
+  useEffect(() => {
+    const handlePrompt = async (prompt: string) => {
+      if (!prompt) {
+        return;
+      }
+      const config = await Config.GetConfigInstanceAsync();
+      //console.log(config);
+      console.log("processing prompt:" + prompt);
+      console.log(
+        "add user prompt question message AND assistant placeholder response first"
+      );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const newmessages = [
+        ...SessionManager.currentSession.messages,
+        new Message({
+          role: "user",
+          content: prompt,
+          completets: Math.floor(Date.now() / 1000),
+        }),
+        new Message({
+          role: "assistant",
+          content: "Thinking...",
+          completets: Math.floor(Date.now() / 1000),
+        }),
+      ];
+      setMessages(newmessages);
+      SessionManager.currentSession.messages = newmessages;
+      SessionManager.SaveSessionToJson(SessionManager.currentSession);
+      // abort signal for fetch
+      const controller = new AbortController();
+
+      //actual calling api to get a response stream
+      const host = "https://api.openai.com";
+      //console.log(`${config.openaikey} ${config.maxtokenreply}`);
+      //before calling api, do a sanity check
+      //last one is assistant placeholder message
+      //this will check the 2nd to last message to see if it's from the user
+      if (SessionManager.currentSession.messages.slice(-2)[0].role != "user") {
+        //this is an error, the last message should the one sent from the user
+        console.log(
+          "error, the role of the last message is assistant. stop the processing"
+        );
+        setToastmessage(
+          "error, the role of the last message is assistant. stop the processing"
+        );
+        setToastopen(true);
+        return;
+      }
+      const response = await fetch(`${host}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${config.openaikey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: SessionManager.currentSession
+            .GetMessagesWithTokenLimit(2000)
+            .map(({ role, content }) => ({ role, content })),
+          model: "gpt-3.5-turbo",
+          max_tokens: config.maxtokenreply,
+          stream: true,
+        }),
+        signal: controller.signal,
+      });
+
+      let temptext = "";
+
+      await handleSSE(response, (message) => {
+        if (message === "[DONE]") {
+          console.log("try to save session");
+          const last_message =
+            SessionManager.currentSession.messages[
+              SessionManager.currentSession.messages.length - 1
+            ];
+          last_message.completets = Math.floor(Date.now() / 1000);
+          setAudioText(last_message.content);
+          SessionManager.SaveSessionToJson(SessionManager.currentSession);
+          return;
+        }
+        const data = JSON.parse(message);
+        if (data.error) {
+          //throw new Error(`Error from OpenAI: ${JSON.stringify(data)}`);
+          setMessages((mmm) => {
+            const newmessages = [...mmm];
+            newmessages[newmessages.length - 1].content = JSON.stringify(data);
+            SessionManager.currentSession.messages = newmessages;
+            return newmessages;
+          });
+          return;
+        }
+        const text = data.choices[0]?.delta?.content;
+        if (text !== undefined) {
+          temptext += text;
+          console.log(`temptext:${temptext}`);
+
+          setMessages((mmm) => {
+            const newmessages = [...mmm];
+            newmessages[newmessages.length - 1].content = temptext;
+            SessionManager.currentSession.messages = newmessages;
+            return newmessages;
+          });
+        }
+      });
+      //end of async way----------------------------------------------------------
+    };
+    //only when base change the prompt, will it trigger this handle function
+    if (prompt && prompt.value != "") {
+      handlePrompt(prompt.value);
+      console.log(`conversation got the prompt prop changes: ${prompt}`);
+    }
+  }, [prompt]);
   //this loads session history
   useEffect(() => {
     const trigger = () => {
@@ -52,14 +168,6 @@ function Conversation({
     SessionManager.listenercallback = trigger;
     //trigger();
   });
-  //this handle prompt change, prompt is a prop
-  useEffect(() => {
-    //only when base change the prompt, will it trigger this handle function
-    if (prompt && prompt.value != "") {
-      handlePrompt(prompt.value);
-      console.log(`conversation got the prompt prop changes: ${prompt}`);
-    }
-  }, [prompt]);
   //this helps to scroll to the bottom when messages changes.
   useEffect(() => {
     // scrollIntoView function will be called when messages are updated
@@ -67,111 +175,6 @@ function Conversation({
       target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
-  const ClearAudioText = () => {
-    setAudioText("");
-  };
-  const handlePrompt = async (prompt: string) => {
-    if (!prompt) {
-      return;
-    }
-    const config = await Config.GetConfigInstanceAsync();
-    //console.log(config);
-    console.log("processing prompt:" + prompt);
-    console.log(
-      "add user prompt question message AND assistant placeholder response first"
-    );
-    const newmessages = [
-      ...messages,
-      new Message({
-        role: "user",
-        content: prompt,
-        completets: Math.floor(Date.now() / 1000),
-      }),
-      new Message({
-        role: "assistant",
-        content: "Thinking...",
-        completets: Math.floor(Date.now() / 1000),
-      }),
-    ];
-    setMessages(newmessages);
-    SessionManager.currentSession.messages = newmessages;
-    SessionManager.SaveSessionToJson(SessionManager.currentSession);
-    // abort signal for fetch
-    const controller = new AbortController();
-
-    //actual calling api to get a response stream
-    const host = "https://api.openai.com";
-    //console.log(`${config.openaikey} ${config.maxtokenreply}`);
-    //before calling api, do a sanity check
-    //last one is assistant placeholder message
-    //this will check the 2nd to last message to see if it's from the user
-    if (SessionManager.currentSession.messages.slice(-2)[0].role != "user") {
-      //this is an error, the last message should the one sent from the user
-      console.log(
-        "error, the role of the last message is assistant. stop the processing"
-      );
-      setToastmessage(
-        "error, the role of the last message is assistant. stop the processing"
-      );
-      setToastopen(true);
-      return;
-    }
-    const response = await fetch(`${host}/v1/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${config.openaikey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: SessionManager.currentSession
-          .GetMessagesWithTokenLimit(2000)
-          .map(({ role, content }) => ({ role, content })),
-        model: "gpt-3.5-turbo",
-        max_tokens: config.maxtokenreply,
-        stream: true,
-      }),
-      signal: controller.signal,
-    });
-
-    let temptext = "";
-
-    await handleSSE(response, (message) => {
-      if (message === "[DONE]") {
-        console.log("try to save session");
-        const messages = SessionManager.currentSession.messages;
-        messages[messages.length - 1].completets = Math.floor(
-          Date.now() / 1000
-        );
-        setAudioText(messages[messages.length - 1].content);
-        SessionManager.SaveSessionToJson(SessionManager.currentSession);
-        return;
-      }
-      const data = JSON.parse(message);
-      if (data.error) {
-        //throw new Error(`Error from OpenAI: ${JSON.stringify(data)}`);
-        setMessages((mmm) => {
-          const newmessages = [...mmm];
-          newmessages[newmessages.length - 1].content = JSON.stringify(data);
-          SessionManager.currentSession.messages = newmessages;
-          return newmessages;
-        });
-        return;
-      }
-      const text = data.choices[0]?.delta?.content;
-      if (text !== undefined) {
-        temptext += text;
-        console.log(`temptext:${temptext}`);
-
-        setMessages((mmm) => {
-          const newmessages = [...mmm];
-          newmessages[newmessages.length - 1].content = temptext;
-          SessionManager.currentSession.messages = newmessages;
-          return newmessages;
-        });
-      }
-    });
-    //end of async way----------------------------------------------------------
-  };
 
   return (
     <>

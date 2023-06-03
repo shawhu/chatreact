@@ -165,6 +165,10 @@ export default function PersistentDrawerLeft() {
     console.log(config);
     setMyconfig(config);
   };
+  const RefreshSessionList = () => {
+    console.log("setSessionlistrefreshtimestamp triggered");
+    setSessionlistrefreshtimestamp(sessionlistrefreshtimestamp + 1);
+  };
   return (
     <Box className="flex">
       <CssBaseline />
@@ -179,13 +183,7 @@ export default function PersistentDrawerLeft() {
           >
             <MenuIcon />
           </IconButton>
-          <EditableLabel
-            text={sessionname}
-            onModified={() => {
-              console.log("setSessionlistrefreshtimestamp triggered");
-              setSessionlistrefreshtimestamp(sessionlistrefreshtimestamp + 1);
-            }}
-          />
+          <EditableLabel text={sessionname} onModified={RefreshSessionList} />
           <div className="flex-1 flex justify-end">
             <FormControlLabel
               control={
@@ -347,11 +345,7 @@ export default function PersistentDrawerLeft() {
                 console.log("TEST clicked");
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
-                console.log(
-                  `sessions: ${JSON.stringify(
-                    SessionManager.currentSession.messages[0]
-                  )}`
-                );
+                console.log(SessionManager.sessions[0]);
               }}
             >
               TEST1
@@ -359,10 +353,10 @@ export default function PersistentDrawerLeft() {
             <Button
               variant="outlined"
               onClick={async () => {
-                console.log("Record button clicked");
+                console.log("TEST2 button clicked");
               }}
             >
-              RECORD
+              TEST2
             </Button>
             <Button
               variant="outlined"
@@ -381,10 +375,11 @@ export default function PersistentDrawerLeft() {
             <Button onClick={handleClose}>Cancel</Button>
             <Button
               onClick={async () => {
-                SessionManager.ResetSessionToOriginal(
+                await SessionManager.ResetSessionToOriginal(
                   SessionManager.currentSession.sessionId
                 );
-                console.log("delete all executed.");
+                console.log("Reset session to original");
+                RefreshSessionList();
                 setOpendialog(false);
               }}
               autoFocus
