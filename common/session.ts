@@ -28,6 +28,7 @@ export class Session {
   model: string = "";
   maxToken: number = 0;
   aiheadshotimg: string = "";
+  ainame: string = "";
   username: string = "";
   create_ts: number = 0;
   public GetMessagesWithTokenLimit(tokenLimit: number) {
@@ -42,6 +43,35 @@ export class Session {
       }
     }
     return newmessages;
+  }
+  public GetPromptWithTokenLimit(tokenLimit: number) {
+    if (!this.messages || this.messages.length == 0) {
+      return "";
+    }
+    var prompt = this.messages[0].content;
+    for (let index = 1; index < this.messages.length; index++) {
+      const message = this.messages[index];
+      if (index == 1) {
+        prompt += "\n<START>\n";
+      }
+      if (message.role == "user") {
+        prompt += `${this.username}: ${message.content}\n`;
+      } else if (
+        message.role == "assistant" &&
+        index == this.messages.length - 1
+      ) {
+        //the last message, should be ainame: with no enter
+        prompt += `${this.ainame}:`;
+      } else {
+        prompt += `${this.ainame}: ${message.content}\n`;
+      }
+    }
+    //the last message should be from You the user, checking
+    if (this.messages[this.messages.length - 1].role != "assistant") {
+      prompt += `${this.ainame}:`;
+    }
+
+    return prompt;
   }
 }
 export class SessionManager {
@@ -98,6 +128,7 @@ export class SessionManager {
     newsession.sessionId = uuidv4();
     newsession.sessionName = "Click me to change";
     newsession.create_ts = Math.floor(Date.now() / 1000);
+    newsession.model = "gpt-3.5-turbo";
     newsession.messages = [
       {
         role: "system",
@@ -145,6 +176,7 @@ export class SessionManager {
       session.maxToken = sessionData.maxToken;
       session.aiheadshotimg = sessionData.aiheadshotimg;
       session.username = sessionData.username;
+      session.ainame = sessionData.ainame;
     } catch (error) {
       console.log("server error");
       console.error(error);
@@ -172,6 +204,7 @@ export class SessionManager {
         session.maxToken = sessionData.maxToken;
         session.aiheadshotimg = sessionData.aiheadshotimg;
         session.username = sessionData.username;
+        session.ainame = sessionData.ainame;
         return session;
       });
       SessionManager.sessions = sessions;
@@ -225,6 +258,7 @@ export class SessionManager {
       session.maxToken = sessionData.maxToken;
       session.aiheadshotimg = sessionData.aiheadshotimg;
       session.username = sessionData.username;
+      session.ainame = sessionData.ainame;
       //save to json
       await SessionManager.SaveSessionToJson(session);
       SessionManager.currentSession = session;

@@ -33,6 +33,7 @@ import { pink } from "@mui/material/colors";
 import DialogConfig from "@/components/dialogconfig";
 import EditableLabel from "@/components/editablelabel";
 import Conversation from "@/components/conversation";
+import Conversationllm from "@/components/conversationllm";
 import SessionList from "@/components/sessionlist";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
@@ -266,8 +267,14 @@ export default function PersistentDrawerLeft() {
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}
-        <Conversation prompt={prompt} voiceover={voiceoverChecked} />
-        {/*this is the input area with buttons*/}
+        {SessionManager.currentSession &&
+        SessionManager.currentSession.model == "gpt-3.5-turbo" ? (
+          <Conversation prompt={prompt} voiceover={voiceoverChecked} />
+        ) : (
+          <Conversationllm prompt={prompt} voiceover={voiceoverChecked} />
+        )}
+
+        {/*this is the input area with buttons  this is the input area with buttons  this is the input area with buttons  */}
         <Box className="w-full min-h-[130px] flex">
           <div className="flex-1 ml-1">
             <VoiceInput
@@ -345,7 +352,10 @@ export default function PersistentDrawerLeft() {
                 console.log("TEST clicked");
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
-                console.log(SessionManager.sessions[0]);
+                console.log(
+                  SessionManager.currentSession.GetPromptWithTokenLimit()
+                );
+                console.log(SessionManager.currentSession);
               }}
             >
               TEST1

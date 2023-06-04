@@ -19,7 +19,7 @@ import { Config } from "@/common/config";
 import HistoryEditor from "@/components/historyeditor";
 import HeadshotPicker from "@/components/headshotpicker";
 
-function Conversationllm({
+export default function Conversationllm({
   prompt,
   voiceover,
 }: {
@@ -80,78 +80,84 @@ function Conversationllm({
       const controller = new AbortController();
 
       //actual calling api to get a response stream
-      const host = "http://192.168.42.120:5000/api/v1/generate";
-      //console.log(`${config.openaikey} ${config.maxtokenreply}`);
-      //before calling api, do a sanity check
-      //last one is assistant placeholder message
-      //this will check the 2nd to last message to see if it's from the user
-      if (SessionManager.currentSession.messages.slice(-2)[0].role != "user") {
-        //this is an error, the last message should the one sent from the user
-        console.log(
-          "error, the role of the last message is assistant. stop the processing"
-        );
-        setToastmessage(
-          "error, the role of the last message is assistant. stop the processing"
-        );
-        setToastopen(true);
-        return;
-      }
+      const host = "/api/v1/generate";
+      const requestjobj = {
+        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000),
+        use_story: false,
+        use_memory: false,
+        use_authors_note: false,
+        use_world_info: false,
+        max_context_length: 2048,
+        max_length: 180,
+        rep_pen: 1.1,
+        rep_pen_range: 1024,
+        rep_pen_slope: 0.9,
+        temperature: 0.65,
+        tfs: 0.9,
+        top_a: 0,
+        top_k: 0,
+        top_p: 0.9,
+        typical: 1,
+        sample_order: [6, 0, 1, 2, 3, 4, 5],
+      };
+      const requestbodystr = JSON.stringify(requestjobj);
+      console.log("requesting to kobold api, here is the requesting body");
+      console.log(requestjobj);
+      console.log(requestbodystr);
       const response = await fetch(host, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${config.openaikey}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          messages: SessionManager.currentSession
-            .GetMessagesWithTokenLimit(2000)
-            .map(({ role, content }) => ({ role, content })),
-          model: "gpt-3.5-turbo",
-          max_tokens: config.maxtokenreply,
-          stream: true,
-        }),
+        body: requestbodystr,
         signal: controller.signal,
       });
 
+      const reader = response.body.getReader();
+      let chunks = [];
       let temptext = "";
-
-      await handleSSE(response, (message) => {
-        if (message === "[DONE]") {
-          console.log("try to save session");
-          const last_message =
-            SessionManager.currentSession.messages[
-              SessionManager.currentSession.messages.length - 1
-            ];
-          last_message.completets = Math.floor(Date.now() / 1000);
-          setAudioText(last_message.content);
-          SessionManager.SaveSessionToJson(SessionManager.currentSession);
-          return;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          const allChunks = new Uint8Array(
+            chunks.reduce((acc, chunk) => acc + chunk.length, 0)
+          );
+          let offset = 0;
+          for (let chunk of chunks) {
+            allChunks.set(chunk, offset);
+            offset += chunk.length;
+          }
+          const decodedData = new TextDecoder("utf-8").decode(allChunks);
+          temptext += decodedData;
+          //console.log(decodedData);
+          break;
         }
-        const data = JSON.parse(message);
-        if (data.error) {
-          //throw new Error(`Error from OpenAI: ${JSON.stringify(data)}`);
-          setMessages((mmm) => {
-            const newmessages = [...mmm];
-            newmessages[newmessages.length - 1].content = JSON.stringify(data);
-            SessionManager.currentSession.messages = newmessages;
-            return newmessages;
-          });
-          return;
-        }
-        const text = data.choices[0]?.delta?.content;
-        if (text !== undefined) {
-          temptext += text;
-          console.log(`temptext:${temptext}`);
-
-          setMessages((mmm) => {
-            const newmessages = [...mmm];
-            newmessages[newmessages.length - 1].content = temptext;
-            SessionManager.currentSession.messages = newmessages;
-            return newmessages;
-          });
-        }
+        chunks.push(value);
+      }
+      //temptext is string json
+      let respjobj = JSON.parse(temptext);
+      //reuse temptext
+      temptext = respjobj.results[0].text.trim();
+      const temptextarray = temptext.split("\nYou");
+      if (temptextarray.length > 1) {
+        temptext = temptextarray[0];
+      }
+      console.log("got response from koboldai, print it out now.");
+      console.log(temptext);
+      //now use the resp text to make changes to the local state variable messages
+      setMessages((mmm) => {
+        const newmessages = [...mmm];
+        newmessages[newmessages.length - 1].content = temptext;
+        newmessages[newmessages.length - 1].completets = Math.floor(
+          Date.now() / 1000
+        );
+        setAudioText(temptext);
+        SessionManager.currentSession.messages = newmessages;
+        SessionManager.SaveSessionToJson(SessionManager.currentSession);
+        return newmessages;
       });
-      //end of async way----------------------------------------------------------
+
+      console.log("prompt handling complete");
     };
     //only when base change the prompt, will it trigger this handle function
     if (prompt && prompt.value != "") {
@@ -240,6 +246,7 @@ function Conversationllm({
                   }`}
                 />
               </ListItemAvatar>
+              llm
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
@@ -289,8 +296,6 @@ function Conversationllm({
     </>
   );
 }
-
-export default Conversation;
 export async function handleSSE(
   response: Response,
   onMessage: (message: string) => void

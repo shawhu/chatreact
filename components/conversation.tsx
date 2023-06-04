@@ -152,6 +152,7 @@ function Conversation({
         }
       });
       //end of async way----------------------------------------------------------
+      console.log("prompt handling complete");
     };
     //only when base change the prompt, will it trigger this handle function
     if (prompt && prompt.value != "") {
@@ -182,7 +183,7 @@ function Conversation({
         className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}
       >
         <ListSubheader
-          className="font-bold text-2xl "
+          className="bg-white/10"
           onClick={() => {
             console.log(`conversatoin header clicked`);
             console.log(`${JSON.stringify(messages)}`);
