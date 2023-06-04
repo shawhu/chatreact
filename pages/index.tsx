@@ -33,7 +33,7 @@ import { pink } from "@mui/material/colors";
 import DialogConfig from "@/components/dialogconfig";
 import EditableLabel from "@/components/editablelabel";
 import Conversation from "@/components/conversation";
-import Conversationllm from "@/components/conversationllm";
+import Conversationllmstreaming from "@/components/conversationllmstreaming";
 import SessionList from "@/components/sessionlist";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
@@ -271,7 +271,10 @@ export default function PersistentDrawerLeft() {
         SessionManager.currentSession.model == "gpt-3.5-turbo" ? (
           <Conversation prompt={prompt} voiceover={voiceoverChecked} />
         ) : (
-          <Conversationllm prompt={prompt} voiceover={voiceoverChecked} />
+          <Conversationllmstreaming
+            prompt={prompt}
+            voiceover={voiceoverChecked}
+          />
         )}
 
         {/*this is the input area with buttons  this is the input area with buttons  this is the input area with buttons  */}

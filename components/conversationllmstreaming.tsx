@@ -19,7 +19,7 @@ import { Config } from "@/common/config";
 import HistoryEditor from "@/components/historyeditor";
 import HeadshotPicker from "@/components/headshotpicker";
 
-export default function Conversationllm({
+export default function Conversationllmstreaming({
   prompt,
   voiceover,
 }: {
