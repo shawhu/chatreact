@@ -356,7 +356,7 @@ export default function PersistentDrawerLeft() {
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
                 console.log(
-                  SessionManager.currentSession.GetPromptWithTokenLimit()
+                  SessionManager.currentSession.GetPromptWithTokenLimit(1000)
                 );
                 console.log(SessionManager.currentSession);
               }}

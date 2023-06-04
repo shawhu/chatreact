@@ -22,13 +22,7 @@ async function LoadAllSessions() {
       await fs.access(jsonDirectory);
     } catch (error) {
       console.log(`Directory ${jsonDirectory} doesn't exist, create a new one`);
-      fs.mkdir(jsonDirectory, (error) => {
-        if (error) {
-          res
-            .status(500)
-            .json({ message: `Failed to create directory: ${error}` });
-        }
-      });
+      fs.mkdir(jsonDirectory);
     }
 
     const files = await fs.readdir(jsonDirectory);

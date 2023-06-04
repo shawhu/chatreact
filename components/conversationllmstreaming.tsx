@@ -113,7 +113,9 @@ export default function Conversationllmstreaming({
         body: requestbodystr,
         signal: controller.signal,
       });
-
+      if (!response.body) {
+        return;
+      }
       const reader = response.body.getReader();
       let chunks = [];
       let temptext = "";
