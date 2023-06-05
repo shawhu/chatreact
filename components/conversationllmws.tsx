@@ -19,7 +19,7 @@ import { Config } from "@/common/config";
 import HistoryEditor from "@/components/historyeditor";
 import HeadshotPicker from "@/components/headshotpicker";
 
-export default function Conversationllmstreaming({
+export default function Conversationllmws({
   prompt,
   voiceover,
 }: {
@@ -79,8 +79,22 @@ export default function Conversationllmstreaming({
       // abort signal for fetch
       const controller = new AbortController();
 
-      //actual calling api to get a response stream
-      const host = "/api/v1/generate";
+      //console.log(`${config.openaikey} ${config.maxtokenreply}`);
+      //before calling api, do a sanity check
+      //last one is assistant placeholder message
+      //this will check the 2nd to last message to see if it's from the user
+      if (SessionManager.currentSession.messages.slice(-2)[0].role != "user") {
+        //this is an error, the last message should the one sent from the user
+        console.log(
+          "error, the role of the last message is assistant. stop the processing"
+        );
+        setToastmessage(
+          "error, the role of the last message is assistant. stop the processing"
+        );
+        setToastopen(true);
+        return;
+      }
+      const host = "/api/llmstreamerws";
       const requestjobj = {
         prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000),
         use_story: false,
@@ -113,56 +127,46 @@ export default function Conversationllmstreaming({
         body: requestbodystr,
         signal: controller.signal,
       });
-      if (!response.body) {
-        return;
-      }
-      const reader = response.body.getReader();
-      let chunks = [];
-      let temptext = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          const allChunks = new Uint8Array(
-            chunks.reduce((acc, chunk) => acc + chunk.length, 0)
-          );
-          let offset = 0;
-          for (let chunk of chunks) {
-            allChunks.set(chunk, offset);
-            offset += chunk.length;
-          }
-          const decodedData = new TextDecoder("utf-8").decode(allChunks);
-          temptext += decodedData;
-          //console.log(decodedData);
-          break;
-        }
-        chunks.push(value);
-      }
-      //temptext is string json
-      let respjobj = JSON.parse(temptext);
-      //reuse temptext
-      temptext = respjobj.results[0].text.trim();
-      //initial temptext may have redundent text
-      console.log("initial temptext may have redundent text");
-      console.log(temptext);
-      const temptextarray = temptext.split("\nYou");
-      if (temptextarray.length > 1) {
-        temptext = temptextarray[0];
-      }
-      console.log("got response from koboldai, print it out now.");
-      console.log(temptext);
-      //now use the resp text to make changes to the local state variable messages
-      setMessages((mmm) => {
-        const newmessages = [...mmm];
-        newmessages[newmessages.length - 1].content = temptext;
-        newmessages[newmessages.length - 1].completets = Math.floor(
-          Date.now() / 1000
-        );
-        setAudioText(temptext);
-        SessionManager.currentSession.messages = newmessages;
-        SessionManager.SaveSessionToJson(SessionManager.currentSession);
-        return newmessages;
-      });
 
+      let temptext = "";
+
+      await handleSSE(response, (message) => {
+        if (message === "[DONE]") {
+          console.log("try to save session");
+          const last_message =
+            SessionManager.currentSession.messages[
+              SessionManager.currentSession.messages.length - 1
+            ];
+          last_message.completets = Math.floor(Date.now() / 1000);
+          setAudioText(last_message.content);
+          SessionManager.SaveSessionToJson(SessionManager.currentSession);
+          return;
+        }
+        const data = JSON.parse(message);
+        if (data.error) {
+          //throw new Error(`Error from OpenAI: ${JSON.stringify(data)}`);
+          setMessages((mmm) => {
+            const newmessages = [...mmm];
+            newmessages[newmessages.length - 1].content = JSON.stringify(data);
+            SessionManager.currentSession.messages = newmessages;
+            return newmessages;
+          });
+          return;
+        }
+        const text = data.choices[0]?.delta?.content;
+        if (text !== undefined) {
+          temptext += text;
+          console.log(`temptext:${temptext}`);
+
+          setMessages((mmm) => {
+            const newmessages = [...mmm];
+            newmessages[newmessages.length - 1].content = temptext;
+            SessionManager.currentSession.messages = newmessages;
+            return newmessages;
+          });
+        }
+      });
+      //end of async way----------------------------------------------------------
       console.log("prompt handling complete");
     };
     //only when base change the prompt, will it trigger this handle function
@@ -194,7 +198,7 @@ export default function Conversationllmstreaming({
         className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}
       >
         <ListSubheader
-          className="font-bold text-2xl "
+          className="bg-white/10"
           onClick={() => {
             console.log(`conversatoin header clicked`);
             console.log(`${JSON.stringify(messages)}`);
@@ -252,7 +256,6 @@ export default function Conversationllmstreaming({
                   }`}
                 />
               </ListItemAvatar>
-              llm
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
@@ -301,4 +304,62 @@ export default function Conversationllmstreaming({
       />
     </>
   );
+}
+
+export async function handleSSE(
+  response: Response,
+  onMessage: (message: string) => void
+) {
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    console.log(
+      error
+        ? JSON.stringify(error)
+        : `${response.status} ${response.statusText}`
+    );
+    onMessage(
+      error
+        ? JSON.stringify(error)
+        : `${response.status} ${response.statusText}`
+    );
+    onMessage("[DONE]");
+    return;
+  }
+  if (response.status !== 200) {
+    console.log(`Error from OpenAI: ${response.status} ${response.statusText}`);
+    onMessage(`Error from OpenAI: ${response.status} ${response.statusText}`);
+    onMessage("[DONE]");
+    return;
+  }
+  if (!response.body) {
+    console.log("No response body");
+    return;
+  }
+  const parser = createParser((event) => {
+    if (event.type === "event") {
+      onMessage(event.data);
+    }
+  });
+  for await (const chunk of iterableStreamAsync(response.body)) {
+    const str = new TextDecoder().decode(chunk);
+    parser.feed(str);
+  }
+}
+
+export async function* iterableStreamAsync(
+  stream: ReadableStream
+): AsyncIterableIterator<Uint8Array> {
+  const reader = stream.getReader();
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        return;
+      } else {
+        yield value;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
 }
