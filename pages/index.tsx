@@ -193,32 +193,33 @@ export default function PersistentDrawerLeft() {
             <MenuIcon />
           </IconButton>
           <EditableLabel text={sessionname} onModified={RefreshSessionList} />
-          <div className="flex items-center">
-            <span className="ml-10">Choose Model:</span>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-              <Select
-                sx={{
-                  bgcolor: "white",
-                  color: "black",
-                  border: "1px solid black",
-                }}
-                labelId="backend-select-label"
-                id="backend-select"
-                value={model}
-                onChange={async (event: SelectChangeEvent) => {
-                  SessionManager.currentSession.model = event.target.value;
-                  await SessionManager.SaveSessionToJson(
-                    SessionManager.currentSession
-                  );
-                  setModel(SessionManager.currentSession.model);
-                }}
-              >
-                <MenuItem value={"kobold"}>kobold</MenuItem>
-                <MenuItem value={"gpt-3.5-turbo"}>gpt-3.5-turbo</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
+
           <div className="flex-1 flex justify-end">
+            <div className="flex items-center">
+              <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                <Select
+                  sx={{
+                    bgcolor: "white",
+                    color: "black",
+                    border: "1px solid black",
+                  }}
+                  labelId="backend-select-label"
+                  id="backend-select"
+                  value={model}
+                  onChange={async (event: SelectChangeEvent) => {
+                    SessionManager.currentSession.model = event.target.value;
+                    await SessionManager.SaveSessionToJson(
+                      SessionManager.currentSession
+                    );
+                    setModel(SessionManager.currentSession.model);
+                  }}
+                >
+                  <MenuItem value={"kobold"}>kobold</MenuItem>
+                  <MenuItem value={"gpt-3.5-turbo"}>gpt-3.5-turbo</MenuItem>
+                </Select>
+              </FormControl>
+              <span className="mr-10">Choose Backend</span>
+            </div>
             <FormControlLabel
               control={
                 <GreenSwitch
