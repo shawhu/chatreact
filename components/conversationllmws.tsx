@@ -143,7 +143,14 @@ export default function Conversationllmws({
               SessionManager.currentSession.messages.length - 1
             ];
           last_message.completets = Math.floor(Date.now() / 1000);
-          setAudioText(last_message.content);
+          //process the content
+          //get rid of italic items
+          let regexpattern = /\*([\s\S]*?)\*/g;
+          let tempaudiotext = last_message.content.replace(regexpattern, ``);
+          //get rid of codeblocks
+          regexpattern = /```([\s\S]*?)```/g;
+          tempaudiotext = tempaudiotext.replace(regexpattern, ``);
+          setAudioText(tempaudiotext);
           SessionManager.SaveSessionToJson(SessionManager.currentSession);
           return;
         }

@@ -47,7 +47,13 @@ export default function MyMessageBlock({ rawtext }: any) {
     // is the one and only block.
     const textblocks = processed.split("codeblock");
     const textlines = textblocks[0].split("\n");
-    const actualtext = textlines.join("<br>");
+    let actualtext = textlines.join("<br>");
+    //find italic items
+    const regexpattern = /\*([\s\S]*?)\*/g;
+    actualtext = actualtext.replace(
+      regexpattern,
+      `<em style="Color: #238442">$1</em>`
+    );
     var tempdisplaytexts = [
       { type: "text", content: actualtext, language: "" },
     ];
@@ -72,6 +78,7 @@ export default function MyMessageBlock({ rawtext }: any) {
         //processing textblock after this codeblock
         const textlines = textblocks[i].split("\n");
         const actualtext = textlines.join("<br>");
+
         tempdisplaytexts.push({
           type: "text",
           content: actualtext,
