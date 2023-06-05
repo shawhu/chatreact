@@ -21,6 +21,7 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
   const [maxtokenreply, setMaxtokenreply] = React.useState(-1);
   const [ctrlenter, setCtrlenter] = React.useState(false);
   const [voiceover, setVoiceover] = React.useState(false);
+  const [koboldapi, setKoboldapi] = React.useState("");
 
   React.useEffect(() => {
     const fetchConfigData = async () => {
@@ -31,6 +32,7 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
         setMaxtokenreply(myconfig.maxtokenreply);
         setCtrlenter(myconfig.ctrlenter);
         setVoiceover(myconfig.voiceover);
+        setKoboldapi(myconfig.koboldapi);
       } catch (error) {
         console.error(error);
       }
@@ -44,6 +46,7 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
     myconfig.maxtokenreply = maxtokenreply;
     myconfig.ctrlenter = ctrlenter;
     myconfig.voiceover = voiceover;
+    myconfig.koboldapi = koboldapi;
 
     await myconfig.SaveAsync();
     refreshindexpageconfig(myconfig);
@@ -120,6 +123,22 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
               }}
             />
           </Typography>
+        </ListItem>
+        <ListItem>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="koboldapi"
+            label="Kobold API Url"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={koboldapi}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setKoboldapi(event.target.value);
+            }}
+          />
         </ListItem>
       </List>
       <DialogActions>

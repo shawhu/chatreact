@@ -6,6 +6,7 @@ export class Config {
   maxtokenreply: number = 0;
   voiceover: boolean = false;
   currentsessionid: string = "";
+  koboldapi: string = "";
 
   public static async GetConfigInstanceAsync() {
     //load config from json and return it
@@ -43,6 +44,7 @@ export class Config {
     myconfig.maxtokenreply = jobj.maxtokenreply;
     myconfig.voiceover = jobj.voiceover;
     myconfig.currentsessionid = jobj.currentsessionid;
+    myconfig.koboldapi = jobj.koboldapi;
     return myconfig;
   }
 }

@@ -75,7 +75,7 @@ export class Session {
   }
 }
 export class SessionManager {
-  public static sessions: Session[] = [];
+  public static sessions: Session[] = [new Session(0)];
   public static listenercallback: () => void;
   public static indexpagecallback: () => void;
   public static currentSession: Session = SessionManager.sessions[0];

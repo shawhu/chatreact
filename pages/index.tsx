@@ -27,6 +27,10 @@ import {
   DialogContent,
   FormControlLabel,
   Switch,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { alpha, styled, useTheme } from "@mui/material/styles";
 import { pink } from "@mui/material/colors";
@@ -129,6 +133,8 @@ export default function PersistentDrawerLeft() {
 
   //this is to show current session name on the top
   const [sessionname, setSessionname] = React.useState("");
+  //this's to show session model
+  const [model, setModel] = React.useState("");
 
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
@@ -147,6 +153,8 @@ export default function PersistentDrawerLeft() {
     SessionManager.indexpagecallback = () => {
       console.log("Index page indexpagecallback triggered");
       setSessionname(SessionManager.currentSession.sessionName);
+      setModel(SessionManager.currentSession.model);
+      setPrompt("");
     };
   });
 
@@ -185,6 +193,31 @@ export default function PersistentDrawerLeft() {
             <MenuIcon />
           </IconButton>
           <EditableLabel text={sessionname} onModified={RefreshSessionList} />
+          <div className="flex items-center">
+            <span className="ml-10">Choose Model:</span>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+              <Select
+                sx={{
+                  bgcolor: "white",
+                  color: "black",
+                  border: "1px solid black",
+                }}
+                labelId="backend-select-label"
+                id="backend-select"
+                value={model}
+                onChange={async (event: SelectChangeEvent) => {
+                  SessionManager.currentSession.model = event.target.value;
+                  await SessionManager.SaveSessionToJson(
+                    SessionManager.currentSession
+                  );
+                  setModel(SessionManager.currentSession.model);
+                }}
+              >
+                <MenuItem value={"kobold"}>kobold</MenuItem>
+                <MenuItem value={"gpt-3.5-turbo"}>gpt-3.5-turbo</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
           <div className="flex-1 flex justify-end">
             <FormControlLabel
               control={
@@ -267,11 +300,18 @@ export default function PersistentDrawerLeft() {
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}
-        {SessionManager.currentSession &&
-        SessionManager.currentSession.model == "gpt-3.5-turbo" ? (
-          <Conversation prompt={prompt} voiceover={voiceoverChecked} />
+        {model == "gpt-3.5-turbo" ? (
+          <Conversation
+            prompt={prompt}
+            voiceover={voiceoverChecked}
+            initialmessages={SessionManager.currentSession.messages}
+          />
         ) : (
-          <Conversationllmws prompt={prompt} voiceover={voiceoverChecked} />
+          <Conversationllmws
+            prompt={prompt}
+            voiceover={voiceoverChecked}
+            initialmessages={SessionManager.currentSession.messages}
+          />
         )}
 
         {/*this is the input area with buttons  this is the input area with buttons  this is the input area with buttons  */}
@@ -356,6 +396,8 @@ export default function PersistentDrawerLeft() {
                   SessionManager.currentSession.GetPromptWithTokenLimit(1000)
                 );
                 console.log(SessionManager.currentSession);
+                console.log("prompt is:");
+                console.log(prompt);
               }}
             >
               TEST1

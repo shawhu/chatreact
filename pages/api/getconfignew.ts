@@ -8,7 +8,7 @@ export default async function getconfignew(req: any, resp: any) {
   try {
     await fs.access(filePath);
   } catch (error) {
-    const defaultContents = `{"openaikey":"","ctrlenter":false,"maxtokencontext":4096,"maxtokenreply":2000,"voiceover":false,"currentsessionid":""}`;
+    const defaultContents = `{"openaikey":"","ctrlenter":false,"maxtokencontext":4096,"maxtokenreply":2000,"voiceover":false,"currentsessionid":"","koboldapi":""}`;
     await fs.writeFile(filePath, defaultContents);
   }
 

@@ -22,6 +22,7 @@ import HeadshotPicker from "@/components/headshotpicker";
 function Conversation({
   prompt,
   voiceover,
+  initialmessages,
 }: {
   prompt: {
     value: string;
@@ -29,7 +30,7 @@ function Conversation({
   voiceover: boolean;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(initialmessages);
   const [changemessagerequest, setChangemessagerequest] = React.useState({
     index: 0,
     content: "",

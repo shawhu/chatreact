@@ -2,14 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { WebSocket } from "ws";
 import { Readable } from "stream";
 
-// WebSocket client and request options
-const wsOptions = {
-  url: "ws://192.168.42.120:5005/api/v1/stream",
-  headers: {
-    "Content-Type": "application/json",
-  },
-};
-
+//url: "ws://192.168.42.120:5005/api/v1/stream",
 const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
   // Set up server-sent events response headers
   res.setHeader("Cache-Control", "no-cache");
@@ -21,10 +14,21 @@ const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const bodytext = JSON.stringify(req.body);
+    const url = req.body.koboldapi;
+    const bodytext = JSON.stringify(req.body.data);
+    if (!url || url == "" || !bodytext || bodytext == "") {
+      res.status(400).json({ error: "Missing koboldapi or data field" });
+      return;
+    }
     //console.log(bodytext);
     // Create a WebSocket client and connect to the external API
-    const ws = new WebSocket(wsOptions.url, { headers: wsOptions.headers });
+    const ws = new WebSocket(url, {
+      headers: [
+        {
+          "Content-Type": "application/json",
+        },
+      ],
+    });
     ws.once("open", () => {
       // Send the request payload to the API using the WebSocket connection
       ws.send(bodytext, (err) => {

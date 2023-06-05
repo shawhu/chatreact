@@ -22,6 +22,7 @@ import HeadshotPicker from "@/components/headshotpicker";
 export default function Conversationllmws({
   prompt,
   voiceover,
+  initialmessages,
 }: {
   prompt: {
     value: string;
@@ -29,7 +30,7 @@ export default function Conversationllmws({
   voiceover: boolean;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(initialmessages);
   const [changemessagerequest, setChangemessagerequest] = React.useState({
     index: 0,
     content: "",
@@ -95,6 +96,7 @@ export default function Conversationllmws({
         return;
       }
       const host = "/api/llmstreamerws";
+      const koboldapi = Config.GetConfig().koboldapi;
       const requestjobj = {
         prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000),
         use_story: false,
@@ -115,7 +117,10 @@ export default function Conversationllmws({
         sample_order: [6, 0, 1, 2, 3, 4, 5],
         stopping_string: ["\nYou"],
       };
-      const requestbodystr = JSON.stringify(requestjobj);
+      const requestbodystr = JSON.stringify({
+        koboldapi,
+        data: requestjobj,
+      });
       console.log("requesting to kobold api, here is the requesting body");
       console.log(requestjobj);
       console.log(requestbodystr);
