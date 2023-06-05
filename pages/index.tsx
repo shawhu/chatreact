@@ -330,7 +330,7 @@ export default function PersistentDrawerLeft() {
               id="outlined-basic"
               label={`Your prompt goes here. Press [${
                 myconfig.ctrlenter ? "Ctrl+Enter" : "Enter"
-              }] to submit. Set in config`}
+              }] to submit. Change it in the Settings`}
               variant="outlined"
               value={message}
               onChange={(e) => {
