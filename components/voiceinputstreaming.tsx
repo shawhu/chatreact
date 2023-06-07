@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { Config } from "@/common/config";
+import { Box } from "@mui/material";
+import Button from "@mui/material/Button";
+import SendIcon from "@mui/icons-material/Send";
+import MicIcon from "@mui/icons-material/Mic";
+import StopIcon from "@mui/icons-material/Stop";
+import GlobalValues from "@/common/globalvalues";
 
-const AudioRecorder = () => {
+const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
   const [isRecording, setIsRecording] = React.useState<boolean>(false);
   const [stream, setStream] = React.useState<MediaStream | null>(null);
   const [voiceRecorder, setVoiceRecorder] = React.useState(null);
-  const [audioChunks, setAudioChunks] = React.useState([]);
-  const [sttresult, setSttresult] = React.useState("");
+  const [chunks, setChunks] = React.useState([]);
+  const [apicallcount, setApicallcount] = React.useState(0);
 
   const StartRecording = async () => {
+    console.log("StartRecording");
     try {
       const audioStream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -22,36 +30,29 @@ const AudioRecorder = () => {
     }
   };
   const StopRecording = () => {
+    console.log("StopRecording");
     if (!isRecording || !stream || !voiceRecorder) return;
-
     const tracks = stream.getAudioTracks();
-
     for (const track of tracks) {
       track.stop();
     }
-
     voiceRecorder.stop();
-
     setVoiceRecorder(null);
     setIsRecording(false);
   };
-  /**
-   * triggered when the recording is started
-   */
+  //triggered when the recording is started
   React.useEffect(() => {
     if (!isRecording || !voiceRecorder) return;
     //checking this how to add slice
-    voiceRecorder.start(3000); //3 seconds a piece
+    voiceRecorder.start(sliceduration); //3 seconds a piece
     voiceRecorder.ondataavailable = ({ data }) => {
       //here we get a new piece of audio chunk
       console.log("ondataavailable triggered");
       //console.log("Got audio data chunk:", data);
 
-      setAudioChunks((prevChunks) => {
+      setChunks((prevChunks) => {
         const newchunks = [...prevChunks, data];
         const callingwhisper = async (chunks, apiurl) => {
-          const myconfig = await Config.GetConfigInstanceAsync();
-          const mykey = myconfig.openaikey;
           //try the openai whisper api
           try {
             const newblob = new Blob(chunks, {
@@ -64,10 +65,11 @@ const AudioRecorder = () => {
             const formData = new FormData();
             formData.append("file", file, "recording.webm");
             formData.append("model", "whisper-1");
-            formData.append("prompt", sttresult);
-            console.log("sending to openai using newblob");
-            console.log(newblob);
+            //formData.append("prompt", "");
 
+            //console.log(newblob);
+            const myconfig = await Config.GetConfigInstanceAsync();
+            const mykey = myconfig.openaikey;
             const response = await fetch(apiurl, {
               method: "POST",
               body: formData,
@@ -75,13 +77,16 @@ const AudioRecorder = () => {
                 Authorization: `Bearer ${mykey}`,
               },
             });
-            console.log(formData.entries());
-
+            //console.log(formData.entries());
+            console.log(
+              `No. ${apicallcount} sending to openai using newblob, `
+            );
+            setApicallcount((oldcount) => oldcount + 1);
             if (response.ok) {
               const jobj = await response.json();
-              console.log(jobj);
+              //console.log(jobj);
               if (jobj && jobj.text) {
-                setSttresult(jobj.text);
+                sendbacktext(jobj.text);
               }
             } else {
               console.error("OpenAI respond is not ok");
@@ -101,51 +106,25 @@ const AudioRecorder = () => {
     };
   }, [isRecording, voiceRecorder]);
 
-  /**
-   * triggered when the recording is stopped
-   */
+  //triggered when the recording is stopped
   React.useEffect(() => {
     if (isRecording || !stream) return;
     setStream(null);
   }, [isRecording]);
 
   return (
-    <div className="flex flex-col">
-      <button onClick={!isRecording ? StartRecording : StopRecording}>
-        {!isRecording ? "START" : "STOP"}
-      </button>
-      <button
-        onClick={() => {
-          console.log("test button clicked");
-          //console.log(audioChunks);
-          //console.log(sttresult);
-          const myconfig = Config.GetConfig();
-          console.log(myconfig);
-        }}
+    <Box className="absolute z-10 right-56 m-1">
+      <Button
+        onClick={isRecording ? StopRecording : StartRecording}
+        variant="contained"
+        size="small"
+        color={isRecording ? "error" : "primary"} // dynamically set color based on isRecording
+        startIcon={isRecording ? <StopIcon /> : <MicIcon />}
       >
-        TEST
-      </button>
-      <div>
-        British logistics played a key role in the success of Operation
-        Overlord, the Allied invasion of France in June 1944. The objective of
-        the campaign was to secure a lodgement on the mainland of Europe for
-        further operations.{" "}
-      </div>
-      <br />
-      <div>sttresult:{sttresult}</div>
-      {audioChunks.map((chunk, index) => (
-        <audio
-          key={index}
-          src={URL.createObjectURL(
-            new Blob(audioChunks.slice(0, index + 1), {
-              type: "audio/webm; codecs=opus",
-            })
-          )}
-          controls
-        />
-      ))}
-    </div>
+        {isRecording ? "Stop" : "Start"}
+      </Button>
+    </Box>
   );
 };
 
-export default AudioRecorder;
+export default VoiceInputStreaming;
