@@ -35,12 +35,14 @@ const VoiceInput = ({ sendbacktext }: any) => {
           formData.append("model", "whisper-1");
           const config = await Config.GetConfigInstanceAsync();
           try {
-            const host = "https://api.openai.com";
-            const response = await fetch(`${host}/v1/audio/transcriptions`, {
-              method: "POST",
-              body: formData,
-              headers: { Authorization: `Bearer ${config.openaikey}` },
-            });
+            const response = await fetch(
+              `https://api.openai.com/v1/audio/transcriptions`,
+              {
+                method: "POST",
+                body: formData,
+                headers: { Authorization: `Bearer ${config.openaikey}` },
+              }
+            );
 
             if (response.ok) {
               const jobj = await response.json();

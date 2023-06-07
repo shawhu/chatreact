@@ -16,14 +16,13 @@ export class Config {
     return Config._myconfig;
   }
   public static GetConfig() {
-    if (Config._myconfig != null) {
-      return Config._myconfig;
-    } else {
-      console.error(
-        "this GetConfig can't be used without calling GetConfigInstanceAsync first"
-      );
+    if (Config._myconfig == null) {
+      console.error("Config._myconfig is null");
+      return "";
     }
+    return Config._myconfig;
   }
+
   public async SaveAsync() {
     await fetch("/api/saveconfignew", {
       method: "POST",
