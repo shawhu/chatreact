@@ -13,7 +13,6 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
   const [stream, setStream] = React.useState<MediaStream | null>(null);
   const [voiceRecorder, setVoiceRecorder] = React.useState(null);
   const [chunks, setChunks] = React.useState([]);
-  const [apicallcount, setApicallcount] = React.useState(0);
 
   const StartRecording = async () => {
     console.log("StartRecording");
@@ -40,6 +39,65 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
     setVoiceRecorder(null);
     setIsRecording(false);
   };
+  //try to call api
+  React.useEffect(() => {
+    if (chunks.length == 0) {
+      return;
+    }
+
+    if (!GlobalValues.isWaitingForWhisper) {
+      GlobalValues.isWaitingForWhisper = true;
+      console.log(`calling whisper with ${chunks.length} chunks`);
+      const callingwhisper = async (chunks, apiurl) => {
+        //try the openai whisper api
+        try {
+          const newblob = new Blob(chunks, {
+            type: "audio/webm; codecs=opus",
+          });
+          const file = new File([newblob], "speech.webm", {
+            type: "audio/webm; codecs=opus",
+          });
+          //seding blob to api
+          const formData = new FormData();
+          formData.append("file", file, "recording.webm");
+          formData.append("model", "whisper-1");
+          formData.append("language", "en");
+          //formData.append("prompt", "");
+
+          //console.log(newblob);
+          const myconfig = await Config.GetConfigInstanceAsync();
+          const mykey = myconfig.openaikey;
+          const response = await fetch(apiurl, {
+            method: "POST",
+            body: formData,
+            headers: {
+              Authorization: `Bearer ${mykey}`,
+            },
+          });
+          GlobalValues.isWaitingForWhisper = false;
+          //console.log(formData.entries());
+          if (response.ok) {
+            const jobj = await response.json();
+            //console.log(jobj);
+            if (jobj && jobj.text) {
+              sendbacktext(jobj.text);
+            }
+          } else {
+            console.error("OpenAI respond is not ok");
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      callingwhisper(chunks, `https://api.openai.com/v1/audio/transcriptions`);
+    } else {
+      console.log("isWaitingForWhisper, skip this calling ");
+    }
+
+    if (!isRecording) {
+      setChunks([]);
+    }
+  }, [chunks]);
   //triggered when the recording is started
   React.useEffect(() => {
     if (!isRecording || !voiceRecorder) return;
@@ -49,60 +107,7 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
       //here we get a new piece of audio chunk
       console.log("ondataavailable triggered");
       //console.log("Got audio data chunk:", data);
-
-      setChunks((prevChunks) => {
-        const newchunks = [...prevChunks, data];
-        const callingwhisper = async (chunks, apiurl) => {
-          //try the openai whisper api
-          try {
-            const newblob = new Blob(chunks, {
-              type: "audio/webm; codecs=opus",
-            });
-            const file = new File([newblob], "speech.webm", {
-              type: "audio/webm; codecs=opus",
-            });
-            //seding blob to api
-            const formData = new FormData();
-            formData.append("file", file, "recording.webm");
-            formData.append("model", "whisper-1");
-            //formData.append("prompt", "");
-
-            //console.log(newblob);
-            const myconfig = await Config.GetConfigInstanceAsync();
-            const mykey = myconfig.openaikey;
-            const response = await fetch(apiurl, {
-              method: "POST",
-              body: formData,
-              headers: {
-                Authorization: `Bearer ${mykey}`,
-              },
-            });
-            //console.log(formData.entries());
-            console.log(
-              `No. ${apicallcount} sending to openai using newblob, `
-            );
-            setApicallcount((oldcount) => oldcount + 1);
-            if (response.ok) {
-              const jobj = await response.json();
-              //console.log(jobj);
-              if (jobj && jobj.text) {
-                sendbacktext(jobj.text);
-              }
-            } else {
-              console.error("OpenAI respond is not ok");
-            }
-          } catch (error) {
-            console.error(error);
-          }
-        };
-
-        callingwhisper(
-          newchunks,
-          `https://api.openai.com/v1/audio/transcriptions`
-        );
-
-        return newchunks;
-      });
+      setChunks((prevChunks) => [...prevChunks, data]);
     };
   }, [isRecording, voiceRecorder]);
 
