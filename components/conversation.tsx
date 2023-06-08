@@ -201,9 +201,14 @@ function Conversation({
             <audio
               ref={audioRef}
               src={
+                //english
                 `http://localhost:5002/api/tts?text=${encodeURIComponent(
                   audioText
                 )}&speaker_id=p248&style_wav=&language_id=`
+                //chinese
+                // `http://localhost:5002/api/tts?text=${encodeURIComponent(
+                //   audioText
+                // )}&speaker_id=&style_wav=&language_id=`
 
                 //'female-en-5': 0, 'female-en-5\n': 1, 'female-pt-4\n': 2, 'male-en-2': 3, 'male-en-2\n': 4, 'male-pt-3
                 // `http://localhost:5002/api/tts?text=${encodeURIComponent(

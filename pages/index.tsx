@@ -41,12 +41,11 @@ import Conversationllmws from "@/components/conversationllmws";
 import SessionList from "@/components/sessionlist";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
-
-import dynamic from "next/dynamic";
-const VoiceInput = dynamic(() => import("@/components/voiceinput"), {
-  ssr: false,
-});
-//import VoiceInputStreaming from "@/components/voiceinputstreaming";
+import VoiceInputStreaming from "@/components/voiceinputstreaming";
+// import dynamic from "next/dynamic";
+// const VoiceInput = dynamic(() => import("@/components/voiceinput"), {
+//   ssr: false,
+// });
 
 const PinkSwitch = styled(Switch)(({ theme }) => ({
   "& .MuiSwitch-switchBase.Mui-checked": {
@@ -319,8 +318,8 @@ export default function PersistentDrawerLeft() {
         {/*this is the input area with buttons  this is the input area with buttons  this is the input area with buttons  */}
         <Box className="w-full min-h-[130px] flex">
           <div className="flex-1 ml-1">
-            <VoiceInput
-              sliceduration={1000}
+            <VoiceInputStreaming
+              sliceduration={1000} //this only works for voiceinputstreaming
               sendbacktext={(text: string) => {
                 setMessage(text);
               }}

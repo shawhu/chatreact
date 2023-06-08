@@ -61,7 +61,7 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
           const formData = new FormData();
           formData.append("file", file, "recording.webm");
           formData.append("model", "whisper-1");
-          formData.append("language", "en");
+          //formData.append("language", "en");
           //formData.append("prompt", "");
 
           //console.log(newblob);
@@ -89,7 +89,7 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
           console.error(error);
         }
       };
-      callingwhisper(chunks, `https://api.openai.com/v1/audio/transcriptions`);
+      callingwhisper(chunks, `/api/transcribe`);
     } else {
       console.log("isWaitingForWhisper, skip this calling ");
     }
@@ -118,7 +118,7 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
   }, [isRecording]);
 
   return (
-    <Box className="absolute z-10 right-56 m-1">
+    <Box className="absolute z-10 right-32 bottom-32 m-1">
       <Button
         onClick={isRecording ? StopRecording : StartRecording}
         variant="contained"

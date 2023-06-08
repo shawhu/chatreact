@@ -36,7 +36,8 @@ const VoiceInput = ({ sendbacktext }: any) => {
           const config = await Config.GetConfigInstanceAsync();
           try {
             const response = await fetch(
-              `https://api.openai.com/v1/audio/transcriptions`,
+              `/api/transcribe`, //localrun whisper
+              //`https://api.openai.com/v1/audio/transcriptions`,
               {
                 method: "POST",
                 body: formData,
@@ -51,7 +52,7 @@ const VoiceInput = ({ sendbacktext }: any) => {
                 sendbacktext(jobj.text);
               }
             } else {
-              console.error("Unable to save audio file");
+              console.error("calling whisper is failed");
             }
           } catch (error) {
             console.error(error);
