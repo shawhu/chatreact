@@ -42,6 +42,7 @@ import SessionList from "@/components/sessionlist";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
 import VoiceInputStreaming from "@/components/voiceinputstreaming";
+import CharacterEditor from "@/components/charactereditor";
 // import dynamic from "next/dynamic";
 // const VoiceInput = dynamic(() => import("@/components/voiceinput"), {
 //   ssr: false,
