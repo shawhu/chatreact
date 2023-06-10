@@ -4,6 +4,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
 import TuneIcon from "@mui/icons-material/Tune";
 import LoginIcon from "@mui/icons-material/Login";
+import ContactsIcon from "@mui/icons-material/Contacts";
 import { Menu as MenuIcon, Mail as MailIcon } from "@mui/icons-material";
 import MuiAppBar, { AppBarProps } from "@mui/material/AppBar";
 import {
@@ -126,6 +127,8 @@ export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true); //this is to control sidebar open by default
   const [openDialogConfig, setOpenDialogConfig] = React.useState(false); //control config dialog to show
+  const [openDialogCharacterEditor, setOpenDialogCharacterEditor] =
+    React.useState(false); //control config dialog to show
   const [opendialog, setOpendialog] = React.useState(false);
   const [dialogMessage, setDialogMessage] = React.useState("");
   const [voiceoverChecked, setvoiceoverChecked] = React.useState(false);
@@ -193,10 +196,22 @@ export default function PersistentDrawerLeft() {
           >
             <MenuIcon />
           </IconButton>
+          {/* Modify session name */}
           <EditableLabel text={sessionname} onModified={RefreshSessionList} />
-
+          <IconButton
+            onClick={() => {
+              console.log("popup character editor");
+              setOpenDialogCharacterEditor(true);
+            }}
+            className="ml-4"
+            color="secondary"
+            aria-label="Character"
+          >
+            <ContactsIcon />
+          </IconButton>
           <div className="flex-1 flex justify-end">
-            <div className="flex items-center">
+            {/* Modify session backend */}
+            <div className="flex items-center mr-4">
               <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                 <Select
                   sx={{
@@ -219,8 +234,8 @@ export default function PersistentDrawerLeft() {
                   <MenuItem value={"gpt-3.5-turbo"}>gpt-3.5-turbo</MenuItem>
                 </Select>
               </FormControl>
-              <span className="mr-10">Choose Backend</span>
             </div>
+            {/* Turn voice-over on/off */}
             <FormControlLabel
               control={
                 <GreenSwitch
@@ -443,6 +458,15 @@ export default function PersistentDrawerLeft() {
             </Button>
           </DialogActions>
         </Dialog>
+        <CharacterEditor
+          open={openDialogCharacterEditor}
+          handleClose={() => {
+            setOpenDialogCharacterEditor(false);
+          }}
+          refreshindexpage={() => {
+            console.log("CharacterEditor causing index page to refresh");
+          }}
+        />
       </Main>
     </Box>
   );
