@@ -12,7 +12,7 @@
         "content": "Hello, I'm an AI, nice to meet you. How can I help you?"
       }
     ],
-    "model": "gpt-3.5-turbo",
+    "model": "ChatGPT",
     "maxToken": 2000,
     "aiheadshotimg": "/headshots/fairy/00019-3329581369.jpg"
   },
@@ -49,7 +49,7 @@
         "completets": 1685502360
       }
     ],
-    "model": "gpt-3.5-turbo",
+    "model": "ChatGPT",
     "maxToken": 2000,
     "aiheadshotimg": "/headshots/ai/00017-3896379606.jpg"
   },
@@ -66,7 +66,7 @@
         "content": "今天需要我做什么呢？"
       }
     ],
-    "model": "gpt-3.5-turbo",
+    "model": "ChatGPT",
     "maxToken": 2000,
     "aiheadshotimg": "/headshots/pure/00032-1439467013.jpg"
   },

@@ -11,8 +11,8 @@ import GlobalValues from "@/common/globalvalues";
 const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
   const [isRecording, setIsRecording] = React.useState<boolean>(false);
   const [stream, setStream] = React.useState<MediaStream | null>(null);
-  const [voiceRecorder, setVoiceRecorder] = React.useState(null);
-  const [chunks, setChunks] = React.useState([]);
+  const [voiceRecorder, setVoiceRecorder] = React.useState<MediaRecorder | null>(null);
+  const [chunks, setChunks] = React.useState<any[]>([]);
 
   const StartRecording = async () => {
     console.log("StartRecording");
@@ -48,7 +48,7 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
     if (!GlobalValues.isWaitingForWhisper) {
       GlobalValues.isWaitingForWhisper = true;
       console.log(`calling whisper with ${chunks.length} chunks`);
-      const callingwhisper = async (chunks, apiurl) => {
+      const callingwhisper = async (chunks: any, apiurl: string) => {
         //try the openai whisper api
         try {
           const newblob = new Blob(chunks, {

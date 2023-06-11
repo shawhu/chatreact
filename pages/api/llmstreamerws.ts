@@ -23,11 +23,9 @@ const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
     //console.log(bodytext);
     // Create a WebSocket client and connect to the external API
     const ws = new WebSocket(url, {
-      headers: [
-        {
-          "Content-Type": "application/json",
-        },
-      ],
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
     ws.once("open", () => {
       // Send the request payload to the API using the WebSocket connection
@@ -37,8 +35,9 @@ const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
     });
     let fulltext = "";
     // Listen for incoming WebSocket messages and push them to the stream
-    ws.on("message", (data) => {
-      const message = new Buffer.from(data).toString("utf8");
+    ws.on("message", (data: string | ArrayBuffer) => {
+      const byteArrayData = new Uint8Array(data as ArrayBuffer);
+      const message = new TextDecoder().decode(byteArrayData);
       const jobj = JSON.parse(message);
 
       if (jobj.event == "text_stream") {

@@ -5,8 +5,8 @@ const nextConfig = {
     return [
       {
         //using local run llm
-        source: "/api/v1/generate",
-        destination: "http://192.168.42.120:5000/api/v1/generate",
+        source: "/api/v1/:path*",
+        destination: "http://192.168.42.120:5000/api/v1/:path*",
       },
       {
         //using local run whisper

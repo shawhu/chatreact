@@ -5,6 +5,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import TuneIcon from "@mui/icons-material/Tune";
 import LoginIcon from "@mui/icons-material/Login";
 import ContactsIcon from "@mui/icons-material/Contacts";
+import WifiIcon from "@mui/icons-material/Wifi";
+import WifiOffIcon from "@mui/icons-material/WifiOff";
 import { Menu as MenuIcon, Mail as MailIcon } from "@mui/icons-material";
 import MuiAppBar, { AppBarProps } from "@mui/material/AppBar";
 import {
@@ -127,24 +129,60 @@ export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true); //this is to control sidebar open by default
   const [openDialogConfig, setOpenDialogConfig] = React.useState(false); //control config dialog to show
-  const [openDialogCharacterEditor, setOpenDialogCharacterEditor] =
-    React.useState(false); //control config dialog to show
+  const [openDialogCharacterEditor, setOpenDialogCharacterEditor] = React.useState(false); //control config dialog to show
   const [opendialog, setOpendialog] = React.useState(false);
   const [dialogMessage, setDialogMessage] = React.useState("");
   const [voiceoverChecked, setvoiceoverChecked] = React.useState(false);
-  const [sessionlistrefreshtimestamp, setSessionlistrefreshtimestamp] =
-    React.useState(0);
+  const [sessionlistrefreshtimestamp, setSessionlistrefreshtimestamp] = React.useState(0);
 
   //this is to show current session name on the top
   const [sessionname, setSessionname] = React.useState("");
   //this's to show session model
   const [model, setModel] = React.useState("");
-
+  const [timerId, setTimerId] = React.useState<NodeJS.Timeout>();
+  const [connected, setConnected] = React.useState(false);
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
   //这是用来传给conversation控件处理，发送后message会变空，prompt会变成message内容
   const [prompt, setPrompt] = React.useState({ value: "" }); //处理完成后prompt会变空
   const [myconfig, setMyconfig] = React.useState(new Config());
+
+  React.useEffect(() => {
+    console.log("model changed to " + model);
+
+    //setup and run the probe
+    if (timerId) clearInterval(timerId); // clear previous interval
+    const newTimerId = setInterval(() => {
+      let apiEndpoint = "";
+      console.log("inside interval model: " + SessionManager.currentSession.model);
+      if (SessionManager.currentSession.model.toLowerCase() === "chatgpt") {
+        apiEndpoint = "https://api.openai.com/v1/models";
+      } else if (SessionManager.currentSession.model.toLowerCase() === "kobold") {
+        apiEndpoint = "/api/v1/model";
+      }
+
+      fetch(apiEndpoint, {
+        headers: {
+          Authorization: `Bearer ${Config.GetConfig()?.openaikey}`,
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => {
+          if (res.status > 210) {
+            console.error("Backend probe return error");
+            setConnected(false);
+          } else {
+            setConnected(true);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          setConnected(false);
+        });
+    }, 5000);
+    setTimerId(newTimerId); // set new timerId
+    return () => clearInterval(newTimerId);
+  }, [model]);
   React.useEffect(() => {
     // call the GetConfig function to get the API key and other configs
     async function getvoiceoverAsync() {
@@ -158,7 +196,9 @@ export default function PersistentDrawerLeft() {
       console.log("Index page indexpagecallback triggered");
       setSessionname(SessionManager.currentSession.sessionName);
       setModel(SessionManager.currentSession.model);
-      setPrompt("");
+      //cancel interval calling probe
+      setConnected(false);
+      setPrompt({ value: "" });
     };
   });
 
@@ -222,18 +262,17 @@ export default function PersistentDrawerLeft() {
                   labelId="backend-select-label"
                   id="backend-select"
                   value={model}
-                  onChange={async (event: SelectChangeEvent) => {
+                  onChange={async (event: any) => {
                     SessionManager.currentSession.model = event.target.value;
-                    await SessionManager.SaveSessionToJson(
-                      SessionManager.currentSession
-                    );
+                    await SessionManager.SaveSessionToJson(SessionManager.currentSession);
                     setModel(SessionManager.currentSession.model);
                   }}
                 >
                   <MenuItem value={"kobold"}>kobold</MenuItem>
-                  <MenuItem value={"gpt-3.5-turbo"}>gpt-3.5-turbo</MenuItem>
+                  <MenuItem value={"ChatGPT"}>ChatGPT</MenuItem>
                 </Select>
               </FormControl>
+              {connected ? <WifiIcon /> : <WifiOffIcon />}
             </div>
             {/* Turn voice-over on/off */}
             <FormControlLabel
@@ -271,11 +310,7 @@ export default function PersistentDrawerLeft() {
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
+            {theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
         <Divider />
@@ -317,7 +352,7 @@ export default function PersistentDrawerLeft() {
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}
-        {model == "gpt-3.5-turbo" ? (
+        {model == "ChatGPT" ? (
           <Conversation
             prompt={prompt}
             voiceover={voiceoverChecked}
@@ -384,9 +419,7 @@ export default function PersistentDrawerLeft() {
               variant="outlined"
               onClick={async () => {
                 //remove the last message
-                const previousPrompt = await SessionManager.RegenLastMessage(
-                  SessionManager.currentSession
-                );
+                const previousPrompt = await SessionManager.RegenLastMessage(SessionManager.currentSession);
                 setMessage(`${previousPrompt}`);
                 console.log("regen clicked");
               }}
@@ -396,9 +429,7 @@ export default function PersistentDrawerLeft() {
             <Button
               variant="outlined"
               onClick={() => {
-                setDialogMessage(
-                  "Do you want to delete all messages from this session?"
-                );
+                setDialogMessage("Do you want to delete all messages from this session?");
                 setOpendialog(true);
               }}
             >
@@ -410,12 +441,9 @@ export default function PersistentDrawerLeft() {
                 console.log("TEST clicked");
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
-                console.log(
-                  SessionManager.currentSession.GetPromptWithTokenLimit(1000)
-                );
+                console.log(SessionManager.currentSession.GetPromptWithTokenLimit(1000));
                 console.log(SessionManager.currentSession);
-                console.log("prompt is:");
-                console.log(prompt);
+                console.log("model is:" + model);
               }}
             >
               TEST1
@@ -445,9 +473,7 @@ export default function PersistentDrawerLeft() {
             <Button onClick={handleClose}>Cancel</Button>
             <Button
               onClick={async () => {
-                await SessionManager.ResetSessionToOriginal(
-                  SessionManager.currentSession.sessionId
-                );
+                await SessionManager.ResetSessionToOriginal(SessionManager.currentSession.sessionId);
                 console.log("Reset session to original");
                 RefreshSessionList();
                 setOpendialog(false);
@@ -460,11 +486,44 @@ export default function PersistentDrawerLeft() {
         </Dialog>
         <CharacterEditor
           open={openDialogCharacterEditor}
-          handleClose={() => {
+          handleClose={(allfields: string, firstmessage: string, headshoturl: string, ainame: string) => {
+            //console.log(`index page got allfields: ${allfields}`);
+            if (allfields && allfields != "") {
+              console.log("try to load characters to currentsession");
+              if (SessionManager.currentSession.messages.length > 0) {
+                SessionManager.currentSession.ainame = ainame;
+                SessionManager.currentSession.username = "you";
+                SessionManager.currentSession.aiheadshotimg = headshoturl;
+                SessionManager.currentSession.messages[0].content = allfields;
+                //check if there's a first message
+                if (
+                  SessionManager.currentSession.messages.length > 1 &&
+                  SessionManager.currentSession.messages[1].role == "assistant" &&
+                  firstmessage != ""
+                ) {
+                  SessionManager.currentSession.messages[1].content = firstmessage;
+                }
+                SessionManager.SaveSessionToJson(SessionManager.currentSession);
+              } else {
+                const messagesystem = new Message({
+                  role: "system",
+                  content: allfields,
+                  completets: Math.floor(Date.now() / 1000),
+                });
+                const messageassistant = new Message({
+                  role: "assistant",
+                  content: firstmessage,
+                  completets: Math.floor(Date.now() / 1000) + 1,
+                });
+                SessionManager.currentSession.ainame = ainame;
+                SessionManager.currentSession.username = "you";
+                SessionManager.currentSession.aiheadshotimg = headshoturl;
+                SessionManager.currentSession.messages.push(messagesystem);
+                SessionManager.currentSession.messages.push(messageassistant);
+                SessionManager.SaveSessionToJson(SessionManager.currentSession);
+              }
+            }
             setOpenDialogCharacterEditor(false);
-          }}
-          refreshindexpage={() => {
-            console.log("CharacterEditor causing index page to refresh");
           }}
         />
       </Main>

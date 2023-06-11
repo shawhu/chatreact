@@ -18,7 +18,7 @@ export class Config {
   public static GetConfig() {
     if (Config._myconfig == null) {
       console.error("Config._myconfig is null");
-      return "";
+      return null;
     }
     return Config._myconfig;
   }

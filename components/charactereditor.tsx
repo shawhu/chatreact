@@ -17,15 +17,10 @@ import {
   FormControl,
 } from "@mui/material";
 import { Config } from "@/common/config";
+import { estimateTokens } from "@/common/helper";
 
-// {{name}}'s Persona:{{description}}
-// {{personalitySummary}}
-// {{scenario}}
-// {{dialoguesExample}}
-// {{firstMessage}}
-
-function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
-  const [headshotimg, setHeadshotimg] = React.useState("");
+function CharacterEditor({ open, handleClose }: any) {
+  const [headshoturl, setHeadshoturl] = React.useState("");
   const [context, setContext] = React.useState("");
   const [name, setName] = React.useState("");
   const [categories, setCategories] = React.useState([]);
@@ -35,7 +30,18 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
   const [scenario, setScenario] = React.useState("");
   const [dialoguesExample, setDialoguesExample] = React.useState("");
   const [firstMessage, setFirstMessage] = React.useState("");
-  const [uploadFile, setUploadFile] = React.useState(null);
+  const [uploadFile, setUploadFile] = React.useState<any>(null);
+  const [totaltoken, setTotaltoken] = React.useState(0);
+
+  React.useEffect(() => {
+    //startup cleanup
+    setDescription("");
+    setPersonalitySummary("");
+    setScenario("");
+    setDialoguesExample("");
+    setFirstMessage("");
+    setTotaltoken(0);
+  }, [open]);
 
   //processing upload tavarnai character png/webp
   React.useEffect(() => {
@@ -43,8 +49,6 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
       return;
     }
     const GetInfoFromServerAsync = async () => {
-      // Generate a unique boundary string
-      const boundary = `----${new Date().getTime()}`;
       const formData = new FormData();
       formData.append("file", uploadFile, uploadFile.name);
       const response = await fetch(`/api/imginforeader`, {
@@ -52,7 +56,13 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
         body: formData,
       });
       const json = await response.json();
-      console.log(json);
+      //console.log(json);
+      if (json.headshoturl) {
+        setHeadshoturl(json.headshoturl);
+      }
+      if (json.name) {
+        setName(json.name);
+      }
       if (json.description) {
         setDescription(json.description);
       }
@@ -68,16 +78,39 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
       if (json.firstMessage) {
         setFirstMessage(json.firstMessage);
       }
+      const allfields = `${json.name}'s Persona:${json.description}${json.personalitySummary}${json.scenario}${json.dialoguesExample}${json.firstMessage}`;
+      setTotaltoken(estimateTokens(allfields));
     };
     GetInfoFromServerAsync();
   }, [uploadFile]);
 
-  const handleSave = async () => {
-    handleClose();
+  const handleSave = () => {
+    //combine all necessary fields
+    // {{name}}'s Persona:{{description}}
+    // {{personalitySummary}}
+    // {{scenario}}
+    // {{dialoguesExample}}
+    // {{firstMessage}}
+    let allfields = `${name}'s Persona:${description}${personalitySummary}${scenario}${dialoguesExample}`;
+    allfields = allfields.replaceAll("{{char}}", name);
+    allfields = allfields.replaceAll("{{user}}", "you");
+    allfields = allfields.replaceAll("\r", "");
+    let fm = firstMessage.replaceAll("{{char}}", name);
+    fm = fm.replaceAll("{{user}}", "you");
+    fm = fm.replaceAll("\r", "");
+    setTotaltoken(estimateTokens(allfields));
+    handleClose(allfields, fm, headshoturl, name);
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xl" fullWidth={true}>
+    <Dialog
+      open={open}
+      onClose={() => {
+        handleClose("", "", "", "");
+      }}
+      maxWidth="xl"
+      fullWidth={true}
+    >
       <DialogTitle>Character Editor</DialogTitle>
       <List className="m-12">
         <ListItem
@@ -88,17 +121,12 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
             gap: "10px",
           }}
         >
-          <Image
-            src={"/headshots/ai/00001-748567734.jpg"}
-            width="100"
-            height="100"
-            alt="aiheadshot"
-          ></Image>
+          <Image src={"/headshots/ai/00001-748567734.jpg"} width="100" height="100" alt="aiheadshot"></Image>
           <div>
             <FormControl>
               <Input
                 type="file"
-                onChange={(e) => {
+                onChange={(e: any) => {
                   if (e.target.files.length > 0) {
                     console.log(e.target.files[0].name);
                     setUploadFile(e.target.files[0]); // Get the first selected file
@@ -110,10 +138,9 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
             </FormControl>
             <TextField
               autoFocus
-              required
               margin="dense"
               id="shortDescription"
-              label="shortDescription"
+              label="Short Description"
               type="text"
               fullWidth
               variant="standard"
@@ -122,15 +149,15 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
                 setShortDescription(event.target.value);
               }}
             />
+            <span>Total tokens: {totaltoken}</span>
           </div>
         </ListItem>
         <ListItem>
           <TextField
             autoFocus
-            required
             margin="dense"
             id="description"
-            label="description"
+            label="Description"
             type="text"
             fullWidth
             multiline
@@ -144,10 +171,9 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
         <ListItem>
           <TextField
             autoFocus
-            required
             margin="dense"
             id="personalitySummary"
-            label="personalitySummary"
+            label="Personality Summary"
             type="text"
             multiline
             fullWidth
@@ -161,10 +187,9 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
         <ListItem>
           <TextField
             autoFocus
-            required
             margin="dense"
             id="scenario"
-            label="scenario"
+            label="Scenario"
             type="text"
             multiline
             fullWidth
@@ -178,10 +203,9 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
         <ListItem>
           <TextField
             autoFocus
-            required
             margin="dense"
             id="dialoguesExample"
-            label="dialoguesExample"
+            label="Dialogues Example"
             type="text"
             multiline
             fullWidth
@@ -195,10 +219,9 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
         <ListItem>
           <TextField
             autoFocus
-            required
             margin="dense"
             id="firstMessage"
-            label="firstMessage"
+            label="First Message"
             type="text"
             multiline
             fullWidth
@@ -211,11 +234,16 @@ function CharacterEditor({ open, handleClose, refreshindexpage }: any) {
         </ListItem>
       </List>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button
+          onClick={() => {
+            handleClose("", "", "", "");
+          }}
+          color="primary"
+        >
           Cancel
         </Button>
         <Button onClick={handleSave} color="primary">
-          Ok
+          Load
         </Button>
       </DialogActions>
     </Dialog>

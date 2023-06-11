@@ -13,7 +13,7 @@ export const config = {
   },
 };
 
-const charaRead = async (file, input_format) => {
+const charaRead = async (file: any, input_format: string) => {
   let format;
   sharp.cache(false);
   if (input_format === undefined) {
@@ -30,12 +30,19 @@ const charaRead = async (file, input_format) => {
     case "webp":
       try {
         let char_data;
+        const filedata = await fs.readFile(file.filepath);
+        const exif_data = await ExifReader.load(filedata);
+        // write the file to the target directory
+        const targetFilePath = path.join(process.cwd(), "public/headshots/characters/" + file.originalFilename);
 
-        const exif_data = await ExifReader.load(
-          await fs.readFile(file.filepath)
-        );
+        try {
+          await fs.writeFile(targetFilePath, filedata);
+          console.log(`File saved to ${targetFilePath}.`);
+        } catch (error) {
+          console.error(`Error writing file: ${error}`);
+        }
 
-        if (exif_data["UserComment"]["description"]) {
+        if (exif_data && exif_data["UserComment"] && exif_data["UserComment"]["description"]) {
           let description = exif_data["UserComment"]["description"];
           try {
             JSON.parse(description);
@@ -60,42 +67,38 @@ const charaRead = async (file, input_format) => {
       const buffer = await fs.readFile(file.filepath);
       const chunks = extract(buffer);
       const textChunks = chunks
-        .filter(function (chunk) {
+        .filter(function (chunk: any) {
           return chunk.name === "tEXt";
         })
-        .map(function (chunk) {
+        .map(function (chunk: any) {
           return PNGtext.decode(chunk.data);
         });
-      var base64DecodedData = Buffer.from(
-        textChunks[0].text,
-        "base64"
-      ).toString("utf8");
+      var base64DecodedData = Buffer.from(textChunks[0].text, "base64").toString("utf8");
       return base64DecodedData;
     default:
       break;
   }
 };
 
-async function processFormData(fields, files) {
+async function processFormData(fields: any, files: any, res: any) {
   // save to persistent data store
-  console.log("processing formdata...");
+  //console.log("processing formdata...");
   try {
     const file = files.file;
     if (!file) {
       res.status(400).json({ error: "Missing file field" });
       return;
     }
-    const jsonstr = await charaRead(file);
+    const jsonstr = await charaRead(file, "");
     return jsonstr;
   } catch (error) {
     console.error(error);
   }
 }
 
-async function handlePostFormReq(req, res) {
+async function handlePostFormReq(req: any, res: any) {
   const form = formidable({ multiples: true });
-
-  const formData = new Promise((resolve, reject) => {
+  const formData = new Promise<{ fields: formidable.Fields; files: formidable.Files }>((resolve, reject) => {
     form.parse(req, async (err, fields, files) => {
       if (err) {
         console.error(err);
@@ -104,13 +107,14 @@ async function handlePostFormReq(req, res) {
       resolve({ fields, files });
     });
   });
-
   try {
     const { fields, files } = await formData;
 
     try {
-      const result = await processFormData(fields, files);
-      const jobj = JSON.parse(result);
+      const result = await processFormData(fields, files, res);
+      const jobj = result ? JSON.parse(result) : {};
+      const file = files.file as any;
+
       const selectedFields = {
         name: jobj.name,
         description: jobj.description,
@@ -118,6 +122,7 @@ async function handlePostFormReq(req, res) {
         scenario: jobj.scenario,
         dialoguesExample: jobj.mes_example,
         firstMessage: jobj.first_mes,
+        headshoturl: `/headshots/characters/${file.originalFilename}`,
       };
       res.status(200).json(selectedFields);
       return;

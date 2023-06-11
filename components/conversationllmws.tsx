@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  ListSubheader,
-  ListItemAvatar,
-  Avatar,
-} from "@mui/material";
+import { List, ListItem, ListItemText, Typography, ListSubheader, ListItemAvatar, Avatar } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import { Configuration, OpenAIApi } from "openai";
 import { createParser } from "eventsource-parser";
@@ -28,6 +20,7 @@ export default function Conversationllmws({
     value: string;
   };
   voiceover: boolean;
+  initialmessages: Message[];
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>(initialmessages);
@@ -57,9 +50,7 @@ export default function Conversationllmws({
       const config = await Config.GetConfigInstanceAsync();
       //console.log(config);
       console.log("processing prompt:" + prompt);
-      console.log(
-        "add user prompt question message AND assistant placeholder response first"
-      );
+      console.log("add user prompt question message AND assistant placeholder response first");
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const newmessages = [
         ...SessionManager.currentSession.messages,
@@ -86,17 +77,14 @@ export default function Conversationllmws({
       //this will check the 2nd to last message to see if it's from the user
       if (SessionManager.currentSession.messages.slice(-2)[0].role != "user") {
         //this is an error, the last message should the one sent from the user
-        console.log(
-          "error, the role of the last message is assistant. stop the processing"
-        );
-        setToastmessage(
-          "error, the role of the last message is assistant. stop the processing"
-        );
+        console.log("error, the role of the last message is assistant. stop the processing");
+        setToastmessage("error, the role of the last message is assistant. stop the processing");
         setToastopen(true);
         return;
       }
       const host = "/api/llmstreamerws";
-      const koboldapi = Config.GetConfig().koboldapi;
+      const tempconfig = Config.GetConfig();
+      const koboldapi = tempconfig ? tempconfig.koboldapi : "";
       const requestjobj = {
         prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000),
         use_story: false,
@@ -139,9 +127,7 @@ export default function Conversationllmws({
         if (message === "[DONE]") {
           console.log("try to save session");
           const last_message =
-            SessionManager.currentSession.messages[
-              SessionManager.currentSession.messages.length - 1
-            ];
+            SessionManager.currentSession.messages[SessionManager.currentSession.messages.length - 1];
           last_message.completets = Math.floor(Date.now() / 1000);
           //process the content
           //get rid of italic items
@@ -206,9 +192,7 @@ export default function Conversationllmws({
 
   return (
     <>
-      <List
-        className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}
-      >
+      <List className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}>
         <ListSubheader
           className="bg-white/10"
           onClick={() => {
@@ -241,19 +225,14 @@ export default function Conversationllmws({
             key={`message_${index}`}
             alignItems="flex-start"
             className={`flex justify-start ${
-              message.role === "assistant" || message.role === "system"
-                ? "flex-row "
-                : "flex-row-reverse"
+              message.role === "assistant" || message.role === "system" ? "flex-row " : "flex-row-reverse"
             }`}
           >
             <div>
               <ListItemAvatar
                 className="flex justify-center cursor-pointer"
                 onClick={() => {
-                  if (
-                    message.role === "assistant" ||
-                    message.role === "system"
-                  ) {
+                  if (message.role === "assistant" || message.role === "system") {
                     setHeadshotopen(true);
                   }
                 }}
@@ -271,9 +250,7 @@ export default function Conversationllmws({
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
-              primary={
-                <MyMessageBlock rawtext={message.content}></MyMessageBlock>
-              }
+              primary={<MyMessageBlock rawtext={message.content}></MyMessageBlock>}
               secondary={`${getFormattedDateTime(message.completets)}`}
               className={`rounded-t-xl p-4 cursor-pointer ${
                 message.role === "assistant" || message.role === "system"
@@ -318,22 +295,11 @@ export default function Conversationllmws({
   );
 }
 
-export async function handleSSE(
-  response: Response,
-  onMessage: (message: string) => void
-) {
+export async function handleSSE(response: Response, onMessage: (message: string) => void) {
   if (!response.ok) {
     const error = await response.json().catch(() => null);
-    console.log(
-      error
-        ? JSON.stringify(error)
-        : `${response.status} ${response.statusText}`
-    );
-    onMessage(
-      error
-        ? JSON.stringify(error)
-        : `${response.status} ${response.statusText}`
-    );
+    console.log(error ? JSON.stringify(error) : `${response.status} ${response.statusText}`);
+    onMessage(error ? JSON.stringify(error) : `${response.status} ${response.statusText}`);
     onMessage("[DONE]");
     return;
   }
@@ -358,9 +324,7 @@ export async function handleSSE(
   }
 }
 
-export async function* iterableStreamAsync(
-  stream: ReadableStream
-): AsyncIterableIterator<Uint8Array> {
+export async function* iterableStreamAsync(stream: ReadableStream): AsyncIterableIterator<Uint8Array> {
   const reader = stream.getReader();
   try {
     while (true) {

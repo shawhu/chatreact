@@ -7,15 +7,7 @@ export class Message {
   content: string = "";
   completets?: number = -1;
 
-  constructor({
-    role,
-    content,
-    completets,
-  }: {
-    role: string;
-    content: string;
-    completets?: number;
-  }) {
+  constructor({ role, content, completets }: { role: string; content: string; completets?: number }) {
     this.role = role as "user" | "assistant" | "system";
     this.content = content;
     this.completets = completets ?? -1;
@@ -56,10 +48,7 @@ export class Session {
       }
       if (message.role == "user") {
         prompt += `${this.username}: ${message.content}\n`;
-      } else if (
-        message.role == "assistant" &&
-        index == this.messages.length - 1
-      ) {
+      } else if (message.role == "assistant" && index == this.messages.length - 1) {
         //the last message, should be ainame: with no enter
         prompt += `${this.ainame}:`;
       } else {
@@ -75,7 +64,7 @@ export class Session {
   }
 }
 export class SessionManager {
-  public static sessions: Session[] = [new Session(0)];
+  public static sessions: Session[] = [new Session()];
   public static listenercallback: () => void;
   public static indexpagecallback: () => void;
   public static currentSession: Session = SessionManager.sessions[0];
@@ -88,9 +77,7 @@ export class SessionManager {
   }
   public static async SetCurrentSessionById(sessionid: string) {
     // Find the session object in the array with the matching session ID
-    const session = SessionManager.sessions.find(
-      (s) => s.sessionId === sessionid
-    );
+    const session = SessionManager.sessions.find((s) => s.sessionId === sessionid);
     if (session) {
       // If a matching session was found, set it as the current session
       SessionManager.currentSession = session;
@@ -103,9 +90,7 @@ export class SessionManager {
       SessionManager.indexpagecallback();
     } else {
       // If no matching session was found, throw an error
-      throw new Error(
-        `Session with ID "${sessionid}" not found in session manager`
-      );
+      throw new Error(`Session with ID "${sessionid}" not found in session manager`);
     }
   }
   public static async SaveSessionToJson(session: Session) {
@@ -128,12 +113,11 @@ export class SessionManager {
     newsession.sessionId = uuidv4();
     newsession.sessionName = "Click me to change";
     newsession.create_ts = Math.floor(Date.now() / 1000);
-    newsession.model = "gpt-3.5-turbo";
+    newsession.model = "ChatGPT";
     newsession.messages = [
       {
         role: "system",
-        content:
-          "You are a friendly assistant and you will happily answer all questions.",
+        content: "You are a friendly assistant and you will happily answer all questions.",
       },
       {
         role: "assistant",
@@ -213,9 +197,7 @@ export class SessionManager {
       //console.log(config);
       if (config.currentsessionid && config.currentsessionid != "") {
         console.log("found history sessionid");
-        const current_session = SessionManager.sessions.find(
-          (session) => session.sessionId == config.currentsessionid
-        );
+        const current_session = SessionManager.sessions.find((session) => session.sessionId == config.currentsessionid);
         if (current_session) {
           SessionManager.currentSession = current_session;
         } else {
@@ -263,9 +245,7 @@ export class SessionManager {
       await SessionManager.SaveSessionToJson(session);
       SessionManager.currentSession = session;
       //replace session in sessions
-      const index = SessionManager.sessions.findIndex(
-        (s) => s.sessionId == sessionid
-      );
+      const index = SessionManager.sessions.findIndex((s) => s.sessionId == sessionid);
       if (index >= 0) {
         SessionManager.sessions[index] = session;
       }
@@ -274,26 +254,20 @@ export class SessionManager {
       console.log("server error, can't find session in template");
       console.log("will delete all messages until 2 left");
 
-      SessionManager.currentSession.messages =
-        SessionManager.currentSession.messages.slice(0, 2);
+      SessionManager.currentSession.messages = SessionManager.currentSession.messages.slice(0, 2);
       //save to json
       await SessionManager.SaveSessionToJson(SessionManager.currentSession);
       SessionManager.dolistenercallback();
     }
   }
   public static async RegenLastMessage(session: Session): Promise<string> {
-    const lastusermessage =
-      session.messages[session.messages.length - 2].content;
+    const lastusermessage = session.messages[session.messages.length - 2].content;
     session.messages = session.messages.slice(0, -2); //delete both the user and ai response, last 2 messages
     SessionManager.dolistenercallback();
     return lastusermessage;
   }
-  public static async DeleteSessionAsync(
-    sessionid: string
-  ): Promise<Session[]> {
-    const newSessions = SessionManager.sessions.filter(
-      (session) => session.sessionId !== sessionid
-    );
+  public static async DeleteSessionAsync(sessionid: string): Promise<Session[]> {
+    const newSessions = SessionManager.sessions.filter((session) => session.sessionId !== sessionid);
     SessionManager.sessions = newSessions;
     //call api to actually delete the file
     try {
