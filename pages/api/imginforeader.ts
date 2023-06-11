@@ -16,7 +16,7 @@ export const config = {
 const charaRead = async (file: any, input_format: string) => {
   let format;
   sharp.cache(false);
-  if (input_format === undefined) {
+  if (input_format === undefined || input_format == "") {
     if (file.originalFilename.indexOf(".webp") !== -1) {
       format = "webp";
     } else {
