@@ -23,29 +23,44 @@ export class Session {
   ainame: string = "";
   username: string = "";
   create_ts: number = 0;
+  //used by chatgpt
   public GetMessagesWithTokenLimit(tokenLimit: number) {
     var newmessages: Message[] = [];
+    //this.messages.length - 2 because the last one is assistant is thinking...
     for (let index = this.messages.length - 2; index >= 0; index--) {
       const msg = this.messages[index];
       newmessages.unshift(msg);
-      const value = estimateTokens(JSON.stringify(newmessages));
-      if (value > tokenLimit) {
+      const tokenscount = estimateTokens(JSON.stringify(newmessages));
+      if (tokenscount > tokenLimit) {
         newmessages.shift();
         break;
       }
     }
     return newmessages;
   }
+  //used by local run llm
   public GetPromptWithTokenLimit(tokenLimit: number) {
     if (!this.messages || this.messages.length == 0) {
       return "";
     }
-    var prompt = this.messages[0].content;
-    for (let index = 1; index < this.messages.length; index++) {
-      const message = this.messages[index];
-      if (index == 1) {
-        prompt += "\n<START>\n";
+    var newmessages: Message[] = [];
+    const systemtokenscount = estimateTokens(this.messages[0].content);
+    //this.messages.length - 2 because the last one is assistant is thinking...
+    for (let index = this.messages.length - 2; index >= 0; index--) {
+      const msg = this.messages[index];
+      newmessages.unshift(msg); //add to the top
+      const tokenscount = estimateTokens(JSON.stringify(newmessages));
+      if (tokenscount > tokenLimit - systemtokenscount) {
+        newmessages.shift();
+        newmessages.unshift(this.messages[0]); //add system
+        break;
       }
+    }
+
+    var prompt = this.messages[0].content;
+    prompt += "\n<START>\n";
+    for (let index = 1; index < newmessages.length; index++) {
+      const message = newmessages[index];
       if (message.role == "user") {
         prompt += `${this.username}: ${message.content}\n`;
       } else if (message.role == "assistant" && index == this.messages.length - 1) {
@@ -55,11 +70,11 @@ export class Session {
         prompt += `${this.ainame}: ${message.content}\n`;
       }
     }
-    //the last message should be from You the user, checking
-    if (this.messages[this.messages.length - 1].role != "assistant") {
+    //the last message should be from You but it could be from assistant either.
+    //check if it's from You, add assistant
+    if (newmessages[newmessages.length - 1].role == "user") {
       prompt += `${this.ainame}:`;
     }
-
     return prompt;
   }
 }

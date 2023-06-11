@@ -154,7 +154,7 @@ export default function PersistentDrawerLeft() {
     if (timerId) clearInterval(timerId); // clear previous interval
     const newTimerId = setInterval(() => {
       let apiEndpoint = "";
-      console.log("inside interval model: " + SessionManager.currentSession.model);
+      //console.log("inside interval model: " + SessionManager.currentSession.model);
       if (SessionManager.currentSession.model.toLowerCase() === "chatgpt") {
         apiEndpoint = "https://api.openai.com/v1/models";
       } else if (SessionManager.currentSession.model.toLowerCase() === "kobold") {
@@ -441,9 +441,6 @@ export default function PersistentDrawerLeft() {
                 console.log("TEST clicked");
                 const ccc = await Config.GetConfigInstanceAsync();
                 console.log(ccc);
-                console.log(SessionManager.currentSession.GetPromptWithTokenLimit(1000));
-                console.log(SessionManager.currentSession);
-                console.log("model is:" + model);
               }}
             >
               TEST1
