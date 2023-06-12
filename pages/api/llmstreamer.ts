@@ -1,6 +1,6 @@
 import { NextApiResponse, NextApiRequest } from "next";
 
-export default function (req: NextApiRequest, res: NextApiResponse) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   // Set up server-sent events response headers
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Content-Type", "text/event-stream");

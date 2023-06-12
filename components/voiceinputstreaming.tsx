@@ -109,13 +109,14 @@ const VoiceInputStreaming = ({ sliceduration, sendbacktext }: any) => {
       //console.log("Got audio data chunk:", data);
       setChunks((prevChunks) => [...prevChunks, data]);
     };
-  }, [isRecording, voiceRecorder]);
+  }, [isRecording, voiceRecorder, sliceduration]);
 
   //triggered when the recording is stopped
   React.useEffect(() => {
-    if (isRecording || !stream) return;
-    setStream(null);
-  }, [isRecording]);
+    if (!isRecording && stream) {
+      setStream(null);
+    }
+  }, [isRecording, stream]);
 
   return (
     <Box className="absolute z-10 right-32 bottom-32 m-1">

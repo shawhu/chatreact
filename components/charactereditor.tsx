@@ -20,7 +20,7 @@ import { Config } from "@/common/config";
 import { estimateTokens } from "@/common/helper";
 
 function CharacterEditor({ open, handleClose }: any) {
-  const [headshoturl, setHeadshoturl] = React.useState("");
+  const [headshoturl, setHeadshoturl] = React.useState("/headshots/characters/placeholder.jpg");
   const [context, setContext] = React.useState("");
   const [name, setName] = React.useState("");
   const [categories, setCategories] = React.useState([]);
@@ -41,6 +41,7 @@ function CharacterEditor({ open, handleClose }: any) {
     setDialoguesExample("");
     setFirstMessage("");
     setTotaltoken(0);
+    setHeadshoturl("/headshots/characters/placeholder.jpg");
   }, [open]);
 
   //processing upload tavarnai character png/webp
@@ -90,19 +91,15 @@ function CharacterEditor({ open, handleClose }: any) {
     GetInfoFromServerAsync();
   }, [uploadFile]);
 
-  const handleSave = () => {
-    //combine all necessary fields
-    // {{name}}'s Persona:{{description}}
-    // {{personalitySummary}}
-    // {{scenario}}
-    // {{dialoguesExample}}
-    // {{firstMessage}}
+  const ApplyCharacter = () => {
     let allfields = `${name}'s Persona:${description}${personalitySummary}${scenario}${dialoguesExample}`;
     allfields = allfields.replaceAll("{{char}}", name);
+    allfields = allfields.replaceAll("{{user}}:", "You:");
     allfields = allfields.replaceAll("{{user}}", "you");
     allfields = allfields.replaceAll("\r", "");
     allfields = allfields.replaceAll("you's", "your");
     let fm = firstMessage.replaceAll("{{char}}", name);
+    fm = fm.replaceAll("{{user}}:", "You:");
     fm = fm.replaceAll("{{user}}", "you");
     fm = fm.replaceAll("\r", "");
     fm = fm.replaceAll("you's", "your");
@@ -119,7 +116,41 @@ function CharacterEditor({ open, handleClose }: any) {
       maxWidth="xl"
       fullWidth={true}
     >
-      <DialogTitle>Character Editor</DialogTitle>
+      <DialogActions>
+        <Button
+          onClick={() => {
+            handleClose("", "", "", "");
+          }}
+          color="primary"
+        >
+          Close
+        </Button>
+        <Button variant="contained" onClick={ApplyCharacter} color="primary">
+          Load Character
+        </Button>
+        <Button
+          variant="contained"
+          onClick={async () => {
+            const jobj = { name, description, personalitySummary, scenario, dialoguesExample, firstMessage };
+            const exportjobj = {
+              source_img: headshoturl,
+              target_img: headshoturl.replaceAll("characters", "temp"),
+              tEXt: jobj,
+            };
+            const response = await fetch(`/api/imgsaveinfo`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(exportjobj),
+            });
+            console.log("Save and export Image");
+          }}
+          color="primary"
+        >
+          Save & Export Image
+        </Button>
+      </DialogActions>
       <List className="m-12">
         <ListItem
           sx={{
@@ -252,19 +283,6 @@ function CharacterEditor({ open, handleClose }: any) {
           />
         </ListItem>
       </List>
-      <DialogActions>
-        <Button
-          onClick={() => {
-            handleClose("", "", "", "");
-          }}
-          color="primary"
-        >
-          Cancel
-        </Button>
-        <Button onClick={handleSave} color="primary">
-          Load
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }

@@ -4,9 +4,10 @@ import { promises as fs } from "fs";
 import ExifReader from "exifreader";
 import formidable from "formidable";
 import sharp from "sharp";
-//import { extract } from "png-chunks-extract";
+
 const extract = require("png-chunks-extract");
 const PNGtext = require("png-chunk-text");
+const encode = require("png-chunks-encode");
 export const config = {
   api: {
     bodyParser: false,

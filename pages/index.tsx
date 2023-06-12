@@ -183,7 +183,7 @@ export default function PersistentDrawerLeft() {
     const newTimerId = setInterval(backendProbe, backendCallingInterval);
     setTimerId(newTimerId); // set new timerId
     return () => clearInterval(newTimerId);
-  }, [model]);
+  }, [model, timerId]);
   React.useEffect(() => {
     // call the GetConfig function to get the API key and other configs
     async function getvoiceoverAsync() {
