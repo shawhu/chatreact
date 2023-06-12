@@ -25,23 +25,21 @@ const charaRead = async (file: any, input_format: string) => {
   } else {
     format = input_format;
   }
-  //const filepath = path.join(process.cwd(), img_url);
+  // write the file to the target directory
+  const targetFilePath = path.join(process.cwd(), "public/headshots/characters/" + file.originalFilename);
+  const filedata = await fs.readFile(file.filepath);
+  try {
+    await fs.writeFile(targetFilePath, filedata);
+    console.log(`File saved to ${targetFilePath}.`);
+  } catch (error) {
+    console.error(`Error writing file: ${error}`);
+  }
+  //read file tEXt
   switch (format) {
     case "webp":
       try {
         let char_data;
-        const filedata = await fs.readFile(file.filepath);
         const exif_data = await ExifReader.load(filedata);
-        // write the file to the target directory
-        const targetFilePath = path.join(process.cwd(), "public/headshots/characters/" + file.originalFilename);
-
-        try {
-          await fs.writeFile(targetFilePath, filedata);
-          console.log(`File saved to ${targetFilePath}.`);
-        } catch (error) {
-          console.error(`Error writing file: ${error}`);
-        }
-
         if (exif_data && exif_data["UserComment"] && exif_data["UserComment"]["description"]) {
           let description = exif_data["UserComment"]["description"];
           try {

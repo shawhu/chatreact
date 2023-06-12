@@ -129,21 +129,32 @@ function CharacterEditor({ open, handleClose }: any) {
             gap: "10px",
           }}
         >
-          <Image src={"/headshots/ai/00001-748567734.jpg"} width="100" height="100" alt="aiheadshot"></Image>
+          <Image src={headshoturl} width="200" height="300" alt="aiheadshot"></Image>
           <div>
-            <FormControl>
-              <Input
-                type="file"
-                onChange={(e: any) => {
-                  if (e.target.files.length > 0) {
-                    console.log(e.target.files[0].name);
-                    setUploadFile(e.target.files[0]); // Get the first selected file
-                  } else {
-                    console.log("no file has been selected, quit");
-                  }
-                }}
-              />
-            </FormControl>
+            <Input
+              type="file"
+              onChange={(e: any) => {
+                if (e.target.files.length > 0) {
+                  console.log(e.target.files[0].name);
+                  setUploadFile(e.target.files[0]); // Get the first selected file
+                } else {
+                  console.log("no file has been selected, quit");
+                }
+              }}
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="ainame"
+              label="Character Name"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={name}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setName(event.target.value);
+              }}
+            />
             <TextField
               autoFocus
               margin="dense"
