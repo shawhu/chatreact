@@ -186,7 +186,10 @@ export default function Conversationllmws({
   useEffect(() => {
     // scrollIntoView function will be called when messages are updated
     if (target_bottomRef.current) {
-      target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      console.log("trying to move to the bottom");
+      setTimeout(() => {
+        target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     }
   }, [messages]);
 

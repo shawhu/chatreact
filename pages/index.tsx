@@ -127,6 +127,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
+  const backendCallingInterval = 10000; //10 seconds
   const [open, setOpen] = React.useState(true); //this is to control sidebar open by default
   const [openDialogConfig, setOpenDialogConfig] = React.useState(false); //control config dialog to show
   const [openDialogCharacterEditor, setOpenDialogCharacterEditor] = React.useState(false); //control config dialog to show
@@ -147,39 +148,39 @@ export default function PersistentDrawerLeft() {
   const [prompt, setPrompt] = React.useState({ value: "" }); //处理完成后prompt会变空
   const [myconfig, setMyconfig] = React.useState(new Config());
 
+  const backendProbe = () => {
+    let apiEndpoint = "";
+    //console.log("inside interval model: " + SessionManager.currentSession.model);
+    if (SessionManager.currentSession.model.toLowerCase() === "chatgpt") {
+      apiEndpoint = "https://api.openai.com/v1/models";
+    } else if (SessionManager.currentSession.model.toLowerCase() === "kobold") {
+      apiEndpoint = "/api/v1/model";
+    }
+    fetch(apiEndpoint, {
+      headers: {
+        Authorization: `Bearer ${Config.GetConfig()?.openaikey}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (res.status > 210) {
+          //console.error("Backend probe return error");
+          setConnected(false);
+        } else {
+          setConnected(true);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setConnected(false);
+      });
+  };
   React.useEffect(() => {
     console.log("model changed to " + model);
-
     //setup and run the probe
     if (timerId) clearInterval(timerId); // clear previous interval
-    const newTimerId = setInterval(() => {
-      let apiEndpoint = "";
-      //console.log("inside interval model: " + SessionManager.currentSession.model);
-      if (SessionManager.currentSession.model.toLowerCase() === "chatgpt") {
-        apiEndpoint = "https://api.openai.com/v1/models";
-      } else if (SessionManager.currentSession.model.toLowerCase() === "kobold") {
-        apiEndpoint = "/api/v1/model";
-      }
-
-      fetch(apiEndpoint, {
-        headers: {
-          Authorization: `Bearer ${Config.GetConfig()?.openaikey}`,
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => {
-          if (res.status > 210) {
-            console.error("Backend probe return error");
-            setConnected(false);
-          } else {
-            setConnected(true);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          setConnected(false);
-        });
-    }, 5000);
+    backendProbe();
+    const newTimerId = setInterval(backendProbe, backendCallingInterval);
     setTimerId(newTimerId); // set new timerId
     return () => clearInterval(newTimerId);
   }, [model]);
