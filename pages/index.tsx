@@ -202,17 +202,6 @@ export default function PersistentDrawerLeft() {
     };
   });
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-  const handleClose = () => {
-    setOpendialog(false);
-  };
-
   const RefreshIndexPageConfig = (config: any) => {
     console.log("got config callback from dialogconfig");
     console.log(config);
@@ -230,7 +219,9 @@ export default function PersistentDrawerLeft() {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => {
+              setOpen(true);
+            }}
             edge="start"
             sx={{ mr: 2, ...(open && { display: "none" }) }}
           >
@@ -266,6 +257,7 @@ export default function PersistentDrawerLeft() {
                     SessionManager.currentSession.model = event.target.value;
                     await SessionManager.SaveSessionToJson(SessionManager.currentSession);
                     setModel(SessionManager.currentSession.model);
+                    setConnected(false);
                   }}
                 >
                   <MenuItem value={"kobold"}>kobold</MenuItem>
@@ -309,7 +301,11 @@ export default function PersistentDrawerLeft() {
         open={open}
       >
         <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
+          <IconButton
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
             {theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
@@ -463,11 +459,22 @@ export default function PersistentDrawerLeft() {
             </Button>
           </Box>
         </Box>
-        <Dialog open={opendialog} onClose={handleClose}>
+        <Dialog
+          open={opendialog}
+          onClose={() => {
+            setOpendialog(false);
+          }}
+        >
           <DialogTitle>Clean up</DialogTitle>
           <DialogContent>{dialogMessage}</DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button
+              onClick={() => {
+                setOpendialog(false);
+              }}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={async () => {
                 await SessionManager.ResetSessionToOriginal(SessionManager.currentSession.sessionId);

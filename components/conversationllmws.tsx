@@ -126,8 +126,8 @@ export default function Conversationllmws({
       await handleSSE(response, (message) => {
         if (message === "[DONE]") {
           console.log("try to save session");
-          const last_message =
-            SessionManager.currentSession.messages[SessionManager.currentSession.messages.length - 1];
+          const msgs = SessionManager.currentSession.messages;
+          const last_message = msgs[msgs.length - 1];
           last_message.completets = Math.floor(Date.now() / 1000);
           //process the content
           //get rid of italic items

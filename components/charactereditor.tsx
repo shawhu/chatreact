@@ -64,7 +64,9 @@ function CharacterEditor({ open, handleClose }: any) {
         setName(json.name);
       }
       if (json.description) {
-        setDescription(json.description);
+        let desc = json.description.replaceAll("\r", "");
+        desc = desc.replaceAll("\n\n", "\n");
+        setDescription(desc);
       }
       if (json.personalitySummary) {
         setPersonalitySummary(json.personalitySummary);
@@ -73,12 +75,16 @@ function CharacterEditor({ open, handleClose }: any) {
         setScenario(json.scenario);
       }
       if (json.dialoguesExample) {
-        setDialoguesExample(json.dialoguesExample);
+        let dexample = json.dialoguesExample.replaceAll("\r", "");
+        dexample = dexample.replaceAll("\n\n", "\n");
+        setDialoguesExample(dexample);
       }
       if (json.firstMessage) {
-        setFirstMessage(json.firstMessage);
+        let fmsg = json.firstMessage.replaceAll("\r", "");
+        fmsg = fmsg.replaceAll("\n\n", "\n");
+        setFirstMessage(fmsg);
       }
-      const allfields = `${json.name}'s Persona:${json.description}${json.personalitySummary}${json.scenario}${json.dialoguesExample}${json.firstMessage}`;
+      const allfields = `${json.name}'s Persona:${json.description}${json.personalitySummary}${json.scenario}\n${json.dialoguesExample}\n${json.firstMessage}`;
       setTotaltoken(estimateTokens(allfields));
     };
     GetInfoFromServerAsync();
@@ -95,9 +101,11 @@ function CharacterEditor({ open, handleClose }: any) {
     allfields = allfields.replaceAll("{{char}}", name);
     allfields = allfields.replaceAll("{{user}}", "you");
     allfields = allfields.replaceAll("\r", "");
+    allfields = allfields.replaceAll("you's", "your");
     let fm = firstMessage.replaceAll("{{char}}", name);
     fm = fm.replaceAll("{{user}}", "you");
     fm = fm.replaceAll("\r", "");
+    fm = fm.replaceAll("you's", "your");
     setTotaltoken(estimateTokens(allfields));
     handleClose(allfields, fm, headshoturl, name);
   };

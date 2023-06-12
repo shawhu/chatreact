@@ -43,7 +43,15 @@ const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
       if (jobj.event == "text_stream") {
         fulltext += jobj.text;
         //console.log(fulltext);
-        let checkingarray = fulltext.split("\nYou");
+        let checkingarray = fulltext.split("\nYou:");
+        if (checkingarray.length > 1) {
+          //found \nYou, close the ws and send ending
+          //console.log("found \\nYou, trying to close the ");
+          res.status(200).end("data: [DONE]\n\n");
+          ws.close();
+          return;
+        }
+        checkingarray = fulltext.split("\nyou:");
         if (checkingarray.length > 1) {
           //found \nYou, close the ws and send ending
           //console.log("found \\nYou, trying to close the ");
