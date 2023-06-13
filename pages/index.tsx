@@ -178,12 +178,12 @@ export default function PersistentDrawerLeft() {
   React.useEffect(() => {
     console.log("model changed to " + model);
     //setup and run the probe
-    if (timerId) clearInterval(timerId); // clear previous interval
+    clearInterval(timerId); // clear previous interval
     backendProbe();
     const newTimerId = setInterval(backendProbe, backendCallingInterval);
     setTimerId(newTimerId); // set new timerId
     return () => clearInterval(newTimerId);
-  }, [model, timerId]);
+  }, [model]);
   React.useEffect(() => {
     // call the GetConfig function to get the API key and other configs
     async function getvoiceoverAsync() {

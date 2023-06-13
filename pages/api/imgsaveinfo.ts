@@ -20,11 +20,22 @@ const ProcessingImageAsync = async (source_img: string, tEXtdata: any, target_im
     sharp.cache(false);
     const filepath = path.join(process.cwd(), `public/${source_img}`);
     const targetpath = path.join(process.cwd(), `public/${target_img}`);
+    const jobj = JSON.parse(tEXtdata);
+    const pngjobj = {
+      name: jobj.name,
+      description: jobj.description,
+      personality: jobj.personalitySummary,
+      scenario: jobj.scenario,
+      mes_example: jobj.dialoguesExample,
+      first_mes: jobj.firstMessage,
+    };
+    const pngjson = JSON.stringify(pngjobj);
     switch (format) {
       case ".webp":
       case "webp":
         const imageBuffer = await fs.readFile(filepath);
-        let stringByteArray = new TextEncoder().encode(tEXtdata).toString();
+
+        let stringByteArray = new TextEncoder().encode(pngjson).toString();
         const processedImage = await sharp(imageBuffer)
           .resize(400, 600)
           .webp({ quality: 95 })
@@ -58,16 +69,6 @@ const ProcessingImageAsync = async (source_img: string, tEXtdata: any, target_im
         //   headshoturl: `/headshots/characters/${file.originalFilename}`,
         // };
         // Add new chunks before the IEND chunk
-        const jobj = JSON.parse(tEXtdata);
-        const pngjobj = {
-          name: jobj.name,
-          description: jobj.description,
-          personality: jobj.personalitySummary,
-          scenario: jobj.scenario,
-          mes_example: jobj.dialoguesExample,
-          first_mes: jobj.firstMessage,
-        };
-        const pngjson = JSON.stringify(pngjobj);
         var base64EncodedData = Buffer.from(pngjson, "utf8").toString("base64");
         chunks.splice(-1, 0, PNGtext.encode("chara", base64EncodedData));
         await fs.writeFile(targetpath, Buffer.from(encode(chunks)));

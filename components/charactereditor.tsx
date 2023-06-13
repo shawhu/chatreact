@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { Config } from "@/common/config";
 import { estimateTokens } from "@/common/helper";
+import { FileUploader } from "react-drag-drop-files";
 
 function CharacterEditor({ open, handleClose }: any) {
   const [headshoturl, setHeadshoturl] = React.useState("/headshots/characters/placeholder.jpg");
@@ -40,6 +41,7 @@ function CharacterEditor({ open, handleClose }: any) {
     setScenario("");
     setDialoguesExample("");
     setFirstMessage("");
+    setName("");
     setTotaltoken(0);
     setHeadshoturl("/headshots/characters/placeholder.jpg");
   }, [open]);
@@ -117,24 +119,29 @@ function CharacterEditor({ open, handleClose }: any) {
       fullWidth={true}
     >
       <DialogActions>
-        <Button
-          onClick={() => {
-            handleClose("", "", "", "");
+        <FileUploader
+          label={"Upload TavernAI webp/png"}
+          labelAfter={"done"}
+          multiple={false}
+          handleChange={(file: File) => {
+            console.log(file);
+            setUploadFile(file); // Get the first selected file
           }}
-          color="primary"
-        >
-          Close
-        </Button>
-        <Button variant="contained" onClick={ApplyCharacter} color="primary">
+          name="file"
+          types={["png", "webp"]}
+          dropMessageStyle={{ backgroundColor: "rgba(0, 0, 0, 1)", color: "lightgreen" }}
+        />
+        <Button disabled={description == ""} variant="contained" onClick={ApplyCharacter} color="primary">
           Load Character
         </Button>
         <Button
+          disabled={description == ""}
           variant="contained"
           onClick={async () => {
             const jobj = { name, description, personalitySummary, scenario, dialoguesExample, firstMessage };
             const exportjobj = {
               source_img: headshoturl,
-              target_img: headshoturl.replaceAll("characters", "temp"),
+              target_img: headshoturl.replaceAll("characters", "exported"),
               tEXt: jobj,
             };
             const response = await fetch(`/api/imgsaveinfo`, {
@@ -150,6 +157,14 @@ function CharacterEditor({ open, handleClose }: any) {
         >
           Save & Export Image
         </Button>
+        <Button
+          onClick={() => {
+            handleClose("", "", "", "");
+          }}
+          color="primary"
+        >
+          Close
+        </Button>
       </DialogActions>
       <List className="m-12">
         <ListItem
@@ -162,17 +177,6 @@ function CharacterEditor({ open, handleClose }: any) {
         >
           <Image src={headshoturl} width="200" height="300" alt="aiheadshot"></Image>
           <div>
-            <Input
-              type="file"
-              onChange={(e: any) => {
-                if (e.target.files.length > 0) {
-                  console.log(e.target.files[0].name);
-                  setUploadFile(e.target.files[0]); // Get the first selected file
-                } else {
-                  console.log("no file has been selected, quit");
-                }
-              }}
-            />
             <TextField
               autoFocus
               margin="dense"

@@ -37,6 +37,7 @@
     "postcss": "8.4.24",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-drag-drop-files": "^2.3.10",
     "react-is": "^16.8.0",
     "react-media-recorder": "^1.6.6",
     "react-syntax-highlighter": "^15.5.0",

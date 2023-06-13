@@ -62,7 +62,7 @@ export class Session {
     for (let index = 1; index < newmessages.length; index++) {
       const message = newmessages[index];
       if (message.role == "user") {
-        prompt += `${this.username}: ${message.content}\n`;
+        prompt += `${this.username.charAt(0).toUpperCase() + this.username.slice(1)}: ${message.content}\n`;
       } else if (message.role == "assistant" && index == this.messages.length - 1) {
         //the last message, should be ainame: with no enter
         prompt += `${this.ainame}:`;
