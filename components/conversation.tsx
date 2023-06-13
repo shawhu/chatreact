@@ -165,9 +165,12 @@ function Conversation({
   //this helps to scroll to the bottom when messages changes.
   useEffect(() => {
     // scrollIntoView function will be called when messages are updated
-    if (target_bottomRef.current) {
-      target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    console.log("conversation: trying to scroll to the bottom");
+    setTimeout(() => {
+      if (target_bottomRef.current) {
+        target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
   }, [messages]);
 
   return (

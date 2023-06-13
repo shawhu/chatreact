@@ -43,8 +43,14 @@ function CharacterEditor({ open, handleClose }: any) {
     setFirstMessage("");
     setName("");
     setTotaltoken(0);
-    setHeadshoturl("/headshots/characters/placeholder.jpg");
+    setHeadshoturl("/headshots/characters/placeholder.webp");
   }, [open]);
+
+  //calculate and update total tokens
+  React.useEffect(() => {
+    const allfields = `${name}'s Persona:${description}${personalitySummary}${scenario}\n${dialoguesExample}\n${firstMessage}`;
+    setTotaltoken(estimateTokens(allfields));
+  }, [description, personalitySummary, scenario, dialoguesExample, firstMessage, name]);
 
   //processing upload tavarnai character png/webp
   React.useEffect(() => {

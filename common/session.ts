@@ -87,7 +87,9 @@ export class SessionManager {
     if (SessionManager.listenercallback) {
       SessionManager.listenercallback(); //trigger any component using session manager to re-render
     } else {
-      console.error("listenercallback is undefined, can't call");
+      console.log(
+        "SessionManager: conversation or conversaionllm is not loaded, listenercallback is undefined, skip calling"
+      );
     }
   }
   public static async SetCurrentSessionById(sessionid: string) {
@@ -183,6 +185,8 @@ export class SessionManager {
     return session;
   }
   public static async ReloadAndGetAllSessions() {
+    console.log("session class: ReloadAndGetAllSessions");
+
     try {
       //this is going to add 3 session json files to the sessions folder if the folder is empty
       const res = await fetch(`/api/sessionsload`, {
@@ -211,7 +215,7 @@ export class SessionManager {
       const config = await Config.GetConfigInstanceAsync();
       //console.log(config);
       if (config.currentsessionid && config.currentsessionid != "") {
-        console.log("found history sessionid");
+        //console.log("found history sessionid");
         const current_session = SessionManager.sessions.find((session) => session.sessionId == config.currentsessionid);
         if (current_session) {
           SessionManager.currentSession = current_session;

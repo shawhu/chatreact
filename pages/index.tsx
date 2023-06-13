@@ -176,7 +176,10 @@ export default function PersistentDrawerLeft() {
       });
   };
   React.useEffect(() => {
-    console.log("model changed to " + model);
+    if (!model || model == "") {
+      return;
+    }
+    console.log("indexpage: model probe is running, model changed to " + model);
     //setup and run the probe
     clearInterval(timerId); // clear previous interval
     backendProbe();
@@ -194,7 +197,9 @@ export default function PersistentDrawerLeft() {
     }
     getvoiceoverAsync();
     SessionManager.indexpagecallback = () => {
-      console.log("Index page indexpagecallback triggered");
+      console.log(
+        `indexpage: indexpagecallback triggered from SessionManager, sessionname:${SessionManager.currentSession.sessionName} model:${SessionManager.currentSession.model}`
+      );
       setSessionname(SessionManager.currentSession.sessionName);
       setModel(SessionManager.currentSession.model);
       //cancel interval calling probe
@@ -356,11 +361,16 @@ export default function PersistentDrawerLeft() {
             initialmessages={SessionManager.currentSession.messages}
           />
         ) : (
+          <></>
+        )}
+        {model == "kobold" ? (
           <Conversationllmws
             prompt={prompt}
             voiceover={voiceoverChecked}
             initialmessages={SessionManager.currentSession.messages}
           />
+        ) : (
+          <></>
         )}
 
         {/*this is the input area with buttons  this is the input area with buttons  this is the input area with buttons  */}

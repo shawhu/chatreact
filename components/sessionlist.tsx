@@ -1,11 +1,5 @@
 import * as React from "react";
-import {
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Session, Message, SessionManager } from "@/common/session";
@@ -14,16 +8,15 @@ export default function SessionList({ refreshtimestamp }: any) {
   const [mySessions, setMySessions] = React.useState<Session[]>([]);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   React.useEffect(() => {
-    const ggg = async () => {
+    const SessionListInitialization = async () => {
       const sessions = await SessionManager.ReloadAndGetAllSessions();
       const sessionIndex = sessions.findIndex(
-        (session: Session) =>
-          session.sessionId === SessionManager.currentSession.sessionId
+        (session: Session) => session.sessionId === SessionManager.currentSession.sessionId
       );
       setSelectedIndex(sessionIndex);
       setMySessions(sessions);
     };
-    ggg();
+    SessionListInitialization();
   }, []);
   React.useEffect(() => {
     if (
@@ -34,8 +27,7 @@ export default function SessionList({ refreshtimestamp }: any) {
     ) {
       const sessions = SessionManager.sessions;
       const sessionIndex = sessions.findIndex(
-        (session) =>
-          session.sessionId === SessionManager.currentSession.sessionId
+        (session) => session.sessionId === SessionManager.currentSession.sessionId
       );
       setSelectedIndex(sessionIndex);
       setMySessions(sessions);
@@ -73,9 +65,7 @@ export default function SessionList({ refreshtimestamp }: any) {
                 onClick={async (event) => {
                   console.log("session delete clicked");
                   event.stopPropagation();
-                  const newsessions = await SessionManager.DeleteSessionAsync(
-                    session.sessionId
-                  );
+                  const newsessions = await SessionManager.DeleteSessionAsync(session.sessionId);
                   setMySessions(newsessions);
                 }}
               />

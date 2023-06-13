@@ -188,7 +188,7 @@ export default function Conversationllmws({
   //this helps to scroll to the bottom when messages changes.
   useEffect(() => {
     // scrollIntoView function will be called when messages are updated
-    console.log("trying to move to the bottom");
+    console.log("conversationllmws: trying to scroll to the bottom");
     setTimeout(() => {
       if (target_bottomRef.current) {
         target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -253,6 +253,7 @@ export default function Conversationllmws({
                   }`}
                 />
               </ListItemAvatar>
+              llmws
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
