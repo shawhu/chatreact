@@ -128,8 +128,11 @@ export default function Conversationllmws({
           console.log("try to save session");
           const msgs = SessionManager.currentSession.messages;
           const last_message = msgs[msgs.length - 1];
+          //check if we have You at the end if it does, remove it
+          last_message.content = last_message.content.replace(/\n[Yy]ou$/, ""); // Remove the pattern, if found
+          //set timestamp
           last_message.completets = Math.floor(Date.now() / 1000);
-          //process the content
+          //process the content for audio
           //get rid of italic items
           let regexpattern = /\*([\s\S]*?)\*/g;
           let tempaudiotext = last_message.content.replace(regexpattern, ``);
