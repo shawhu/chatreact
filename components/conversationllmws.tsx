@@ -15,6 +15,7 @@ export default function Conversationllmws({
   prompt,
   voiceover,
   initialmessages,
+  initialainame,
 }: {
   prompt: {
     value: string;
@@ -24,6 +25,7 @@ export default function Conversationllmws({
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>(initialmessages);
+  const [ainame, setAiname] = useState<string>(initialainame);
   const [changemessagerequest, setChangemessagerequest] = React.useState({
     index: 0,
     content: "",
@@ -92,7 +94,7 @@ export default function Conversationllmws({
         use_authors_note: false,
         use_world_info: false,
         max_context_length: 2048,
-        max_length: 180,
+        max_length: 1000,
         rep_pen: 1.1,
         rep_pen_range: 1024,
         rep_pen_slope: 0.9,
@@ -181,6 +183,7 @@ export default function Conversationllmws({
     const trigger = () => {
       //console.log("conversation useEffect triggered, loading a new session");
       setMessages(SessionManager.currentSession.messages);
+      setAiname(SessionManager.currentSession.ainame);
     };
     SessionManager.listenercallback = trigger;
     //trigger();
@@ -253,11 +256,11 @@ export default function Conversationllmws({
                   }`}
                 />
               </ListItemAvatar>
-              llmws
+              {ainame}
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
-              primary={<MyMessageBlock rawtext={message.content}></MyMessageBlock>}
+              primary={<MyMessageBlock rawtext={message.content} ainame={ainame}></MyMessageBlock>}
               secondary={`${getFormattedDateTime(message.completets)}`}
               className={`rounded-t-xl p-4 cursor-pointer ${
                 message.role === "assistant" || message.role === "system"

@@ -48,9 +48,18 @@ function CharacterEditor({ open, handleClose }: any) {
 
   //calculate and update total tokens
   React.useEffect(() => {
-    const allfields = `${name}'s Persona:${description}${personalitySummary}${scenario}\n${dialoguesExample}\n${firstMessage}`;
+    let allfields = `description:\n${description}\n`;
+    if (personalitySummary && personalitySummary.length > 0) {
+      allfields += `personalitySummary:\n${personalitySummary}\n`;
+    }
+    if (scenario && scenario.length > 0) {
+      allfields += `scenario:\n${scenario}\n`;
+    }
+    if (dialoguesExample && dialoguesExample.length > 0) {
+      allfields += `dialoguesExample:\n${dialoguesExample}\n`;
+    }
     setTotaltoken(estimateTokens(allfields));
-  }, [description, personalitySummary, scenario, dialoguesExample, firstMessage, name]);
+  }, [description, personalitySummary, scenario, dialoguesExample, name]);
 
   //processing upload tavarnai character png/webp
   React.useEffect(() => {
@@ -100,7 +109,18 @@ function CharacterEditor({ open, handleClose }: any) {
   }, [uploadFile]);
 
   const ApplyCharacter = () => {
-    let allfields = `${name}'s Persona:${description}${personalitySummary}${scenario}${dialoguesExample}`;
+    //let allfields = `${name}'s Persona:${description}${personalitySummary}${scenario}${dialoguesExample}`;
+    let allfields = `description:\n${description}\n`;
+    if (personalitySummary && personalitySummary.length > 0) {
+      allfields += `personalitySummary:\n${personalitySummary}\n`;
+    }
+    if (scenario && scenario.length > 0) {
+      allfields += `scenario:\n${scenario}\n`;
+    }
+    if (dialoguesExample && dialoguesExample.length > 0) {
+      allfields += `dialoguesExample:\n${dialoguesExample}\n`;
+    }
+
     allfields = allfields.replaceAll("{{char}}", name);
     allfields = allfields.replaceAll("{{user}}:", "You:");
     allfields = allfields.replaceAll("{{user}}", "you");

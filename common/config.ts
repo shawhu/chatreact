@@ -7,6 +7,7 @@ export class Config {
   voiceover: boolean = false;
   currentsessionid: string = "";
   koboldapi: string = "";
+  whisperapi: string = "";
 
   public static async GetConfigInstanceAsync() {
     //load config from json and return it
@@ -44,6 +45,8 @@ export class Config {
     myconfig.voiceover = jobj.voiceover;
     myconfig.currentsessionid = jobj.currentsessionid;
     myconfig.koboldapi = jobj.koboldapi;
+    myconfig.whisperapi = jobj.whisperapi;
+    process.env.whisperapi = jobj.whisperapi;
     return myconfig;
   }
 }

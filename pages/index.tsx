@@ -127,7 +127,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const backendCallingInterval = 10000; //10 seconds
+  const backendCallingInterval = 20000; //20 seconds
   const [open, setOpen] = React.useState(true); //this is to control sidebar open by default
   const [openDialogConfig, setOpenDialogConfig] = React.useState(false); //control config dialog to show
   const [openDialogCharacterEditor, setOpenDialogCharacterEditor] = React.useState(false); //control config dialog to show
@@ -348,7 +348,10 @@ export default function PersistentDrawerLeft() {
       </Drawer>
       <DialogConfig
         open={openDialogConfig}
-        handleClose={() => setOpenDialogConfig(false)}
+        handleClose={() => {
+          setOpenDialogConfig(false);
+          backendProbe();
+        }}
         refreshindexpageconfig={RefreshIndexPageConfig}
       />
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
@@ -368,6 +371,7 @@ export default function PersistentDrawerLeft() {
             prompt={prompt}
             voiceover={voiceoverChecked}
             initialmessages={SessionManager.currentSession.messages}
+            initialainame={SessionManager.currentSession.ainame}
           />
         ) : (
           <></>
@@ -413,6 +417,7 @@ export default function PersistentDrawerLeft() {
             <Button
               id="generate"
               variant="contained"
+              disabled={!connected}
               onClick={() => {
                 console.log("gen clicked: message is: " + message);
                 setPrompt({ value: message });
@@ -446,8 +451,7 @@ export default function PersistentDrawerLeft() {
               variant="outlined"
               onClick={async () => {
                 console.log("TEST clicked");
-                const ccc = await Config.GetConfigInstanceAsync();
-                console.log(ccc);
+                console.log(SessionManager.currentSession);
               }}
             >
               TEST1

@@ -22,6 +22,7 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
   const [ctrlenter, setCtrlenter] = React.useState(false);
   const [voiceover, setVoiceover] = React.useState(false);
   const [koboldapi, setKoboldapi] = React.useState("");
+  const [whisperapi, setWhisperapi] = React.useState("");
 
   React.useEffect(() => {
     const fetchConfigData = async () => {
@@ -33,6 +34,7 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
         setCtrlenter(myconfig.ctrlenter);
         setVoiceover(myconfig.voiceover);
         setKoboldapi(myconfig.koboldapi);
+        setWhisperapi(myconfig.whisperapi);
       } catch (error) {
         console.error(error);
       }
@@ -47,6 +49,7 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
     myconfig.ctrlenter = ctrlenter;
     myconfig.voiceover = voiceover;
     myconfig.koboldapi = koboldapi;
+    myconfig.whisperapi = whisperapi;
 
     await myconfig.SaveAsync();
     refreshindexpageconfig(myconfig);
@@ -137,6 +140,22 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
             value={koboldapi}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setKoboldapi(event.target.value);
+            }}
+          />
+        </ListItem>
+        <ListItem>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="whisperapi"
+            label="Whisper Server"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={whisperapi}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setWhisperapi(event.target.value);
             }}
           />
         </ListItem>

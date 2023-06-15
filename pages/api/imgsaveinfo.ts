@@ -90,7 +90,7 @@ export default async function imgSaveInfo(req: NextApiRequest, res: NextApiRespo
   const { source_img, target_img, tEXt } = req.body;
   await ProcessingImageAsync(source_img, JSON.stringify(tEXt), target_img);
 
-  console.log(`request is:\nsource_img:${source_img}\ntarget_img:${target_img}\ntEXt:${tEXt}`);
+  console.log(`request is:\nsource_img:${source_img}\ntarget_img:${target_img}\ntEXt:${JSON.stringify(tEXt)}`);
   res.status(200).json({ exported: target_img });
   return;
 }

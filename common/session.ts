@@ -128,9 +128,11 @@ export class SessionManager {
   public static async CreateSessionAsync() {
     const newsession = new Session();
     newsession.sessionId = uuidv4();
-    newsession.sessionName = "Click me to change";
+    newsession.sessionName = "New Session";
     newsession.create_ts = Math.floor(Date.now() / 1000);
     newsession.model = "ChatGPT";
+    newsession.username = "You";
+    newsession.ainame = "assistant";
     newsession.messages = [
       {
         role: "system",

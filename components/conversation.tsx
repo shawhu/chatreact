@@ -238,7 +238,7 @@ function Conversation({
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
-              primary={<MyMessageBlock rawtext={message.content}></MyMessageBlock>}
+              primary={<MyMessageBlock rawtext={message.content} ainame={"assistant"}></MyMessageBlock>}
               secondary={`${getFormattedDateTime(message.completets)}`}
               className={`rounded-t-xl p-4 cursor-pointer ${
                 message.role === "assistant" || message.role === "system"

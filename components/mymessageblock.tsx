@@ -14,7 +14,7 @@ import {
 //docs reference
 //https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/AVAILABLE_STYLES_HLJS.MD
 //this is the actual block that display the content returned by AI LLM
-export default function MyMessageBlock({ rawtext }: any) {
+export default function MyMessageBlock({ rawtext, ainame }: any) {
   const [displaytexts, setDisplaytexts] = useState<
     {
       type: string;
@@ -34,7 +34,7 @@ export default function MyMessageBlock({ rawtext }: any) {
     //     match[1]
     // );
 
-    const regex = /```([^`]+)(?:```)?/g;
+    const regex = /```([\s\S]+)(?:```)?/g;
     const matchesArray = Array.from(rawtext.matchAll(regex));
     const codeblocks: string[] = matchesArray.map(
       (match: any) =>
@@ -50,13 +50,11 @@ export default function MyMessageBlock({ rawtext }: any) {
     let actualtext = textlines.join("<br>");
     //find italic items
     const regexpattern = /\*([\s\S]*?)\*/g;
-    actualtext = actualtext.replace(
-      regexpattern,
-      `<em style="Color: #238442">$1</em>`
-    );
-    var tempdisplaytexts = [
-      { type: "text", content: actualtext, language: "" },
-    ];
+    if (ainame.toLowerCase() != "assistant") {
+      actualtext = actualtext.replace(regexpattern, `<em style="Color: #238442">$1</em>`);
+    }
+
+    var tempdisplaytexts = [{ type: "text", content: actualtext, language: "" }];
     //if there's code block, we then add <code><text>,<code><text>, until the end
     if (textblocks.length > 1) {
       for (let i = 1; i < textblocks.length; i++) {
@@ -128,10 +126,7 @@ export default function MyMessageBlock({ rawtext }: any) {
             </SyntaxHighlighter>
           </div>
         ) : (
-          <div
-            key={index}
-            dangerouslySetInnerHTML={{ __html: displaytext.content }}
-          ></div>
+          <div key={index} dangerouslySetInnerHTML={{ __html: displaytext.content }}></div>
         )
       )}
       <Snackbar
