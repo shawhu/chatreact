@@ -69,7 +69,7 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
       if (isCode) {
         codeblocks[codeblocks.length - 1] += line + "\n";
       } else {
-        if (textblocks.length == 0) textblocks.push("");
+        if (textblocks.length == 0 || textblocks.length <= codeblocks.length) textblocks.push("");
         textblocks[textblocks.length - 1] += line + "\n";
       }
     }
