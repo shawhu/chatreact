@@ -34,37 +34,62 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
     //     match[1]
     // );
 
-    const regex = /```([\s\S]+)(?:```)?/g;
-    const matchesArray = Array.from(rawtext.matchAll(regex));
-    const codeblocks: string[] = matchesArray.map(
-      (match: any) =>
-        //match[1] ? match[1] : match[2]
-        match[1]
-    );
+    // const regex = /```([\s\S]+)(?:```)?/g;
+    // const matchesArray = Array.from(rawtext.matchAll(regex));
+    // const codeblocks: string[] = matchesArray.map(
+    //   (match: any) =>
+    //     //match[1] ? match[1] : match[2]
+    //     match[1]
+    // );
 
-    const processed = rawtext.replace(regex, `codeblock`);
-    //here we add first block of text. if no code found, first block
-    // is the one and only block.
-    const textblocks = processed.split("codeblock");
-    const textlines = textblocks[0].split("\n");
+    // const processed = rawtext.replace(regex, `codeblock`);
+    // //here we add first block of text. if no code found, first block
+    // // is the one and only block.
+    // const textblocks = processed.split("codeblock");
+
+    let textblocks = [];
+    let codeblocks = [];
+    let textlines = [];
+    const lines = rawtext.split("\n");
+    // Iterate through all the lines and perform some process
+    let isCode: boolean = false;
+    let codeblockcount = 0;
+    let textblockcount = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.includes("```")) {
+        if (!isCode) {
+          const language = line.substring(3);
+          codeblocks.push(`${language}\n`);
+        }
+        isCode = !isCode;
+        continue;
+      }
+      //adding line to textblocks or codeblocks
+      if (isCode) {
+        codeblocks[codeblocks.length - 1] += line + "\n";
+      } else {
+        if (textblocks.length == 0) textblocks.push("");
+        textblocks[textblocks.length - 1] += line + "\n";
+      }
+    }
+    //add first piece of textblock
+    textlines = textblocks[0].split("\n");
     let actualtext = textlines.join("<br>");
     //find italic items
     const regexpattern = /\*([\s\S]*?)\*/g;
     if (ainame.toLowerCase() != "assistant") {
       actualtext = actualtext.replace(regexpattern, `<em style="Color: #238442">$1</em>`);
     }
-
     var tempdisplaytexts = [{ type: "text", content: actualtext, language: "" }];
+
     //if there's code block, we then add <code><text>,<code><text>, until the end
-    if (textblocks.length > 1) {
-      for (let i = 1; i < textblocks.length; i++) {
-        //check to see if codeblock is empty
-        if (!codeblocks[i - 1]) {
-          break;
-        }
+    let codeindex = 0;
+    while (codeblocks.length >= codeindex + 1 || textblocks.length >= codeindex + 2) {
+      if (codeblocks.length >= codeindex + 1) {
         //processing codeblock
         //processing codeblock to get first line and the rest
-        const codelines = codeblocks[i - 1].split("\n");
+        const codelines = codeblocks[codeindex].split("\n");
         const language = codelines[0];
         const actualcode = codelines.slice(1).join("\n"); //this removes the 1st line
         //const actualcode = codelines.join("\n"); //this wont
@@ -73,8 +98,10 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
           content: actualcode,
           language: language,
         });
-        //processing textblock after this codeblock
-        const textlines = textblocks[i].split("\n");
+      }
+      if (textblocks.length >= codeindex + 2) {
+        //processing textblock
+        const textlines = textblocks[codeindex + 1].split("\n");
         const actualtext = textlines.join("<br>");
 
         tempdisplaytexts.push({
@@ -83,7 +110,9 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
           language: "",
         });
       }
+      codeindex++;
     }
+
     //finally we pass tempdisplaytexts to state variable and to re-render
     setDisplaytexts(tempdisplaytexts);
   }, [rawtext]);
