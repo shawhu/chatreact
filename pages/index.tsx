@@ -42,10 +42,12 @@ import EditableLabel from "@/components/editablelabel";
 import Conversation from "@/components/conversation";
 import Conversationllmws from "@/components/conversationllmws";
 import SessionList from "@/components/sessionlist";
-import { Session, Message, SessionManager } from "@/common/session";
-import { Config } from "@/common/config";
 import VoiceInputStreaming from "@/components/voiceinputstreaming";
 import CharacterEditor from "@/components/charactereditor";
+import { Session, Message, SessionManager } from "@/common/session";
+import { Config } from "@/common/config";
+import { GetStandarizedModelName } from "@/common/helper";
+
 // import dynamic from "next/dynamic";
 // const VoiceInput = dynamic(() => import("@/components/voiceinput"), {
 //   ssr: false,
@@ -140,6 +142,7 @@ export default function PersistentDrawerLeft() {
   const [sessionname, setSessionname] = React.useState("");
   //this's to show session model
   const [model, setModel] = React.useState("");
+  const [modelname, setModelname] = React.useState("");
   const [timerId, setTimerId] = React.useState<NodeJS.Timeout>();
   const [connected, setConnected] = React.useState(false);
   //chat related
@@ -162,7 +165,18 @@ export default function PersistentDrawerLeft() {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => {
+      .then(async (res) => {
+        const respjson = await res.json();
+        if (respjson.result) {
+          const modelname = GetStandarizedModelName(respjson.result);
+          console.log(`backendProbe response: ${modelname}`);
+          setModelname(modelname);
+        }
+        if (respjson.data) {
+          console.log(`backendProbe response: gpt-3.5-turbo`);
+          setModelname(`gpt-3.5-turbo`);
+        }
+
         if (res.status > 210) {
           //console.error("Backend probe return error");
           setConnected(false);
@@ -362,6 +376,7 @@ export default function PersistentDrawerLeft() {
             prompt={prompt}
             voiceover={voiceoverChecked}
             initialmessages={SessionManager.currentSession.messages}
+            initialainame={SessionManager.currentSession.ainame}
           />
         ) : (
           <></>
@@ -380,6 +395,7 @@ export default function PersistentDrawerLeft() {
         {/*this is the input area with buttons  this is the input area with buttons  this is the input area with buttons  */}
         <Box className="w-full min-h-[130px] flex">
           <div className="flex-1 ml-1">
+            <Box className="absolute z-10 left-100 bottom-32 m-3 text-xs">{modelname}</Box>
             <VoiceInputStreaming
               sliceduration={1000} //this only works for voiceinputstreaming
               sendbacktext={(text: string) => {
@@ -391,9 +407,7 @@ export default function PersistentDrawerLeft() {
               multiline
               minRows="4"
               id="outlined-basic"
-              label={`Your prompt goes here. Press [${
-                myconfig.ctrlenter ? "Ctrl+Enter" : "Enter"
-              }] to submit. Change it in the Settings`}
+              label={`Press [${myconfig.ctrlenter ? "Ctrl/Shift+Enter" : "Enter"}] to [GEN]`}
               variant="outlined"
               value={message}
               onChange={(e) => {
@@ -403,7 +417,7 @@ export default function PersistentDrawerLeft() {
                 // console.log(
                 //   `onKeyDown checking ctrlenter: ${myconfig.ctrlenter}`
                 // );
-                if (e.keyCode == 13 && (e.ctrlKey || !myconfig.ctrlenter)) {
+                if (e.keyCode == 13 && (e.ctrlKey || e.shiftKey || !myconfig.ctrlenter)) {
                   console.log(`send by enter or ctrlenter`);
                   e.preventDefault();
                   setPrompt({ value: message });

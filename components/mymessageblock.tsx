@@ -53,8 +53,6 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
     const lines = rawtext.split("\n");
     // Iterate through all the lines and perform some process
     let isCode: boolean = false;
-    let codeblockcount = 0;
-    let textblockcount = 0;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (line.includes("```")) {

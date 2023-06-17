@@ -58,7 +58,7 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth={true}>
-      <DialogTitle>Dialog Title</DialogTitle>
+      <DialogTitle>Settings</DialogTitle>
       <List className="m-12">
         <ListItem>
           <TextField
@@ -74,19 +74,6 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setOpenaikey(event.target.value);
             }}
-          />
-        </ListItem>
-        <ListItem>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={ctrlenter}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setCtrlenter(event.target.checked);
-                }}
-              />
-            }
-            label="Use Ctrl + Enter to submit"
           />
         </ListItem>
         <ListItem>
@@ -157,6 +144,19 @@ function DialogConfig({ open, handleClose, refreshindexpageconfig }: any) {
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setWhisperapi(event.target.value);
             }}
+          />
+        </ListItem>
+        <ListItem>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={ctrlenter}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  setCtrlenter(event.target.checked);
+                }}
+              />
+            }
+            label="Use Ctrl + Enter to submit"
           />
         </ListItem>
       </List>

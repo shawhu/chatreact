@@ -248,7 +248,7 @@ export default function Conversationllmws({
               >
                 <Avatar
                   className="w-20 h-20"
-                  alt="Remy Sharp"
+                  alt="aiheadshot"
                   src={`${
                     message.role === "assistant" || message.role === "system"
                       ? SessionManager.currentSession.aiheadshotimg
@@ -256,7 +256,9 @@ export default function Conversationllmws({
                   }`}
                 />
               </ListItemAvatar>
-              {ainame}
+              <div className="text-center">
+                {message.role === "assistant" || message.role === "system" ? ainame : ""}
+              </div>
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText

@@ -15,6 +15,7 @@ function Conversation({
   prompt,
   voiceover,
   initialmessages,
+  initialainame,
 }: {
   prompt: {
     value: string;
@@ -24,6 +25,7 @@ function Conversation({
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>(initialmessages);
+  const [ainame, setAiname] = useState<string>(initialainame);
   const [changemessagerequest, setChangemessagerequest] = React.useState({
     index: 0,
     content: "",
@@ -94,7 +96,7 @@ function Conversation({
           messages: SessionManager.currentSession
             .GetMessagesWithTokenLimit(2000)
             .map(({ role, content }) => ({ role, content })),
-          model: "gpt-3.5-turbo",
+          model: "gpt-3.5-turbo-0613",
           max_tokens: config.maxtokenreply,
           stream: true,
         }),
@@ -235,6 +237,9 @@ function Conversation({
                   }`}
                 />
               </ListItemAvatar>
+              <div className="text-center">
+                {message.role === "assistant" || message.role === "system" ? ainame : ""}
+              </div>
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText

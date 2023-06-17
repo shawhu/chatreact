@@ -38,22 +38,33 @@ export function getFormattedDateTime(unixTime?: number) {
       .toString()
       .padStart(2, "0")}`;
     return timeString;
-  } else if (
-    date.toDateString() ===
-    new Date(now.setDate(now.getDate() - 1)).toDateString()
-  ) {
+  } else if (date.toDateString() === new Date(now.setDate(now.getDate() - 1)).toDateString()) {
     const timeString = `${date.getHours().toString().padStart(2, "0")}:${date
       .getMinutes()
       .toString()
       .padStart(2, "0")}`;
     return `Yesterday ${timeString}`;
   } else {
-    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1)
+    const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date
+      .getDate()
       .toString()
-      .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")} ${date
-      .getHours()
+      .padStart(2, "0")} ${date.getHours().toString().padStart(2, "0")}:${date
+      .getMinutes()
       .toString()
-      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+      .padStart(2, "0")}`;
     return dateString;
+  }
+}
+
+export function GetStandarizedModelName(fullname: string) {
+  const lowcase = fullname.toLowerCase();
+  let normalName = lowcase.replaceAll("4bit", "");
+  normalName = normalName.replaceAll("128g", "");
+  normalName = normalName.replaceAll("gptq", "");
+  normalName = normalName.replaceAll("-", "");
+  if (lowcase.includes("4bit") || lowcase.includes("gptq") || lowcase.includes("128g")) {
+    return `${normalName}-gptq`;
+  } else {
+    return `${normalName}`;
   }
 }
