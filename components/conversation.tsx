@@ -22,6 +22,7 @@ function Conversation({
   };
   voiceover: boolean;
   initialmessages: Message[];
+  initialainame: string;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>(initialmessages);
