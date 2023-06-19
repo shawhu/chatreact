@@ -219,6 +219,7 @@ export default function PersistentDrawerLeft() {
       //cancel interval calling probe
       setConnected(false);
       setPrompt({ value: "" });
+      backendProbe();
     };
   });
 

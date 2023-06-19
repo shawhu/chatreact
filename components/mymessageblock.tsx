@@ -24,29 +24,6 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
   >([]);
   const [toastopen, setToastopen] = React.useState(false);
   useEffect(() => {
-    //using regex to replace ```
-
-    // const regex = /```([^`]+)(?:```)?/g;
-    // const matchesArray = Array.from(rawtext.matchAll(regex));
-    // const codeblocks = matchesArray.map(
-    //   (match) =>
-    //     //match[1] ? match[1] : match[2]
-    //     match[1]
-    // );
-
-    // const regex = /```([\s\S]+)(?:```)?/g;
-    // const matchesArray = Array.from(rawtext.matchAll(regex));
-    // const codeblocks: string[] = matchesArray.map(
-    //   (match: any) =>
-    //     //match[1] ? match[1] : match[2]
-    //     match[1]
-    // );
-
-    // const processed = rawtext.replace(regex, `codeblock`);
-    // //here we add first block of text. if no code found, first block
-    // // is the one and only block.
-    // const textblocks = processed.split("codeblock");
-
     let textblocks = [];
     let codeblocks = [];
     let textlines = [];
@@ -113,7 +90,7 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
 
     //finally we pass tempdisplaytexts to state variable and to re-render
     setDisplaytexts(tempdisplaytexts);
-  }, [rawtext]);
+  }, [rawtext, ainame]);
 
   //return <div>{displaytext}</div>;
   return (
