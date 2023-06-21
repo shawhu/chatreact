@@ -16,6 +16,7 @@ export default function Conversationllmws({
   voiceover,
   initialmessages,
   initialainame,
+  llmname,
 }: {
   prompt: {
     value: string;
@@ -23,6 +24,7 @@ export default function Conversationllmws({
   voiceover: boolean;
   initialmessages: Message[];
   initialainame: string;
+  llmname: string;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>(initialmessages);
@@ -89,7 +91,7 @@ export default function Conversationllmws({
       const tempconfig = Config.GetConfig();
       const koboldapi = tempconfig ? tempconfig.koboldapi : "";
       const requestjobj = {
-        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000),
+        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000, llmname),
         use_story: false,
         use_memory: false,
         use_authors_note: false,
@@ -125,6 +127,7 @@ export default function Conversationllmws({
       });
 
       let temptext = "";
+      console.log(JSON.stringify(response));
 
       await handleSSE(response, (message) => {
         if (message === "[DONE]") {
@@ -160,7 +163,7 @@ export default function Conversationllmws({
         const text = data.choices[0]?.delta?.content;
         if (text !== undefined) {
           temptext += text;
-          console.log(`temptext:${temptext}`);
+          //console.log(`temptext:${temptext}`);
 
           setMessages((mmm) => {
             const newmessages = [...mmm];
@@ -192,7 +195,7 @@ export default function Conversationllmws({
   //this helps to scroll to the bottom when messages changes.
   useEffect(() => {
     // scrollIntoView function will be called when messages are updated
-    console.log("conversationllmws: trying to scroll to the bottom");
+    //console.log("conversationllmws: trying to scroll to the bottom");
     setTimeout(() => {
       if (target_bottomRef.current) {
         target_bottomRef.current.scrollIntoView({ behavior: "smooth" });

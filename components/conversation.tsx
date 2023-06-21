@@ -11,11 +11,55 @@ import { Config } from "@/common/config";
 import HistoryEditor from "@/components/historyeditor";
 import HeadshotPicker from "@/components/headshotpicker";
 
-function Conversation({
+export async function handleSSE(response: Response, onMessage: (message: string) => void) {
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+    console.log(error ? JSON.stringify(error) : `${response.status} ${response.statusText}`);
+    onMessage(error ? JSON.stringify(error) : `${response.status} ${response.statusText}`);
+    onMessage("[DONE]");
+    return;
+  }
+  if (response.status !== 200) {
+    console.log(`Error from OpenAI: ${response.status} ${response.statusText}`);
+    onMessage(`Error from OpenAI: ${response.status} ${response.statusText}`);
+    onMessage("[DONE]");
+    return;
+  }
+  if (!response.body) {
+    console.log("No response body");
+    return;
+  }
+  const parser = createParser((event) => {
+    if (event.type === "event") {
+      onMessage(event.data);
+    }
+  });
+  for await (const chunk of iterableStreamAsync(response.body)) {
+    const str = new TextDecoder().decode(chunk);
+    parser.feed(str);
+  }
+}
+export async function* iterableStreamAsync(stream: ReadableStream): AsyncIterableIterator<Uint8Array> {
+  const reader = stream.getReader();
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        return;
+      } else {
+        yield value;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+export default function Conversation({
   prompt,
   voiceover,
   initialmessages,
   initialainame,
+  refreshsessionlist,
 }: {
   prompt: {
     value: string;
@@ -23,6 +67,7 @@ function Conversation({
   voiceover: boolean;
   initialmessages: Message[];
   initialainame: string;
+  refreshsessionlist: () => void;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>(initialmessages);
@@ -105,6 +150,7 @@ function Conversation({
       });
 
       let temptext = "";
+      console.log(JSON.stringify(response));
 
       await handleSSE(response, (message) => {
         if (message === "[DONE]") {
@@ -120,6 +166,38 @@ function Conversation({
           regexpattern = /```([\s\S]*?)```/g;
           tempaudiotext = tempaudiotext.replace(regexpattern, ``);
           setAudioText(tempaudiotext);
+          //since it's done, try to ask openai for session name
+          if (SessionManager.currentSession.sessionName == "New Session") {
+            let asknamemessage = SessionManager.currentSession
+              .GetMessagesWithTokenLimit(2000)
+              .map(({ role, content }) => ({ role, content }));
+            asknamemessage.push({ role: "user", content: "name this session concisely with less than 5 tokens" });
+            fetch(`${host}/v1/chat/completions`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${config.openaikey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                messages: asknamemessage,
+                model: "gpt-3.5-turbo-0613",
+                max_tokens: config.maxtokenreply,
+                stream: false,
+              }),
+              signal: controller.signal,
+            })
+              .then((respname) => respname.json())
+              .then((data) => {
+                console.log(`the result of the naming task  is:${JSON.stringify(data)}`);
+                SessionManager.currentSession.sessionName = data.choices[0].message.content;
+                // here we should inform the sessionlist to refresh...
+                refreshsessionlist();
+              })
+              .catch((error) => {
+                console.error("the naming task failed, Error:", error);
+              });
+          }
+          //save session to disk
           SessionManager.SaveSessionToJson(SessionManager.currentSession);
           return;
         }
@@ -137,7 +215,7 @@ function Conversation({
         const text = data.choices[0]?.delta?.content;
         if (text !== undefined) {
           temptext += text;
-          console.log(`temptext:${temptext}`);
+          //console.log(`temptext:${temptext}`);
 
           setMessages((mmm) => {
             const newmessages = [...mmm];
@@ -153,7 +231,7 @@ function Conversation({
     //only when base change the prompt, will it trigger this handle function
     if (prompt && prompt.value != "") {
       handlePrompt(prompt.value);
-      console.log(`conversation got the prompt prop changes: ${prompt}`);
+      console.log(`conversation got the prompt prop changes:${JSON.stringify(prompt)}`);
     }
   }, [prompt]);
   //this loads session history
@@ -168,7 +246,7 @@ function Conversation({
   //this helps to scroll to the bottom when messages changes.
   useEffect(() => {
     // scrollIntoView function will be called when messages are updated
-    console.log("conversation: trying to scroll to the bottom");
+    //console.log("conversation: trying to scroll to the bottom");
     setTimeout(() => {
       if (target_bottomRef.current) {
         target_bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -287,50 +365,4 @@ function Conversation({
       />
     </>
   );
-}
-
-export default Conversation;
-export async function handleSSE(response: Response, onMessage: (message: string) => void) {
-  if (!response.ok) {
-    const error = await response.json().catch(() => null);
-    console.log(error ? JSON.stringify(error) : `${response.status} ${response.statusText}`);
-    onMessage(error ? JSON.stringify(error) : `${response.status} ${response.statusText}`);
-    onMessage("[DONE]");
-    return;
-  }
-  if (response.status !== 200) {
-    console.log(`Error from OpenAI: ${response.status} ${response.statusText}`);
-    onMessage(`Error from OpenAI: ${response.status} ${response.statusText}`);
-    onMessage("[DONE]");
-    return;
-  }
-  if (!response.body) {
-    console.log("No response body");
-    return;
-  }
-  const parser = createParser((event) => {
-    if (event.type === "event") {
-      onMessage(event.data);
-    }
-  });
-  for await (const chunk of iterableStreamAsync(response.body)) {
-    const str = new TextDecoder().decode(chunk);
-    parser.feed(str);
-  }
-}
-
-export async function* iterableStreamAsync(stream: ReadableStream): AsyncIterableIterator<Uint8Array> {
-  const reader = stream.getReader();
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) {
-        return;
-      } else {
-        yield value;
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
 }

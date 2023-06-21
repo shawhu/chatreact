@@ -378,6 +378,7 @@ export default function PersistentDrawerLeft() {
             voiceover={voiceoverChecked}
             initialmessages={SessionManager.currentSession.messages}
             initialainame={SessionManager.currentSession.ainame}
+            refreshsessionlist={RefreshSessionList}
           />
         ) : (
           <></>
@@ -388,6 +389,7 @@ export default function PersistentDrawerLeft() {
             voiceover={voiceoverChecked}
             initialmessages={SessionManager.currentSession.messages}
             initialainame={SessionManager.currentSession.ainame}
+            llmname={modelname}
           />
         ) : (
           <></>
@@ -437,7 +439,7 @@ export default function PersistentDrawerLeft() {
                 console.log("gen clicked: message is: " + message);
                 setPrompt({ value: message });
                 setMessage("");
-                console.log("prompt is: " + prompt);
+                console.log("prompt is:" + JSON.stringify(prompt));
               }}
             >
               Gen

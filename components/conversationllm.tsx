@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  ListSubheader,
-  ListItemAvatar,
-  Avatar,
-} from "@mui/material";
+import { List, ListItem, ListItemText, Typography, ListSubheader, ListItemAvatar, Avatar } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import { Configuration, OpenAIApi } from "openai";
 import { createParser } from "eventsource-parser";
@@ -22,11 +14,13 @@ import HeadshotPicker from "@/components/headshotpicker";
 export default function Conversationllm({
   prompt,
   voiceover,
+  llmname,
 }: {
   prompt: {
     value: string;
   };
   voiceover: boolean;
+  llmname: string;
 }) {
   const target_bottomRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -56,9 +50,7 @@ export default function Conversationllm({
       const config = await Config.GetConfigInstanceAsync();
       //console.log(config);
       console.log("processing prompt:" + prompt);
-      console.log(
-        "add user prompt question message AND assistant placeholder response first"
-      );
+      console.log("add user prompt question message AND assistant placeholder response first");
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const newmessages = [
         ...SessionManager.currentSession.messages,
@@ -82,7 +74,7 @@ export default function Conversationllm({
       //actual calling api to get a response stream
       const host = "/api/v1/generate";
       const requestjobj = {
-        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000),
+        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000, llmname),
         use_story: false,
         use_memory: false,
         use_authors_note: false,
@@ -122,9 +114,7 @@ export default function Conversationllm({
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          const allChunks = new Uint8Array(
-            chunks.reduce((acc, chunk) => acc + chunk.length, 0)
-          );
+          const allChunks = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
           let offset = 0;
           for (let chunk of chunks) {
             allChunks.set(chunk, offset);
@@ -154,9 +144,7 @@ export default function Conversationllm({
       setMessages((mmm) => {
         const newmessages = [...mmm];
         newmessages[newmessages.length - 1].content = temptext;
-        newmessages[newmessages.length - 1].completets = Math.floor(
-          Date.now() / 1000
-        );
+        newmessages[newmessages.length - 1].completets = Math.floor(Date.now() / 1000);
         setAudioText(temptext);
         SessionManager.currentSession.messages = newmessages;
         SessionManager.SaveSessionToJson(SessionManager.currentSession);
@@ -190,9 +178,7 @@ export default function Conversationllm({
 
   return (
     <>
-      <List
-        className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}
-      >
+      <List className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}>
         <ListSubheader
           className="font-bold text-2xl "
           onClick={() => {
@@ -225,19 +211,14 @@ export default function Conversationllm({
             key={`message_${index}`}
             alignItems="flex-start"
             className={`flex justify-start ${
-              message.role === "assistant" || message.role === "system"
-                ? "flex-row "
-                : "flex-row-reverse"
+              message.role === "assistant" || message.role === "system" ? "flex-row " : "flex-row-reverse"
             }`}
           >
             <div>
               <ListItemAvatar
                 className="flex justify-center cursor-pointer"
                 onClick={() => {
-                  if (
-                    message.role === "assistant" ||
-                    message.role === "system"
-                  ) {
+                  if (message.role === "assistant" || message.role === "system") {
                     setHeadshotopen(true);
                   }
                 }}
@@ -256,9 +237,7 @@ export default function Conversationllm({
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
-              primary={
-                <MyMessageBlock rawtext={message.content}></MyMessageBlock>
-              }
+              primary={<MyMessageBlock rawtext={message.content}></MyMessageBlock>}
               secondary={`${getFormattedDateTime(message.completets)}`}
               className={`rounded-t-xl p-4 cursor-pointer ${
                 message.role === "assistant" || message.role === "system"

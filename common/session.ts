@@ -39,7 +39,7 @@ export class Session {
     return newmessages;
   }
   //used by local run llm
-  public GetPromptWithTokenLimit(tokenLimit: number) {
+  public GetPromptWithTokenLimit(tokenLimit: number, llmname: string) {
     if (!this.messages || this.messages.length == 0) {
       return "";
     }
@@ -57,23 +57,52 @@ export class Session {
       }
     }
 
-    var prompt = this.messages[0].content;
-    prompt += "\n<START>\n";
+    let prompt = "";
+    if (llmname.includes("pygmalion")) {
+      prompt += `${this.ainame}'s Persona: `;
+    } else if (llmname.includes("metharme")) {
+      prompt += `<|system|>`;
+    }
+
+    prompt += this.messages[0].content;
+    if (llmname.includes("pygmalion")) {
+      prompt += "\n<START>\n";
+    }
+
     for (let index = 1; index < newmessages.length; index++) {
       const message = newmessages[index];
       if (message.role == "user") {
-        prompt += `${this.username.charAt(0).toUpperCase() + this.username.slice(1)}: ${message.content}\n`;
-      } else if (message.role == "assistant" && index == this.messages.length - 1) {
-        //the last message, should be ainame: with no enter
-        prompt += `${this.ainame}:`;
-      } else {
-        prompt += `${this.ainame}: ${message.content}\n`;
+        if (llmname.includes("metharme")) {
+          prompt += `<|user|>${message.content}\n`;
+        } else {
+          prompt += `${this.username.charAt(0).toUpperCase() + this.username.slice(1)}: ${message.content}\n`;
+        }
+      } else if (message.role == "assistant") {
+        if (llmname.includes("metharme")) {
+          if (index == this.messages.length - 1) {
+            //the last message, should be ainame: with no enter
+            prompt += `<|model|>`;
+          } else {
+            prompt += `<|model|>${message.content}\n`;
+          }
+        } else {
+          if (index == this.messages.length - 1) {
+            //the last message, should be ainame: with no enter
+            prompt += `${this.ainame}:`;
+          } else {
+            prompt += `${this.ainame}: ${message.content}\n`;
+          }
+        }
       }
     }
     //the last message should be from You but it could be from assistant either.
     //check if it's from You, add assistant
     if (newmessages[newmessages.length - 1].role == "user") {
-      prompt += `${this.ainame}:`;
+      if (llmname.includes("metharme")) {
+        prompt += `<|model|>`;
+      } else {
+        prompt += `${this.ainame}:`;
+      }
     }
     return prompt;
   }
