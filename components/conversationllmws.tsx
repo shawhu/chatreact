@@ -6,7 +6,7 @@ import { createParser } from "eventsource-parser";
 import { Session, Message, SessionManager } from "@/common/session";
 import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
-import { getFormattedDateTime } from "@/common/helper";
+import { getFormattedDateTime, TrimAndGetTextInQuote } from "@/common/helper";
 import { Config } from "@/common/config";
 import HistoryEditor from "@/components/historyeditor";
 import HeadshotPicker from "@/components/headshotpicker";
@@ -91,13 +91,13 @@ export default function Conversationllmws({
       const tempconfig = Config.GetConfig();
       const koboldapi = tempconfig ? tempconfig.koboldapi : "";
       const requestjobj = {
-        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(1000, llmname),
+        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(2048 - 768, llmname),
         use_story: false,
         use_memory: false,
         use_authors_note: false,
         use_world_info: false,
         max_context_length: 2048,
-        max_length: 1000,
+        max_length: 768,
         rep_pen: 1.1,
         rep_pen_range: 1024,
         rep_pen_slope: 0.9,

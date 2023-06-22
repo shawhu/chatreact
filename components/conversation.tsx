@@ -6,7 +6,7 @@ import { createParser } from "eventsource-parser";
 import { Session, Message, SessionManager } from "@/common/session";
 import Snackbar from "@mui/material/Snackbar";
 import MyMessageBlock from "@/components/mymessageblock";
-import { getFormattedDateTime } from "@/common/helper";
+import { getFormattedDateTime, TrimAndGetTextInQuote } from "@/common/helper";
 import { Config } from "@/common/config";
 import HistoryEditor from "@/components/historyeditor";
 import HeadshotPicker from "@/components/headshotpicker";
@@ -140,7 +140,7 @@ export default function Conversation({
         },
         body: JSON.stringify({
           messages: SessionManager.currentSession
-            .GetMessagesWithTokenLimit(2000)
+            .GetMessagesWithTokenLimit(4096 - config.maxtokenreply)
             .map(({ role, content }) => ({ role, content })),
           model: "gpt-3.5-turbo-0613",
           max_tokens: config.maxtokenreply,
@@ -150,8 +150,6 @@ export default function Conversation({
       });
 
       let temptext = "";
-      console.log(JSON.stringify(response));
-
       await handleSSE(response, (message) => {
         if (message === "[DONE]") {
           console.log("try to save session");
@@ -166,8 +164,11 @@ export default function Conversation({
           regexpattern = /```([\s\S]*?)```/g;
           tempaudiotext = tempaudiotext.replace(regexpattern, ``);
           setAudioText(tempaudiotext);
+          //
           //since it's done, try to ask openai for session name
-          if (SessionManager.currentSession.sessionName == "New Session") {
+          //
+          const currentSessionName = SessionManager.currentSession.sessionName.trim();
+          if (currentSessionName == "New Session") {
             let asknamemessage = SessionManager.currentSession
               .GetMessagesWithTokenLimit(2000)
               .map(({ role, content }) => ({ role, content }));
@@ -189,7 +190,9 @@ export default function Conversation({
               .then((respname) => respname.json())
               .then((data) => {
                 console.log(`the result of the naming task  is:${JSON.stringify(data)}`);
-                SessionManager.currentSession.sessionName = data.choices[0].message.content;
+                let returnedName = data.choices[0].message.content;
+                returnedName = TrimAndGetTextInQuote(returnedName);
+                SessionManager.currentSession.sessionName = returnedName;
                 // here we should inform the sessionlist to refresh...
                 refreshsessionlist();
               })

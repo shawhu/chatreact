@@ -76,7 +76,7 @@ const GreenSwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-const drawerWidth = 200;
+const drawerWidth = 300;
 console.log("main app started");
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
@@ -308,6 +308,7 @@ export default function PersistentDrawerLeft() {
           </div>
         </Toolbar>
       </AppBar>
+      {/* Left sidebar */}
       <Drawer
         sx={{
           width: drawerWidth,

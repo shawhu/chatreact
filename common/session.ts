@@ -162,6 +162,7 @@ export class SessionManager {
     newsession.model = "ChatGPT";
     newsession.username = "You";
     newsession.ainame = "assistant";
+    newsession.maxToken = 1000;
     newsession.messages = [
       {
         role: "system",
@@ -186,7 +187,7 @@ export class SessionManager {
       console.log("server error");
       console.error(error);
     }
-    SessionManager.sessions = [...SessionManager.sessions, newsession];
+    SessionManager.sessions = [newsession, ...SessionManager.sessions];
   }
   //doesn't have any usage
   public static async LoadSessionFromJson(sessionId: string): Promise<Session> {
@@ -229,18 +230,21 @@ export class SessionManager {
       //console.log(res);
       //the res.json<Session>() can't acutally return Session object it doesn't have methods
       const sessionsData = await res.json();
-      const sessions = sessionsData.map((sessionData: any) => {
-        const session = new Session();
-        session.sessionId = sessionData.sessionId;
-        session.sessionName = sessionData.sessionName;
-        session.messages = sessionData.messages;
-        session.model = sessionData.model;
-        session.maxToken = sessionData.maxToken;
-        session.aiheadshotimg = sessionData.aiheadshotimg;
-        session.username = sessionData.username;
-        session.ainame = sessionData.ainame;
-        return session;
-      });
+      const sessions = sessionsData
+        .map((sessionData: any) => {
+          const session = new Session();
+          session.sessionId = sessionData.sessionId;
+          session.sessionName = sessionData.sessionName;
+          session.messages = sessionData.messages;
+          session.model = sessionData.model;
+          session.maxToken = sessionData.maxToken;
+          session.aiheadshotimg = sessionData.aiheadshotimg;
+          session.username = sessionData.username;
+          session.ainame = sessionData.ainame;
+          session.create_ts = sessionData.create_ts;
+          return session;
+        })
+        .sort((a: Session, b: Session) => b.create_ts - a.create_ts); // sort by create_ts in descending order
       SessionManager.sessions = sessions;
 
       const config = await Config.GetConfigInstanceAsync();

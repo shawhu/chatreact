@@ -60,7 +60,7 @@ export default function SessionList({ refreshtimestamp }: any) {
             }}
           >
             <ListItemText className="flex-1" primary={session.sessionName} />
-            <ListItemIcon>
+            <ListItemIcon className="flex justify-end">
               <DeleteIcon
                 onClick={async (event) => {
                   console.log("session delete clicked");

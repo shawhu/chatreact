@@ -68,3 +68,13 @@ export function GetStandarizedModelName(fullname: string) {
     return `${normalName}`;
   }
 }
+export function TrimAndGetTextInQuote(text: string) {
+  const pattern = /^\s*["']?([^"']*)["']?\s*$/g;
+  const trimmedText = text.trim(); // trim the text
+  const matchedText = pattern.exec(trimmedText); // check if text is enclosed in double quote using regex
+  if (matchedText) {
+    return matchedText[1]; // return the text enclosed in double quotes
+  } else {
+    return trimmedText; // return the trimmed text
+  }
+}
