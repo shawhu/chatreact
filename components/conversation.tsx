@@ -259,7 +259,9 @@ export default function Conversation({
 
   return (
     <>
-      <List className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10`}>
+      <List
+        className={`flex-1 bg-yellow-50 w-full overflow-auto min-h-[40vh] pb-10 scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-gray-100`}
+      >
         <ListSubheader
           className="bg-white/10"
           onClick={() => {

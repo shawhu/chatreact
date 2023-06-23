@@ -323,6 +323,7 @@ export default function PersistentDrawerLeft() {
         anchor="left"
         open={open}
       >
+        {/* 3bar menu icon */}
         <DrawerHeader>
           <IconButton
             onClick={() => {
@@ -333,37 +334,44 @@ export default function PersistentDrawerLeft() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <SessionList refreshtimestamp={sessionlistrefreshtimestamp} />
-        <Divider />
-        <List>
-          {/* Login button */}
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => {
-                console.log("Login clicked");
-              }}
-            >
-              <ListItemIcon>
-                <LoginIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Login"} />
-            </ListItemButton>
-          </ListItem>
-          {/* Settings button */}
-          <ListItem disablePadding>
-            <ListItemButton
-              onClick={() => {
-                console.log("Config clicked");
-                setOpenDialogConfig(true);
-              }}
-            >
-              <ListItemIcon>
-                <TuneIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Settings"} />
-            </ListItemButton>
-          </ListItem>
-        </List>
+        <Box className="bg-gray-200 h-full flex flex-col justify-between overflow-y-hidden">
+          {/* sessionlist */}
+          <SessionList
+            className="bg-red-200 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-gray-100"
+            refreshtimestamp={sessionlistrefreshtimestamp}
+          />
+          {/* sidebar buttons */}
+          <List className="bg-blue-200">
+            <Divider />
+            {/* Login button */}
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  console.log("Login clicked");
+                }}
+              >
+                <ListItemIcon>
+                  <LoginIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Login"} />
+              </ListItemButton>
+            </ListItem>
+            {/* Settings button */}
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  console.log("Config clicked");
+                  setOpenDialogConfig(true);
+                }}
+              >
+                <ListItemIcon>
+                  <TuneIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Settings"} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Box>
       </Drawer>
       {/* Settings dialog */}
       <DialogConfig

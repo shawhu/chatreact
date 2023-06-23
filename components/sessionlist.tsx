@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Session, Message, SessionManager } from "@/common/session";
 
-export default function SessionList({ refreshtimestamp }: any) {
+export default function SessionList({ refreshtimestamp, className }: any) {
   const [mySessions, setMySessions] = React.useState<Session[]>([]);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   React.useEffect(() => {
@@ -34,7 +34,7 @@ export default function SessionList({ refreshtimestamp }: any) {
     }
   }, [refreshtimestamp]);
   return (
-    <List className="h-[75vh] overflow-y-auto">
+    <List className={className}>
       <ListItem>
         <ListItemButton
           onClick={async () => {
