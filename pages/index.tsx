@@ -334,14 +334,14 @@ export default function PersistentDrawerLeft() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <Box className="bg-gray-200 h-full flex flex-col justify-between overflow-y-hidden">
+        <Box className="h-full flex flex-col justify-between overflow-y-hidden">
           {/* sessionlist */}
           <SessionList
-            className="bg-red-200 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-gray-100"
+            className="overflow-y-auto scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-gray-100"
             refreshtimestamp={sessionlistrefreshtimestamp}
           />
           {/* sidebar buttons */}
-          <List className="bg-blue-200">
+          <List>
             <Divider />
             {/* Login button */}
             <ListItem disablePadding>
