@@ -26,16 +26,19 @@ export class Session {
   //used by chatgpt
   public GetMessagesWithTokenLimit(tokenLimit: number) {
     var newmessages: Message[] = [];
+    const systeMsgTokens = estimateTokens(this.messages[0].content);
     //this.messages.length - 2 because the last one is assistant is thinking...
     for (let index = this.messages.length - 2; index >= 0; index--) {
       const msg = this.messages[index];
       newmessages.unshift(msg);
       const tokenscount = estimateTokens(JSON.stringify(newmessages));
-      if (tokenscount > tokenLimit) {
+      if (tokenscount + systeMsgTokens > tokenLimit) {
         newmessages.shift();
         break;
       }
     }
+    //add system message at the top
+    newmessages.unshift(this.messages[0]);
     return newmessages;
   }
   //used by local run llm

@@ -10,6 +10,9 @@ export default function SessionList({ refreshtimestamp, className }: any) {
   React.useEffect(() => {
     const SessionListInitialization = async () => {
       const sessions = await SessionManager.ReloadAndGetAllSessions();
+      if (!sessions) {
+        return;
+      }
       const sessionIndex = sessions.findIndex(
         (session: Session) => session.sessionId === SessionManager.currentSession.sessionId
       );

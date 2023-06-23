@@ -5,7 +5,7 @@
     "messages": [
       {
         "role": "system",
-        "content": "You are a friendly assistant and you will happily answer all questions. You will first rewrite my question, and then give your answer."
+        "content": "You are a friendly assistant and you will happily answer all questions. You will first rewrite my question, and then give your answer like this\nQ:[rewrite my question]\nA:[your answer goes here]"
       },
       {
         "role": "assistant",
