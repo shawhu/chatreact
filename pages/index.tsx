@@ -46,7 +46,7 @@ import VoiceInputStreaming from "@/components/voiceinputstreaming";
 import CharacterEditor from "@/components/charactereditor";
 import { Session, Message, SessionManager } from "@/common/session";
 import { Config } from "@/common/config";
-import { GetStandarizedModelName } from "@/common/helper";
+import { GetStandarizedModelName, estimateTokens } from "@/common/helper";
 
 // import dynamic from "next/dynamic";
 // const VoiceInput = dynamic(() => import("@/components/voiceinput"), {
@@ -264,6 +264,7 @@ export default function PersistentDrawerLeft() {
           <div className="flex-1 flex justify-end">
             {/* Modify session backend */}
             <div className="flex items-center mr-4">
+              <Box className="text-xs">[{modelname}]</Box>
               <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                 <Select
                   sx={{
@@ -335,6 +336,7 @@ export default function PersistentDrawerLeft() {
         <SessionList refreshtimestamp={sessionlistrefreshtimestamp} />
         <Divider />
         <List>
+          {/* Login button */}
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
@@ -347,6 +349,7 @@ export default function PersistentDrawerLeft() {
               <ListItemText primary={"Login"} />
             </ListItemButton>
           </ListItem>
+          {/* Settings button */}
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => {
@@ -362,6 +365,7 @@ export default function PersistentDrawerLeft() {
           </ListItem>
         </List>
       </Drawer>
+      {/* Settings dialog */}
       <DialogConfig
         open={openDialogConfig}
         handleClose={() => {
@@ -396,10 +400,9 @@ export default function PersistentDrawerLeft() {
           <></>
         )}
 
-        {/*this is the input area with buttons  this is the input area with buttons  this is the input area with buttons  */}
+        {/*this is the input area with buttons*/}
         <Box className="w-full min-h-[130px] flex">
           <div className="flex-1 ml-1">
-            <Box className="absolute z-10 left-100 bottom-32 m-3 text-xs">{modelname}</Box>
             <VoiceInputStreaming
               sliceduration={1000} //this only works for voiceinputstreaming
               sendbacktext={(text: string) => {
@@ -411,7 +414,9 @@ export default function PersistentDrawerLeft() {
               multiline
               minRows="4"
               id="outlined-basic"
-              label={`Press [${myconfig.ctrlenter ? "Ctrl/Shift+Enter" : "Enter"}] to [GEN]`}
+              label={`Token: ${estimateTokens(message)}, Press [${
+                myconfig.ctrlenter ? "Ctrl/Shift+Enter" : "Enter"
+              }] to submit`}
               variant="outlined"
               value={message}
               onChange={(e) => {

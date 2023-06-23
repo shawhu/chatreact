@@ -161,7 +161,7 @@
     ],
     "model": "ChatGPT",
     "maxToken": 0,
-    "aiheadshotimg": "",
+    "aiheadshotimg": "/headshots/ai/00001-748567734.jpg",
     "ainame": "Assistant",
     "username": "You",
     "create_ts": 0

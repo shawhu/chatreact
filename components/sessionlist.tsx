@@ -34,7 +34,7 @@ export default function SessionList({ refreshtimestamp }: any) {
     }
   }, [refreshtimestamp]);
   return (
-    <List>
+    <List className="h-[75vh] overflow-y-auto">
       <ListItem>
         <ListItemButton
           onClick={async () => {

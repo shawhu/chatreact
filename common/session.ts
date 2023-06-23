@@ -162,6 +162,7 @@ export class SessionManager {
     newsession.model = "ChatGPT";
     newsession.username = "You";
     newsession.ainame = "assistant";
+    newsession.aiheadshotimg = "/headshots/ai/00001-748567734.jpg";
     newsession.maxToken = 1000;
     newsession.messages = [
       {

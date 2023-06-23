@@ -105,10 +105,11 @@ export default function MyMessageBlock({ rawtext, ainame }: any) {
                 id="copytoclipboard"
                 color="primary"
                 aria-label="copy to clipboard"
-                onClick={() => {
+                onClick={(e: any) => {
                   console.log(`copytoclipboard triggered`);
                   navigator.clipboard.writeText(displaytext.content);
                   setToastopen(true);
+                  e.stopPropagation();
                 }}
               >
                 <ContentCopyIcon color="primary" fontSize="small" />

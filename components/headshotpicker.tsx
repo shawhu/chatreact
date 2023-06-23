@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Box,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  Tabs,
-  Tab,
-  Grid,
-} from "@mui/material";
+import { Button, Box, Dialog, DialogActions, DialogTitle, Tabs, Tab, Grid } from "@mui/material";
 import { Session, Message, SessionManager } from "@/common/session";
 import Image from "next/image";
 
@@ -38,11 +29,7 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Grid
-            container
-            spacing={2}
-            columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 8 }}
-          >
+          <Grid container spacing={2} columns={{ xs: 2, sm: 3, md: 4, lg: 5, xl: 8 }}>
             {data.map((headshot, index) => (
               <Grid
                 item
@@ -55,19 +42,12 @@ function TabPanel(props: TabPanelProps) {
                   console.log("image clicked " + headshot.url);
                   console.log("try to modify and change session headshot url");
                   SessionManager.currentSession.aiheadshotimg = headshot.url;
-                  await SessionManager.SaveSessionToJson(
-                    SessionManager.currentSession
-                  );
+                  await SessionManager.SaveSessionToJson(SessionManager.currentSession);
                   handleClose();
                 }}
               >
                 <div>
-                  <Image
-                    width={200}
-                    height={200}
-                    src={headshot.url}
-                    alt="Headshot of a Chatbot"
-                  />
+                  <Image width={200} height={200} src={headshot.url} alt="Headshot of a Chatbot" />
                 </div>
               </Grid>
             ))}
@@ -78,13 +58,7 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-export default function HeadshotPicker({
-  show,
-  handleClose,
-}: {
-  show: boolean;
-  handleClose: () => void;
-}) {
+export default function HeadshotPicker({ show, handleClose }: { show: boolean; handleClose: () => void }) {
   //code to run tabs and UI
   const [value, setValue] = React.useState(0);
   useEffect(() => {}, []);
@@ -117,11 +91,7 @@ export default function HeadshotPicker({
     <Dialog open={show} onClose={handleClose} maxWidth="xl" fullWidth={true}>
       <DialogTitle>Choose</DialogTitle>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-        >
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
           {headshots.genres.map((genre, index) => (
             <Tab key={index} label={genre} {...a11yProps(index)} />
           ))}
