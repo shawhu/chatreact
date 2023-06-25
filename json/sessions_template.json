@@ -12,6 +12,8 @@
         "content": "Hello, I'm an AI, nice to meet you. How can I help you?"
       }
     ],
+    "ainame": "assistant",
+    "username": "You",
     "model": "ChatGPT",
     "maxToken": 2000,
     "aiheadshotimg": "/headshots/fairy/00019-3329581369.jpg"
@@ -49,6 +51,8 @@
         "completets": 1685502360
       }
     ],
+    "ainame": "assistant",
+    "username": "You",
     "model": "ChatGPT",
     "maxToken": 2000,
     "aiheadshotimg": "/headshots/ai/00017-3896379606.jpg"
@@ -162,7 +166,7 @@
     "model": "ChatGPT",
     "maxToken": 0,
     "aiheadshotimg": "/headshots/ai/00001-748567734.jpg",
-    "ainame": "Assistant",
+    "ainame": "assistant",
     "username": "You",
     "create_ts": 0
   }

@@ -61,52 +61,75 @@ export class Session {
     }
 
     let prompt = "";
-    if (llmname.includes("pygmalion")) {
+    //adding instruction if model requires it
+    if (llmname.toLowerCase().includes("pygmalion")) {
       prompt += `${this.ainame}'s Persona: `;
-    } else if (llmname.includes("metharme")) {
-      prompt += `<|system|>`;
+    } else if (llmname.toLowerCase().includes("wizardcoder")) {
+      //Alpaca instruction
+      prompt += `Continue the chat dialogue below. Write a single reply for the character "### Response".\n`;
+    } else {
+      //Vicuna 1.1 instruction
+      prompt += `Continue the chat dialogue below. Write a single reply for the character "### Response".\n`;
     }
-
-    prompt += this.messages[0].content;
-    if (llmname.includes("pygmalion")) {
-      prompt += "\n<START>\n";
+    //adding context or system message on top
+    if (llmname.toLowerCase().includes("pygmalion")) {
+      prompt += `${newmessages[0].content}\n`;
+      prompt += "<START>\n";
+    } else if (llmname.toLowerCase().includes("wizardcoder")) {
+      prompt += `${newmessages[0].content}\n`;
+    } else {
+      prompt += `${newmessages[0].content}\n`;
     }
 
     for (let index = 1; index < newmessages.length; index++) {
       const message = newmessages[index];
       if (message.role == "user") {
-        if (llmname.includes("metharme")) {
-          prompt += `<|user|>${message.content}\n`;
+        const userstring = `${this.username.charAt(0).toUpperCase() + this.username.slice(1)}:`;
+        if (llmname.toLowerCase().includes("wizardcoder")) {
+          //Alpaca instruction
+          prompt += `### Instruction:\n${message.content}\n\n`;
+        } else if (llmname.toLowerCase().includes("pygmalion")) {
+          //pygmalion etc
+          prompt += `${userstring}${message.content}\n`;
         } else {
-          prompt += `${this.username.charAt(0).toUpperCase() + this.username.slice(1)}: ${message.content}\n`;
+          //vicuna 1.1 instruction
+          prompt += `USER:${message.content}\n`;
         }
       } else if (message.role == "assistant") {
-        if (llmname.includes("metharme")) {
-          if (index == this.messages.length - 1) {
-            //the last message, should be ainame: with no enter
-            prompt += `<|model|>`;
+        if (llmname.toLowerCase().includes("wizardcoder")) {
+          //Alpaca instruction
+          if (index == newmessages.length - 1) {
+            prompt += `### Response:`;
           } else {
-            prompt += `<|model|>${message.content}\n`;
+            prompt += `### Response:\n${message.content}\n\n`;
           }
-        } else {
-          if (index == this.messages.length - 1) {
-            //the last message, should be ainame: with no enter
+        } else if (llmname.toLowerCase().includes("pygmalion")) {
+          //pygmalion style
+          if (index == newmessages.length - 1) {
             prompt += `${this.ainame}:`;
           } else {
-            prompt += `${this.ainame}: ${message.content}\n`;
+            prompt += `${this.ainame}:${message.content}\n`;
+          }
+        } else {
+          //vicuna 1.1 instruction
+          if (index == newmessages.length - 1) {
+            prompt += `ASSISTANT:`;
+          } else {
+            prompt += `ASSISTANT:${message.content}</s>\n`;
           }
         }
       }
     }
-    //the last message should be from You but it could be from assistant either.
-    //check if it's from You, add assistant
-    if (newmessages[newmessages.length - 1].role == "user") {
-      if (llmname.includes("metharme")) {
-        prompt += `<|model|>`;
-      } else {
-        prompt += `${this.ainame}:`;
-      }
+
+    //finally pre add assistant: at the end
+    if (llmname.toLowerCase().includes("wizardcoder")) {
+      prompt += `### Response:`;
+    } else if (llmname.toLowerCase().includes("pygmalion")) {
+      prompt += `${this.ainame}:`;
+    } else {
+      prompt += `ASSISTANT:`;
     }
+
     return prompt;
   }
 }
@@ -171,6 +194,10 @@ export class SessionManager {
       {
         role: "system",
         content: "You are a friendly assistant and you will happily answer all questions.",
+      },
+      {
+        role: "user",
+        content: "Hello",
       },
       {
         role: "assistant",
@@ -312,7 +339,7 @@ export class SessionManager {
       console.log("server error, can't find session in template");
       console.log("will delete all messages until 2 left");
 
-      SessionManager.currentSession.messages = SessionManager.currentSession.messages.slice(0, 2);
+      SessionManager.currentSession.messages = SessionManager.currentSession.messages.slice(0, 3);
       //save to json
       await SessionManager.SaveSessionToJson(SessionManager.currentSession);
       SessionManager.dolistenercallback();

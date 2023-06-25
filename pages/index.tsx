@@ -382,6 +382,7 @@ export default function PersistentDrawerLeft() {
         }}
         refreshindexpageconfig={RefreshIndexPageConfig}
       />
+      {/* chat area */}
       <Main className="h-screen p-0 flex flex-col justify-start" open={open}>
         <DrawerHeader />
         {/*this is the main chat area                       control chat window               control chat window*/}

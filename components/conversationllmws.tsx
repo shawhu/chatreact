@@ -55,7 +55,7 @@ export default function Conversationllmws({
       const config = await Config.GetConfigInstanceAsync();
       //console.log(config);
       console.log("processing prompt:" + prompt);
-      console.log("add user prompt question message AND assistant placeholder response first");
+      // add user prompt question message AND assistant placeholder response first
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const newmessages = [
         ...SessionManager.currentSession.messages,
@@ -114,9 +114,9 @@ export default function Conversationllmws({
         koboldapi,
         data: requestjobj,
       });
-      console.log("requesting to kobold api, here is the requesting body");
-      console.log(requestjobj);
-      console.log(requestbodystr);
+      //console.log("requesting to kobold api, here is the requesting body");
+      //console.log(requestjobj);
+      //console.log(requestbodystr);
       const response = await fetch(host, {
         method: "POST",
         headers: {
@@ -179,7 +179,7 @@ export default function Conversationllmws({
     //only when base change the prompt, will it trigger this handle function
     if (prompt && prompt.value != "") {
       handlePrompt(prompt.value);
-      console.log(`conversation got the prompt prop changes: ${prompt}`);
+      console.log(`conversation got the prompt prop changes: ${JSON.stringify(prompt)}`);
     }
   }, [prompt]);
   //this loads session history
@@ -266,7 +266,7 @@ export default function Conversationllmws({
             </div>
             <div className="w-3 h-3"></div>
             <ListItemText
-              primary={<MyMessageBlock rawtext={message.content} ainame={ainame}></MyMessageBlock>}
+              primary={<MyMessageBlock rawtext={message.content} ainame={ainame ? ainame : ""}></MyMessageBlock>}
               secondary={`${getFormattedDateTime(message.completets)}`}
               className={`rounded-t-xl p-4 cursor-pointer ${
                 message.role === "assistant" || message.role === "system"

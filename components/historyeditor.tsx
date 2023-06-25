@@ -16,26 +16,20 @@ import {
 
 import { Session, Message, SessionManager } from "@/common/session";
 
-export default function HistoryEditor({
-  show,
-  contexttext,
-  changemessagerequest,
-  handleClose,
-}: any) {
+export default function HistoryEditor({ show, contexttext, changemessagerequest, handleClose }: any) {
   const [context, setContext] = React.useState(changemessagerequest.content);
   useEffect(() => {
     //console.log(changemessagerequest);
     setContext(changemessagerequest.content);
   }, [changemessagerequest]);
   const handleSave = async () => {
-    SessionManager.currentSession.messages[changemessagerequest.index].content =
-      context;
+    SessionManager.currentSession.messages[changemessagerequest.index].content = context;
     await SessionManager.SaveSessionToJson(SessionManager.currentSession);
     //handleClose will update conversation.tsx
     handleClose();
   };
   return (
-    <Dialog open={show} onClose={handleClose} maxWidth="lg" fullWidth={true}>
+    <Dialog open={show} onClose={handleClose} maxWidth="xl" fullWidth={true}>
       <DialogTitle>Change history</DialogTitle>
       <List className="m-12">
         <ListItem>

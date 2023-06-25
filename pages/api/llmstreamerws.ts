@@ -2,6 +2,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { WebSocket } from "ws";
 import { Readable } from "stream";
 
+const doTask = async (text: string) => {
+  console.log(`doTask running, text:${text}`);
+};
+
 //url: "ws://192.168.42.120:5005/api/v1/stream",
 const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
   // Set up server-sent events response headers
@@ -41,6 +45,9 @@ const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
       const jobj = JSON.parse(message);
 
       if (jobj.event == "text_stream") {
+        if (fulltext == "" && jobj.text.trim() == "") {
+          return;
+        }
         fulltext += jobj.text;
         //console.log(fulltext);
         let checkingarray = fulltext.split("\nYou:");
@@ -49,6 +56,7 @@ const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
           //console.log("found \\nYou, trying to close the ");
           res.status(200).end("data: [DONE]\n\n");
           ws.close();
+          doTask(fulltext);
           return;
         }
         checkingarray = fulltext.split("\nyou:");
@@ -57,6 +65,7 @@ const llmstreamerws = async (req: NextApiRequest, res: NextApiResponse) => {
           //console.log("found \\nYou, trying to close the ");
           res.status(200).end("data: [DONE]\n\n");
           ws.close();
+          doTask(fulltext);
           return;
         }
         //const output = `event: message\ndata: ${jobj.text}\n\n`;
