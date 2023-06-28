@@ -64,9 +64,12 @@ export class Session {
     //adding instruction if model requires it
     if (llmname.toLowerCase().includes("pygmalion")) {
       prompt += `${this.ainame}'s Persona: `;
-    } else if (llmname.toLowerCase().includes("wizardcoder")) {
+    } else if (llmname.toLowerCase().includes("wizardcoder") || llmname.toLowerCase().includes("alpaca")) {
       //Alpaca instruction
       prompt += `Continue the chat dialogue below. Write a single reply for the character "### Response".\n`;
+    } else if (llmname.toLowerCase().includes("orca")) {
+      //Chat mode, not instruction mode
+      prompt += `### System:\n`;
     } else {
       //Vicuna 1.1 instruction
       prompt += `Continue the chat dialogue below. Write a single reply for the character "### Response".\n`;
@@ -77,6 +80,8 @@ export class Session {
       prompt += "<START>\n";
     } else if (llmname.toLowerCase().includes("wizardcoder")) {
       prompt += `${newmessages[0].content}\n`;
+    } else if (llmname.toLowerCase().includes("orca")) {
+      prompt += `${newmessages[0].content}\n\n`;
     } else {
       prompt += `${newmessages[0].content}\n`;
     }
@@ -85,21 +90,24 @@ export class Session {
       const message = newmessages[index];
       if (message.role == "user") {
         const userstring = `${this.username.charAt(0).toUpperCase() + this.username.slice(1)}:`;
-        if (llmname.toLowerCase().includes("wizardcoder")) {
+        if (llmname.toLowerCase().includes("wizardcoder") || llmname.toLowerCase().includes("alpaca")) {
           //Alpaca instruction
           prompt += `### Instruction:\n${message.content}\n\n`;
         } else if (llmname.toLowerCase().includes("pygmalion")) {
           //pygmalion etc
           prompt += `${userstring}${message.content}\n`;
+        } else if (llmname.toLowerCase().includes("orca")) {
+          //orca
+          prompt += `### User:\n${message.content}\n\n`;
         } else {
-          //vicuna 1.1 instruction
+          //vicuna 1.1 instruction and non instruction
           prompt += `USER:${message.content}\n`;
         }
       } else if (message.role == "assistant") {
-        if (llmname.toLowerCase().includes("wizardcoder")) {
+        if (llmname.toLowerCase().includes("wizardcoder") || llmname.toLowerCase().includes("alpaca")) {
           //Alpaca instruction
           if (index == newmessages.length - 1) {
-            prompt += `### Response:`;
+            prompt += `### Response:\n`;
           } else {
             prompt += `### Response:\n${message.content}\n\n`;
           }
@@ -109,6 +117,13 @@ export class Session {
             prompt += `${this.ainame}:`;
           } else {
             prompt += `${this.ainame}:${message.content}\n`;
+          }
+        } else if (llmname.toLowerCase().includes("orca")) {
+          //orca style
+          if (index == newmessages.length - 1) {
+            prompt += `### Response:\n`;
+          } else {
+            prompt += `### Response:\n${message.content}\n\n`;
           }
         } else {
           //vicuna 1.1 instruction
@@ -122,10 +137,12 @@ export class Session {
     }
 
     //finally pre add assistant: at the end
-    if (llmname.toLowerCase().includes("wizardcoder")) {
-      prompt += `### Response:`;
+    if (llmname.toLowerCase().includes("wizardcoder") || llmname.toLowerCase().includes("alpaca")) {
+      prompt += `### Response:\n`;
     } else if (llmname.toLowerCase().includes("pygmalion")) {
       prompt += `${this.ainame}:`;
+    } else if (llmname.toLowerCase().includes("orca")) {
+      prompt += `### Response:\n`;
     } else {
       prompt += `ASSISTANT:`;
     }
@@ -136,11 +153,11 @@ export class Session {
 export class SessionManager {
   public static sessions: Session[] = [new Session()];
   public static listenercallback: () => void;
-  public static indexpagecallback: () => void;
+  public static indexpagecallback: () => void; //call index page
   public static currentSession: Session = SessionManager.sessions[0];
   private static dolistenercallback() {
     if (SessionManager.listenercallback) {
-      SessionManager.listenercallback(); //trigger any component using session manager to re-render
+      SessionManager.listenercallback(); //call conversation, conversationllm
     } else {
       console.log(
         "SessionManager: conversation or conversaionllm is not loaded, listenercallback is undefined, skip calling"
@@ -166,6 +183,10 @@ export class SessionManager {
     }
   }
   public static async SaveSessionToJson(session: Session) {
+    if (!session.sessionId || session.sessionId == "") {
+      console.error("sessionid is empty, skip session saving");
+      return;
+    }
     try {
       const res = await fetch("/api/sessionsave", {
         method: "POST",
@@ -193,7 +214,7 @@ export class SessionManager {
     newsession.messages = [
       {
         role: "system",
-        content: "You are a friendly assistant and you will happily answer all questions.",
+        content: "You are an AI assistant that follows instruction extremely well. Help as much as you can.",
       },
       {
         role: "user",
@@ -362,9 +383,7 @@ export class SessionManager {
           "Content-Type": "application/json",
         },
       });
-
       const responseText = await res.text(); // read the response body as text
-
       if (res.ok) {
         console.log(responseText); // "ok"
       } else {

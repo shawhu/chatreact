@@ -90,14 +90,19 @@ export default function Conversationllmws({
       const host = "/api/llmstreamerws";
       const tempconfig = Config.GetConfig();
       const koboldapi = tempconfig ? tempconfig.koboldapi : "";
+      let maxtoken = 2048;
+      let maxlength = 512;
+      if (llmname.toLowerCase().includes("8k")) {
+        maxtoken = 8000;
+      }
       const requestjobj = {
-        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(2048 - 768, llmname),
+        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(maxtoken - maxlength, llmname),
         use_story: false,
         use_memory: false,
         use_authors_note: false,
         use_world_info: false,
-        max_context_length: 2048,
-        max_length: 768,
+        max_context_length: maxtoken,
+        max_length: maxlength,
         rep_pen: 1.1,
         rep_pen_range: 1024,
         rep_pen_slope: 0.9,
