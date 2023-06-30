@@ -54,7 +54,7 @@ export default function Conversationllmws({
       }
       const config = await Config.GetConfigInstanceAsync();
       //console.log(config);
-      console.log("processing prompt:" + prompt);
+      //console.log("processing prompt:" + prompt);
       // add user prompt question message AND assistant placeholder response first
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const newmessages = [
@@ -95,8 +95,11 @@ export default function Conversationllmws({
       if (llmname.toLowerCase().includes("8k")) {
         maxtoken = 8000;
       }
+      const submitedprompt = SessionManager.currentSession.GetPromptWithTokenLimit(maxtoken - maxlength, llmname);
+      console.log(`llmws prompt:${submitedprompt}`);
+
       const requestjobj = {
-        prompt: SessionManager.currentSession.GetPromptWithTokenLimit(maxtoken - maxlength, llmname),
+        prompt: submitedprompt,
         use_story: false,
         use_memory: false,
         use_authors_note: false,
@@ -132,7 +135,6 @@ export default function Conversationllmws({
       });
 
       let temptext = "";
-      console.log(JSON.stringify(response));
 
       await handleSSE(response, (message) => {
         if (message === "[DONE]") {
@@ -179,12 +181,12 @@ export default function Conversationllmws({
         }
       });
       //end of async way----------------------------------------------------------
-      console.log("prompt handling complete");
+      //console.log("prompt handling complete");
     };
     //only when base change the prompt, will it trigger this handle function
     if (prompt && prompt.value != "") {
       handlePrompt(prompt.value);
-      console.log(`conversation got the prompt prop changes: ${JSON.stringify(prompt)}`);
+      //console.log(`conversation got the prompt prop changes: ${JSON.stringify(prompt)}`);
     }
   }, [prompt]);
   //this loads session history

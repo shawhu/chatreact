@@ -169,11 +169,11 @@ export default function PersistentDrawerLeft() {
         const respjson = await res.json();
         if (respjson.result) {
           const modelname = GetStandarizedModelName(respjson.result);
-          console.log(`backendProbe response: ${modelname}`);
+          //console.log(`backendProbe response: ${modelname}`);
           setModelname(modelname);
         }
         if (respjson.data) {
-          console.log(`backendProbe response: gpt-3.5-turbo`);
+          //console.log(`backendProbe response: gpt-3.5-turbo`);
           setModelname(`gpt-3.5-turbo`);
         }
 
@@ -451,10 +451,10 @@ export default function PersistentDrawerLeft() {
               variant="contained"
               disabled={!connected}
               onClick={() => {
-                console.log("gen clicked: message is: " + message);
+                //console.log("gen clicked: message is: " + message);
                 setPrompt({ value: message });
                 setMessage("");
-                console.log("prompt is:" + JSON.stringify(prompt));
+                //console.log("prompt is:" + JSON.stringify(prompt));
               }}
             >
               Gen
