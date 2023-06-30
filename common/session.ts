@@ -71,8 +71,8 @@ export class Session {
       //Chat mode, not instruction mode
       prompt += `### System:\n`;
     } else {
-      //Vicuna 1.1 instruction
-      prompt += `Continue the chat dialogue below. Write a single reply for the character "### Response".\n`;
+      //same as vicuna 1.1 and samantha
+      prompt += `Continue the chat dialogue below. Write a single reply for the character "ASSISTANT".\n`;
     }
     //adding context or system message on top
     if (llmname.toLowerCase().includes("pygmalion")) {
@@ -83,6 +83,7 @@ export class Session {
     } else if (llmname.toLowerCase().includes("orca")) {
       prompt += `${newmessages[0].content}\n\n`;
     } else {
+      //same as vicuna 1.1 and samantha
       prompt += `${newmessages[0].content}\n`;
     }
 
@@ -100,7 +101,7 @@ export class Session {
           //orca
           prompt += `### User:\n${message.content}\n\n`;
         } else {
-          //vicuna 1.1 instruction and non instruction
+          //vicuna 1.1 instruction and samantha
           prompt += `USER:${message.content}\n`;
         }
       } else if (message.role == "assistant") {
@@ -126,7 +127,7 @@ export class Session {
             prompt += `### Response:\n${message.content}\n\n`;
           }
         } else {
-          //vicuna 1.1 instruction
+          //vicuna 1.1 instruction and samantha
           if (index == newmessages.length - 1) {
             prompt += `ASSISTANT:`;
           } else {
@@ -144,6 +145,7 @@ export class Session {
     } else if (llmname.toLowerCase().includes("orca")) {
       prompt += `### Response:\n`;
     } else {
+      //vicuna 1.1 and samantha
       prompt += `ASSISTANT:`;
     }
 

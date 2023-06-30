@@ -41,6 +41,7 @@ import DialogConfig from "@/components/dialogconfig";
 import EditableLabel from "@/components/editablelabel";
 import Conversation from "@/components/conversation";
 import Conversationllmws from "@/components/conversationllmws";
+import ConversationllmwsMultiChars from "@/components/conversationllmws_multichars";
 import SessionList from "@/components/sessionlist";
 import VoiceInputStreaming from "@/components/voiceinputstreaming";
 import CharacterEditor from "@/components/charactereditor";
@@ -156,7 +157,7 @@ export default function PersistentDrawerLeft() {
     //console.log("inside interval model: " + SessionManager.currentSession.model);
     if (SessionManager.currentSession.model.toLowerCase() === "chatgpt") {
       apiEndpoint = "https://api.openai.com/v1/models";
-    } else if (SessionManager.currentSession.model.toLowerCase() === "kobold") {
+    } else if (SessionManager.currentSession.model.toLowerCase().includes("kobold")) {
       apiEndpoint = "/api/v1/model";
     }
     fetch(apiEndpoint, {
@@ -283,6 +284,7 @@ export default function PersistentDrawerLeft() {
                   }}
                 >
                   <MenuItem value={"kobold"}>kobold</MenuItem>
+                  <MenuItem value={"koboldmc"}>koboldmc</MenuItem>
                   <MenuItem value={"ChatGPT"}>ChatGPT</MenuItem>
                 </Select>
               </FormControl>
@@ -399,6 +401,17 @@ export default function PersistentDrawerLeft() {
         )}
         {model == "kobold" ? (
           <Conversationllmws
+            prompt={prompt}
+            voiceover={voiceoverChecked}
+            initialmessages={SessionManager.currentSession.messages}
+            initialainame={SessionManager.currentSession.ainame}
+            llmname={modelname}
+          />
+        ) : (
+          <></>
+        )}
+        {model == "koboldmc" ? (
+          <ConversationllmwsMultiChars
             prompt={prompt}
             voiceover={voiceoverChecked}
             initialmessages={SessionManager.currentSession.messages}
