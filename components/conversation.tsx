@@ -183,7 +183,8 @@ export default function Conversation({
               },
               body: JSON.stringify({
                 messages: asknamemessage,
-                model: "gpt-3.5-turbo-0613",
+                //model: "gpt-3.5-turbo-0613",
+                model: "gpt-4",
                 max_tokens: config.maxtokenreply,
                 stream: false,
               }),
