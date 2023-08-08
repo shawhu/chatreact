@@ -175,7 +175,8 @@ export default function PersistentDrawerLeft() {
         }
         if (respjson.data) {
           //console.log(`backendProbe response: gpt-3.5-turbo`);
-          setModelname(`gpt-3.5-turbo`);
+          //setModelname(`gpt-3.5-turbo`);
+          setModelname(`gpt-4`);
         }
 
         if (res.status > 210) {
