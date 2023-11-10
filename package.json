@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0",
     "lint": "next lint",
-    "browser": "start http://localhost:3000 & next start"
+    "browser": "start http://192.168.17.3:3000 & next start"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",

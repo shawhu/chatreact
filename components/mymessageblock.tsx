@@ -4,13 +4,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Snackbar from "@mui/material/Snackbar";
 
 import SyntaxHighlighter from "react-syntax-highlighter";
-import {
-  docco,
-  dark,
-  dracula,
-  gradientDark,
-  atomOneDarkReasonable,
-} from "react-syntax-highlighter/dist/cjs/styles/hljs";
+import { atomOneDarkReasonable } from "react-syntax-highlighter/dist/cjs/styles/hljs";
 //docs reference
 //https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/AVAILABLE_STYLES_HLJS.MD
 //this is the actual block that display the content returned by AI LLM

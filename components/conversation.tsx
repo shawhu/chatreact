@@ -144,7 +144,7 @@ export default function Conversation({
             //.GetMessagesWithTokenLimit(8192 - config.maxtokenreply)
             .map(({ role, content }) => ({ role, content })),
           //model: "gpt-3.5-turbo-0613",
-          model: "gpt-4", //change model to gpt4
+          model: "gpt-4-1106-preview", //change model to gpt4
           max_tokens: config.maxtokenreply,
           stream: true,
         }),
@@ -184,7 +184,7 @@ export default function Conversation({
               body: JSON.stringify({
                 messages: asknamemessage,
                 //model: "gpt-3.5-turbo-0613",
-                model: "gpt-4",
+                model: "gpt-4-1106-preview",
                 max_tokens: config.maxtokenreply,
                 stream: false,
               }),

@@ -363,6 +363,7 @@ export class SessionManager {
       console.log("will delete all messages until 2 left");
 
       SessionManager.currentSession.messages = SessionManager.currentSession.messages.slice(0, 3);
+      SessionManager.currentSession.sessionName = "New Session";
       //save to json
       await SessionManager.SaveSessionToJson(SessionManager.currentSession);
       SessionManager.dolistenercallback();

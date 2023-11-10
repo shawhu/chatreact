@@ -148,6 +148,7 @@ export default function PersistentDrawerLeft() {
   const [connected, setConnected] = React.useState(false);
   //chat related
   const [message, setMessage] = React.useState(""); //这是用来显示文本框中的字
+  const [tokencount, setTokencount] = React.useState(0); //这是用来显示文本框中的字
   //这是用来传给conversation控件处理，发送后message会变空，prompt会变成message内容
   const [prompt, setPrompt] = React.useState({ value: "" }); //处理完成后prompt会变空
   const [myconfig, setMyconfig] = React.useState(new Config());
@@ -437,13 +438,12 @@ export default function PersistentDrawerLeft() {
               multiline
               minRows="4"
               id="outlined-basic"
-              label={`Token: ${estimateTokens(message)}, Press [${
-                myconfig.ctrlenter ? "Ctrl/Shift+Enter" : "Enter"
-              }] to submit`}
+              label={`Token: ${tokencount}, Press [${myconfig.ctrlenter ? "Ctrl/Shift+Enter" : "Enter"}] to submit`}
               variant="outlined"
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value);
+                setTokencount(estimateTokens(e.target.value));
               }}
               onKeyDown={async (e) => {
                 // console.log(
@@ -468,6 +468,8 @@ export default function PersistentDrawerLeft() {
                 //console.log("gen clicked: message is: " + message);
                 setPrompt({ value: message });
                 setMessage("");
+                //clean up the tokencount
+                setTokencount(0);
                 //console.log("prompt is:" + JSON.stringify(prompt));
               }}
             >
@@ -541,6 +543,8 @@ export default function PersistentDrawerLeft() {
                 await SessionManager.ResetSessionToOriginal(SessionManager.currentSession.sessionId);
                 console.log("Reset session to original");
                 RefreshSessionList();
+                //clean up tokencount
+                setTokencount(0);
                 setOpendialog(false);
               }}
               autoFocus
